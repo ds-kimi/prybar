@@ -25,7 +25,8 @@ pub fn run(launch: Launch) {
         .run(move |cx: &mut App| {
             cx.bind_keys(actions::bindings());
             cx.on_action(|_: &Quit, cx| cx.quit());
-            let bounds = Bounds::centered(None, size(px(1200.), px(780.)), cx);
+            let (w, h) = launch.size.unwrap_or((1200., 780.));
+            let bounds = Bounds::centered(None, size(px(w), px(h)), cx);
             let options = WindowOptions {
                 window_bounds: Some(WindowBounds::Windowed(bounds)),
                 ..Default::default()

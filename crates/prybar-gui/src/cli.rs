@@ -1,4 +1,4 @@
-//! Command line: `prybar-gui [--sample] [--screen <name>] [files...]`.
+//! Command line: `prybar-gui [--sample] [--screen <name>] [--size <w>x<h>] [files...]`.
 
 use std::path::PathBuf;
 
@@ -9,6 +9,8 @@ pub struct Launch {
     pub sample: bool,
     /// Screen to show once the files are open, by its bar label.
     pub screen: Option<Screen>,
+    /// Window size in points, to check layouts at fixed sizes.
+    pub size: Option<(f32, f32)>,
     pub files: Vec<PathBuf>,
 }
 
@@ -23,6 +25,16 @@ pub fn parse(mut args: impl Iterator<Item = String>) -> Result<Launch, String> {
                     .into_iter()
                     .find(|s| s.label().eq_ignore_ascii_case(&name));
                 launch.screen = Some(screen.ok_or(format!("unknown screen {name}"))?);
+            }
+            "--size" => {
+                let v = args.next().ok_or("--size needs <w>x<h>")?;
+                let (w, h) = v.split_once('x').ok_or("--size needs <w>x<h>")?;
+                let num = |t: &str| {
+                    t.parse::<f32>()
+                        .ok()
+                        .filter(|n| (400.0..=8000.0).contains(n))
+                };
+                launch.size = Some(num(w).zip(num(h)).ok_or(format!("bad size {v}"))?);
             }
             _ if arg.starts_with("--") => return Err(format!("unknown flag {arg}")),
             _ => launch.files.push(arg.into()),
@@ -44,5 +56,8 @@ fn parses_flags_and_files() {
         parse(["--design".to_string()].into_iter()).is_err(),
         "removed flag"
     );
+    let sized = parse(["--size", "900x600"].map(String::from).into_iter());
+    assert_eq!(sized.expect("size").size, Some((900.0, 600.0)));
+    assert!(parse(["--size", "9x"].map(String::from).into_iter()).is_err());
     assert!(parse(["--nope".to_string()].into_iter()).is_err());
 }
