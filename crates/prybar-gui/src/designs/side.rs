@@ -57,12 +57,11 @@ pub fn header(kind: DesignKind, state: &AppState) -> String {
         .filter(|j| j.status == JobStatus::Running)
         .map(|j| j.label.as_str())
         .collect();
-    format!(
-        "{} · {} · {}",
-        kind.name(),
-        state.screen.label(),
-        running.join(", ")
-    )
+    let mut text = format!("{} · {}", kind.name(), state.screen.label());
+    if !running.is_empty() {
+        text = format!("{text} · {}", running.join(", "));
+    }
+    text
 }
 
 /// Newest last; errors in the danger color.

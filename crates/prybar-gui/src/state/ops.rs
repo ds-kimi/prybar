@@ -29,8 +29,10 @@ impl AppState {
                 state.recent.truncate(MAX_RECENT);
                 state.documents.push(doc);
                 state.selected = Some(state.documents.len() - 1);
-                state.history.push(state.screen);
-                state.screen = screen;
+                if screen != state.screen {
+                    state.history.push(state.screen);
+                    state.screen = screen;
+                }
                 format!("Opened {title}")
             },
             cx,
