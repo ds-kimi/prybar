@@ -81,10 +81,37 @@ body groups and LODs, texture preview with mips and alpha.
 
 Compile runs the picked game's studiomdl (through Wine or `PRYBAR_WINE` off
 Windows) with the log streamed line by line, cancel and copy. Settings
-detects games and edits a game's folder and studiomdl. Publish validates
-with Dry run; real uploads need a build with the Steamworks SDK:
-`cargo run -p prybar-gui --features workshop`, Steam running and logged in.
-Without them the screen says which one is missing.
+detects games and edits a game's folder and studiomdl.
+
+Publish shows Steam's state (not running, not logged in, game not owned,
+ready) with Retry, lists your Garry's Mod items (a click fills the id and
+title to update one), takes an addon folder (its `addon.json` type and tags
+and every file the game refuses are listed as you type) or a `.gma`, and
+fits a png/jpg preview to 512x512 under 1 MB (a GIF goes as is and must be
+under 1 MB). Empty tags take `Addon`, the type and the tags from
+`addon.json`. Steam's stages and bytes show during upload; Steam has no
+cancel for a submitted update. Release builds include Steam support; from
+source: `cargo run -p prybar-gui --features workshop` and copy
+`libsteam_api.dylib` (from `target/debug/build/steamworks-sys-*/out/`) next
+to the binary.
+
+### Manual Workshop test (owner only)
+
+Tests only use a mocked Steam. One real upload checks the whole path:
+
+1. Start Steam, log in with the account that owns Garry's Mod.
+2. Build and run with Steam support (see above); open Publish. The line
+   must say "Steam is ready, logged in as <you>" and list your items.
+3. Make a test folder: `addon.json` with
+   `{"title": "prybar test", "type": "tool", "tags": ["fun"]}` and
+   `lua/autorun/prybar_test.lua` with `print("prybar")`.
+4. Item id empty, title `prybar test`, visibility `Private`, content the
+   folder, a preview png of any size. Dry run, then Publish.
+5. Expect the stages, then "Published item <id>" and Open in Steam. On the
+   page: private, preview 512x512, tags Addon / tool / fun.
+6. Update: click the item in the list, change note `second`, Publish. The
+   page shows the change note.
+7. Delete the item on its Steam page.
 
 
 ## Updates and privacy

@@ -37,7 +37,7 @@ Read the returned log. Frequent causes:
 
 ## Workshop
 
-`built without the workshop feature`: rebuild with `--features workshop`. `steam: ...`: Steam must be running and signed in. Run with `--dry-run` first: it validates without contacting Steam. Visibility defaults to `private`.
+`built without the workshop feature`: use a release build or rebuild with `--features workshop`. `Library not loaded: libsteam_api`: the Steam API library must sit next to the binary (release archives ship it). `prybar publish --status 4000` names what is missing. `steam: ...`: Steam must be running and signed in. Run with `--dry-run` first: it validates without contacting Steam. Visibility defaults to `private`.
 
 ## Updates
 

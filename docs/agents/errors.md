@@ -27,7 +27,8 @@ When nothing was decompiled the run exits with the failures' shared code (4 if t
 | `<field>: expected a path of 1 to N bytes` | empty or oversized path |
 | `inputs: expected 1 to 64 items` | send at most 64 inputs per `decompile_model` call |
 | ``built without the `workshop` feature; rebuild with --features workshop`` | `publish` needs a build with the Steam SDK |
-| `invalid <field>: <reason>` | Workshop spec field is wrong; fix the spec JSON (`content` must be an existing `.gma` for GMod app 4000, else an existing folder) |
+| `invalid <field>: <reason>` | Workshop spec field is wrong; fix the spec JSON (`content` must be an existing `.gma` or addon folder with a valid `addon.json` and only whitelisted files for GMod app 4000, else an existing folder) |
+| `a real publish needs `confirm: true`` (MCP) | `publish_workshop` without `dry_run` needs `confirm: true`; dry run first and ask the user |
 | `no user config directory on this system` | set `PRYBAR_CONFIG` to a file path |
 | read-only format | `pack` only writes `.vpk` and `.gma`; APK and HFS are read-only |
 

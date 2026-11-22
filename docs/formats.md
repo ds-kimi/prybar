@@ -10,6 +10,6 @@ Prybar is a clean-room implementation: every parser and writer is our own code, 
 | VPK v1/v2 | VDC wiki VPK page |
 | GMA | Facepunch/Garry's Mod wiki GMA description |
 | APK, HFS | Observed layout; HFS filename key table taken as format data, provenance in `docs/formats/hfs.md` |
-| Steam Workshop | Steamworks SDK documentation |
+| Steam Workshop | Steamworks SDK documentation; behavior of existing publishers (gmpublisher, gmad) observed, no code taken: `docs/formats/workshop.md` |
 
 Prybar reads a Crowbar clone locally only to learn expected output and version quirks. Its design differs: one version-neutral IR, shared traits per version family, parallel batch work.
