@@ -7,12 +7,14 @@
 pub mod addon;
 mod avatar;
 mod backend;
+pub mod catalog;
 mod error;
 pub mod preview;
 mod publish;
 mod report;
 pub mod spec;
 mod stage;
+pub mod thumb;
 
 pub use avatar::Avatar;
 pub use backend::{avatar as account_avatar, mock, steam, Steam};

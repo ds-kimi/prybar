@@ -1,16 +1,33 @@
 use std::sync::mpsc::channel;
 
 use steamworks::{
-    AppIDs, AppId, PublishedFileVisibility as V, QueryResults, UGCStatisticType, UGCType, UserList,
-    UserListOrder,
+    AppIDs, AppId, Client, PublishedFileVisibility as V, QueryResults, UGCStatisticType, UGCType,
+    UserList, UserListOrder,
 };
 
 use super::wait::{init, wait};
 use crate::spec::Visibility;
 use crate::{ListedItem, WorkshopError};
 
+/// Steam pages hold 50; this caps a runaway answer at 2000 items.
+const MAX_PAGES: u32 = 40;
+
+/// Every page of the user's items, newest update first.
 pub fn list(app_id: u32) -> Result<Vec<ListedItem>, WorkshopError> {
     let client = init(app_id)?;
+    let mut all = Vec::new();
+    for n in 1..=MAX_PAGES {
+        let (items, total) = page(&client, app_id, n)?;
+        let short = items.is_empty();
+        all.extend(items);
+        if short || all.len() as u32 >= total {
+            break;
+        }
+    }
+    Ok(all)
+}
+
+fn page(client: &Client, app_id: u32, n: u32) -> Result<(Vec<ListedItem>, u32), WorkshopError> {
     let app = AppId(app_id);
     let account = client.user().steam_id().account_id();
     let ids = AppIDs::Both {
@@ -20,15 +37,15 @@ pub fn list(app_id: u32) -> Result<Vec<ListedItem>, WorkshopError> {
     let order = UserListOrder::LastUpdatedDesc;
     let query = client
         .ugc()
-        .query_user(account, UserList::Published, UGCType::Items, order, ids, 1)
+        .query_user(account, UserList::Published, UGCType::Items, order, ids, n)
         .map_err(|e| WorkshopError::Steam(e.to_string()))?;
     let (tx, rx) = channel();
     // QueryResults borrows Steam memory, so copy out inside the callback.
     query.fetch(move |res| {
-        let items = res.map(|r| listed(&r));
+        let items = res.map(|r| (listed(&r), r.total_results()));
         let _ = tx.send(items);
     });
-    wait(&client, &rx, || {})?.map_err(|e| WorkshopError::Steam(e.to_string()))
+    wait(client, &rx, || {})?.map_err(|e| WorkshopError::Steam(e.to_string()))
 }
 
 fn listed(r: &QueryResults) -> Vec<ListedItem> {
@@ -36,18 +53,23 @@ fn listed(r: &QueryResults) -> Vec<ListedItem> {
         .iter()
         .enumerate()
         .filter_map(|(i, q)| Some((i as u32, q?)));
+    let stat = |i, s| r.statistic(i, s).unwrap_or(0);
     rows.map(|(i, q)| ListedItem {
         item_id: q.published_file_id.0,
         title: q.title,
         tags: q.tags,
         time_updated: q.time_updated,
+        time_created: q.time_created,
         visibility: match q.visibility {
             V::Public => Visibility::Public,
             V::FriendsOnly => Visibility::FriendsOnly,
             V::Unlisted => Visibility::Unlisted,
             V::Private => Visibility::Private,
         },
-        subscriptions: r.statistic(i, UGCStatisticType::Subscriptions).unwrap_or(0),
+        subscriptions: stat(i, UGCStatisticType::Subscriptions),
+        favorites: stat(i, UGCStatisticType::Favorites),
+        votes_up: q.num_upvotes,
+        votes_down: q.num_downvotes,
         preview_url: r.preview_url(i),
     })
     .collect()

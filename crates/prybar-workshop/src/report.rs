@@ -26,8 +26,12 @@ pub struct ListedItem {
     pub title: String,
     pub tags: Vec<String>,
     pub time_updated: u32,
+    pub time_created: u32,
     pub visibility: Visibility,
     pub subscriptions: u64,
+    pub favorites: u64,
+    pub votes_up: u32,
+    pub votes_down: u32,
     pub preview_url: Option<String>,
 }
 
