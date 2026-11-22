@@ -1,3 +1,4 @@
+mod ime;
 mod input;
 mod shell;
 mod tools;

@@ -9,8 +9,19 @@ use super::{InputEvent, TextInput};
 impl TextInput {
     /// Keys the field uses stop here; the rest (escape, shortcuts) go
     /// on to the app.
-    pub(super) fn on_key(&mut self, ev: &KeyDownEvent, _: &mut Window, cx: &mut Context<Self>) {
+    pub(super) fn on_key(
+        &mut self,
+        ev: &KeyDownEvent,
+        window: &mut Window,
+        cx: &mut Context<Self>,
+    ) {
         let k = &ev.keystroke;
+        let m = &k.modifiers;
+        if k.key == "space" && m.control && m.platform {
+            // The emoji picker; its pick comes back through the input handler.
+            cx.stop_propagation();
+            return window.show_character_palette();
+        }
         if self.clipboard(k, cx) {
             cx.stop_propagation();
             return;
@@ -57,7 +68,7 @@ impl TextInput {
     }
 
     /// One-line fields take pasted line breaks as spaces.
-    fn fit(&self, text: String) -> String {
+    pub(super) fn fit(&self, text: String) -> String {
         if self.spec.multiline {
             return text.replace("\r\n", "\n");
         }

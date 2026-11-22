@@ -2,11 +2,10 @@
 //! text or the hint, and the error line under it.
 
 use gpui::{
-    canvas, div, prelude::*, px, App, Context, Div, FocusHandle, Focusable, MouseButton, Stateful,
-    Window,
+    div, prelude::*, px, App, Context, Div, FocusHandle, Focusable, MouseButton, Stateful, Window,
 };
 
-use super::text::{caret, row};
+use super::text::{caret, probe, row, Marks};
 use super::{TextInput, FONT, LINE};
 use crate::theme::prybar::{tokens, Light, Tokens};
 
@@ -15,16 +14,15 @@ impl Render for TextInput {
         let t = tokens(cx.try_global::<Light>().is_some_and(|l| l.0));
         let focused = self.focus.is_focused(window);
         let error = self.error().filter(|_| self.touched);
-        let bounds = self.bounds.clone();
-        let probe = canvas(move |b, _, _| bounds.set(Some(b)), |_, _, _, _| {})
-            .absolute()
-            .size_full();
+        self.follow_caret(window);
+        let probe = probe(self.bounds.clone(), self.focus.clone(), cx.entity());
+        let lines = self.lines(focused, t).relative().left(-self.scroll);
         let text = div()
             .relative()
             .flex_1()
             .min_w_0()
-            .child(probe)
-            .child(self.lines(focused, t));
+            .child(probe.absolute().size_full())
+            .child(lines);
         let field = self.frame(error.is_some(), t, cx).child(text);
         let message = error.map(|e| div().text_xs().text_color(t.danger).child(e));
         div()
@@ -84,12 +82,16 @@ impl TextInput {
                 .when(focused, |el| el.child(caret(t)))
                 .child(hint);
         }
-        let head = focused.then_some(self.buf.head);
+        let marks = Marks {
+            sel: self.buf.range(),
+            marked: self.marked.clone(),
+            head: focused.then_some(self.buf.head),
+        };
         let mut start = 0;
         let mut rows = Vec::new();
         for line in text.split('\n') {
             let end = start + line.len();
-            rows.push(row(text, start..end, self.buf.range(), head, t));
+            rows.push(row(text, start..end, &marks, t));
             start = end + 1;
         }
         div().flex().flex_col().children(rows)

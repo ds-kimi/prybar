@@ -52,7 +52,7 @@ fn column(text: &str, at: usize, col: usize, before: bool) -> usize {
 }
 
 /// The edit a key means. Clipboard keys are handled by the input, since
-/// they need the app; `None` lets the key go on to the app.
+/// they need the app; `None` lets the key go on to text input or the app.
 pub fn key_op(k: &Keystroke, multiline: bool) -> Option<Op> {
     let m = &k.modifiers;
     let cmd = if cfg!(target_os = "macos") {
@@ -74,11 +74,9 @@ pub fn key_op(k: &Keystroke, multiline: bool) -> Option<Op> {
         "backspace" => Some(Op::Back),
         "delete" => Some(Op::Forward),
         "enter" if multiline => Some(Op::Insert("\n".into())),
-        _ => k
-            .key_char
-            .clone()
-            .filter(|c| !c.is_empty() && !c.chars().any(char::is_control))
-            .map(Op::Insert),
+        // Printable keys go on to the platform input handler, which knows
+        // about dead keys and input methods.
+        _ => None,
     }
 }
 

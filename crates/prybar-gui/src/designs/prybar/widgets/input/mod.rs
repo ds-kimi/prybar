@@ -1,11 +1,11 @@
 //! A real text field: caret, selection by mouse and shift-arrows, copy,
-//! cut, paste and undo, one line or several. Keys arrive as key events,
-//! not through the platform text input: that needs an eight-method
-//! trait the repo's four-functions-per-file rule cannot hold, so IME
-//! composition is not supported.
+//! cut, paste and undo, one line or several. Editing keys arrive as key
+//! events; text itself comes through the platform input handler, so
+//! accents, the emoji picker and IME composition work.
 
 mod buffer;
 mod edit;
+mod ime;
 mod keys;
 mod mouse;
 mod step;
@@ -14,7 +14,7 @@ mod tests;
 mod text;
 mod view;
 
-use std::{cell::Cell, rc::Rc};
+use std::{cell::Cell, ops::Range, rc::Rc};
 
 use gpui::{px, Bounds, Context, EventEmitter, FocusHandle, Pixels};
 
@@ -49,6 +49,10 @@ pub struct TextInput {
     /// Where the text was last drawn; mouse positions are read against it.
     bounds: Rc<Cell<Option<Bounds<Pixels>>>>,
     dragging: bool,
+    /// Text the input method is still composing, drawn underlined.
+    marked: Option<Range<usize>>,
+    /// How far a one-line field is slid left to keep the caret in view.
+    scroll: Pixels,
     /// Errors wait for the first edit, so a fresh form is not all red.
     touched: bool,
 }
@@ -65,6 +69,8 @@ impl TextInput {
             spec,
             bounds: Rc::default(),
             dragging: false,
+            marked: None,
+            scroll: px(0.),
             touched: false,
         }
     }
@@ -76,6 +82,7 @@ impl TextInput {
     /// The app replacing the text, such as clearing search; not an edit.
     pub fn set_text(&mut self, text: &str, cx: &mut Context<Self>) {
         self.buf.set(text);
+        self.marked = None;
         self.touched = false;
         cx.notify();
     }

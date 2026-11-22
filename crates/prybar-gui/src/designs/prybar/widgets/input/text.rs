@@ -1,25 +1,34 @@
-//! One drawn line: plain runs, the selected run, and the caret.
+//! One drawn line: plain runs, the selected run, the composing run, and
+//! the caret; plus the probe that ties the field to the platform.
 
+use std::cell::Cell;
 use std::ops::Range;
+use std::rc::Rc;
 use std::time::Duration;
 
-use gpui::{div, prelude::*, px, Animation, AnimationExt as _, AnyElement, Div, Rgba};
+use gpui::{
+    canvas, div, prelude::*, px, Animation, AnimationExt as _, AnyElement, Bounds, Canvas, Div,
+    ElementInputHandler, Entity, FocusHandle, Pixels, Rgba,
+};
 
-use super::LINE;
+use super::{TextInput, LINE};
 use crate::theme::prybar::Tokens;
 
-/// Cuts the line where the selection and the caret fall, so each run is
-/// drawn once and the caret sits between two of them.
-pub fn row(
-    text: &str,
-    line: Range<usize>,
-    sel: Range<usize>,
-    head: Option<usize>,
-    t: Tokens,
-) -> Div {
+/// What one row needs to know about the field around it.
+pub struct Marks {
+    pub sel: Range<usize>,
+    pub marked: Option<Range<usize>>,
+    pub head: Option<usize>,
+}
+
+/// Cuts the line where the selection, the composition and the caret
+/// fall, so each run is drawn once and the caret sits between two.
+pub fn row(text: &str, line: Range<usize>, m: &Marks, t: Tokens) -> Div {
     let clamp = |x: usize| x.clamp(line.start, line.end);
+    let (sel, comp) = (m.sel.clone(), m.marked.clone().unwrap_or(0..0));
     let mut cuts = vec![line.start, line.end, clamp(sel.start), clamp(sel.end)];
-    let head = head.filter(|h| (line.start..=line.end).contains(h));
+    cuts.extend([clamp(comp.start), clamp(comp.end)]);
+    let head = m.head.filter(|h| (line.start..=line.end).contains(h));
     cuts.extend(head);
     cuts.sort_unstable();
     cuts.dedup();
@@ -29,9 +38,10 @@ pub fn row(
         if head == Some(w[0]) {
             el = el.child(caret(t));
         }
-        let picked = sel.start <= w[0] && w[1] <= sel.end && !sel.is_empty();
+        let inside = |r: &Range<usize>| r.start <= w[0] && w[1] <= r.end && !r.is_empty();
         let run = div()
-            .when(picked, |d| d.bg(tint))
+            .when(inside(&sel), |d| d.bg(tint))
+            .when(inside(&comp), |d| d.underline())
             .child(text[w[0]..w[1]].to_owned());
         el = el.child(run);
     }
@@ -62,4 +72,19 @@ pub fn caret(t: Tokens) -> AnyElement {
             |el, x| el.opacity(if x < 0.6 { 1. } else { 0.2 }),
         )
         .into_any_element()
+}
+
+/// Fills the text area: it records where the text sits for the mouse,
+/// and hands the platform this field as the place typed text goes.
+pub fn probe(
+    bounds: Rc<Cell<Option<Bounds<Pixels>>>>,
+    focus: FocusHandle,
+    field: Entity<TextInput>,
+) -> Canvas<()> {
+    canvas(
+        move |b, _, _| bounds.set(Some(b)),
+        move |b, _, window, cx| {
+            window.handle_input(&focus, ElementInputHandler::new(b, field), cx);
+        },
+    )
 }
