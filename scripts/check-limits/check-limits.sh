@@ -5,7 +5,7 @@ set -u
 root="$(cd "$(dirname "$0")/../.." && pwd)"
 status=0
 
-for f in $(find "$root/crates" "$root/tests" "$root/fuzz/fuzz_targets" "$root/fuzz/examples" -name '*.rs' -not -path '*/target/*' 2>/dev/null); do
+for f in $(find "$root/crates" "$root/services" "$root/tests" "$root/fuzz/fuzz_targets" "$root/fuzz/examples" -name '*.rs' -not -path '*/target/*' 2>/dev/null); do
     awk -v file="$f" '
         # Brace depth is tracked per fn so nested blocks and closures count
         # toward the enclosing fn, which is what the 30-line rule means.
@@ -32,13 +32,13 @@ for f in $(find "$root/crates" "$root/tests" "$root/fuzz/fuzz_targets" "$root/fu
 done
 
 if grep -rnI --exclude-dir=target --exclude-dir=.git -E '[[:space:]]+$' \
-    "$root/crates" "$root/scripts" "$root/fuzz/fuzz_targets" "$root/fuzz/examples" "$root/.github" "$root/Cargo.toml" "$root/README.md" "$root/CONTRIBUTING.md" 2>/dev/null; then
+    "$root/crates" "$root/services" "$root/scripts" "$root/fuzz/fuzz_targets" "$root/fuzz/examples" "$root/.github" "$root/Cargo.toml" "$root/README.md" "$root/CONTRIBUTING.md" 2>/dev/null; then
     echo "trailing whitespace found"
     status=1
 fi
 
 # Flat folders hide structure; past 10 files a folder must be split by domain.
-for d in $(find "$root/crates" "$root/tests" -type d -not -path '*/target*' 2>/dev/null); do
+for d in $(find "$root/crates" "$root/services" "$root/tests" -type d -not -path '*/target*' 2>/dev/null); do
     n=$(find "$d" -maxdepth 1 -name '*.rs' | wc -l)
     if [ "$n" -gt 10 ]; then
         echo "$d: $n .rs files (max 10)"
