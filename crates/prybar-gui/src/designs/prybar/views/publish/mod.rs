@@ -1,7 +1,9 @@
 //! Workshop publish form: new item or update by id, then progress and
 //! the item's link.
 
+mod addon;
 mod result;
+mod steam;
 
 use gpui::{div, prelude::*, px, AnyElement, Context, Entity};
 
@@ -21,38 +23,45 @@ pub fn view(s: &AppState, f: &Forms, t: Tokens, cx: &Context<Root>) -> AnyElemen
         .child(
             div()
                 .text_color(t.muted)
-                .child("Upload a Garry's Mod addon to the Steam Workshop. Dry run checks it without uploading."),
+                .child("Upload a Garry's Mod addon folder or .gma to the Steam Workshop. Dry run checks it without uploading."),
         )
+        .child(steam::view(s, t, cx))
         .child(widgets::field("Item id", &f.publish.item_id, t))
         .child(widgets::field("Title", &f.publish.title, t).debug_selector(|| "pb-pub-title".into()))
         .child(widgets::field("Description", &f.publish.description, t))
         .child(widgets::field("Tags", &f.publish.tags, t))
         .child(widgets::field("Visibility", &f.publish.visibility, t))
-        .child(picked("Addon (.gma)", "pb-pub-content", &f.publish.content, t, cx))
-        .child(picked("Preview image", "pb-pub-preview", &f.publish.preview, t, cx))
+        .child(picked("Addon folder or .gma", "pb-pub-content", &f.publish.content, true, t, cx))
+        .child(addon::view(s, t))
+        .child(picked("Preview image", "pb-pub-preview", &f.publish.preview, false, t, cx))
         .child(widgets::field("Change note", &f.publish.change_note, t))
         .child(buttons(s, f, t, cx))
         .child(result::view(s, t, cx))
         .into_any_element()
 }
 
-/// A path field with a Choose… button that fills it.
+/// A path field with a Choose… button that fills it; `folder` adds a
+/// second button for picking a folder.
 fn picked(
     label: &'static str,
     id: &'static str,
     input: &Entity<TextInput>,
+    folder: bool,
     t: Tokens,
     cx: &Context<Root>,
 ) -> impl IntoElement {
-    let target = input.clone();
-    let choose = widgets::button(id, "Choose…", Kind::Secondary, true, t)
-        .on_click(cx.listener(move |this, _, _, cx| this.pick_into(target.clone(), false, cx)));
+    let choose = |n: usize, text: &'static str, dirs: bool| {
+        let target = input.clone();
+        widgets::button((id, n), text, Kind::Secondary, true, t)
+            .on_click(cx.listener(move |this, _, _, cx| this.pick_into(target.clone(), dirs, cx)))
+    };
     div()
         .flex()
         .items_end()
         .gap_2()
         .child(widgets::field(label, input, t).flex_1())
-        .child(choose)
+        .when(folder, |el| el.child(choose(0, "Folder…", true)))
+        .child(choose(1, "File…", false))
 }
 
 /// Both wait for a clean form and for the run in flight.

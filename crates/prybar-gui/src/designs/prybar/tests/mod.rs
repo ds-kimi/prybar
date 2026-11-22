@@ -1,5 +1,6 @@
 mod ime;
 mod input;
+mod publish;
 mod shell;
 mod tools;
 mod views;

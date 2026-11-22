@@ -7,12 +7,14 @@ mod compile;
 mod games;
 mod publish;
 mod result;
+mod steam;
 
 pub use backend::Backend;
 #[cfg(test)]
 pub use compile::LineKind;
 pub use compile::{CompileOutcome, CompileRun};
 pub use publish::{PublishForm, PublishRun};
+pub use steam::SteamView;
 
 use prybar_service::tools::Game;
 
@@ -28,4 +30,7 @@ pub struct Tools {
     pub editing: Option<usize>,
     pub compile: CompileRun,
     pub publish: PublishRun,
+    pub steam: SteamView,
+    /// Set once the publish screen asked Steam the first time.
+    pub steam_started: bool,
 }

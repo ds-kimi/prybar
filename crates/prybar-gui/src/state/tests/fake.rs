@@ -6,7 +6,8 @@ use std::sync::atomic::AtomicBool;
 
 use prybar_service::tools::Game;
 use prybar_tools::compile::CompileReport;
-use prybar_workshop::{Progress, PublishReport};
+use prybar_workshop::spec::Visibility;
+use prybar_workshop::{ListedItem, Progress, PublishReport, SteamStatus};
 
 use crate::state::tools::Backend;
 
@@ -28,6 +29,23 @@ pub(crate) fn backend() -> Backend {
         },
         games: |detect| Ok(games(if detect { 3 } else { 2 })),
         save: |g| Ok(vec![g]),
+        status: |_| SteamStatus::Ready {
+            user: "tester".into(),
+        },
+        items: |_| Ok(vec![item()]),
+        addon: |dir| prybar_workshop::addon::check_addon(dir).map_err(|e| e.to_string()),
+    }
+}
+
+pub(crate) fn item() -> ListedItem {
+    ListedItem {
+        item_id: 7,
+        title: "Crate pack".into(),
+        tags: vec!["Addon".into()],
+        time_updated: 1_700_000_000,
+        visibility: Visibility::Public,
+        subscriptions: 12,
+        preview_url: None,
     }
 }
 

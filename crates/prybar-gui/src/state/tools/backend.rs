@@ -7,8 +7,9 @@ use std::sync::atomic::AtomicBool;
 use prybar_service::tools::{self, Game};
 use prybar_service::ServiceError;
 use prybar_tools::compile::CompileReport;
+use prybar_workshop::addon::AddonCheck;
 use prybar_workshop::spec::ItemSpec;
-use prybar_workshop::{Progress, PublishReport};
+use prybar_workshop::{ListedItem, Progress, PublishReport, SteamStatus};
 
 pub type CompileFn =
     fn(&Game, &Path, &mut dyn FnMut(&str), &AtomicBool) -> Result<CompileReport, String>;
@@ -17,6 +18,9 @@ pub type PublishFn =
 /// `true` detects installs through Steam and saves the merged list.
 pub type GamesFn = fn(bool) -> Result<Vec<Game>, String>;
 pub type SaveFn = fn(Game) -> Result<Vec<Game>, String>;
+pub type StatusFn = fn(u32) -> SteamStatus;
+pub type ItemsFn = fn(u32) -> Result<Vec<ListedItem>, String>;
+pub type AddonFn = fn(&Path) -> Result<AddonCheck, String>;
 
 #[derive(Clone, Copy)]
 pub struct Backend {
@@ -24,6 +28,9 @@ pub struct Backend {
     pub publish: PublishFn,
     pub games: GamesFn,
     pub save: SaveFn,
+    pub status: StatusFn,
+    pub items: ItemsFn,
+    pub addon: AddonFn,
 }
 
 impl Default for Backend {
@@ -38,6 +45,9 @@ impl Default for Backend {
                 Ok(r.games)
             },
             save: |game| Ok(tools::config_set(game).map_err(|e| e.to_string())?.games),
+            status: tools::steam_status,
+            items: |app| tools::workshop_list(app).map_err(|e| explain(&e)),
+            addon: |dir| tools::addon_check(dir).map_err(|e| e.to_string()),
         }
     }
 }

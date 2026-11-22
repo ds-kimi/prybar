@@ -1,12 +1,13 @@
 //! The Workshop form's fields, kept together so the form reads them
 //! in one place.
 
-use gpui::{App, Entity};
+use gpui::{App, Context, Entity, Subscription};
 
 use super::forms::field;
+use super::Root;
 use crate::designs::input::TextInput;
-use crate::state::checks;
 use crate::state::tools::PublishForm;
+use crate::state::{checks, AppState};
 
 #[derive(Clone)]
 pub struct PublishInputs {
@@ -27,9 +28,9 @@ impl PublishInputs {
             item_id: field(cx, "Empty for a new item", "", false, checks::item_id),
             title: field(cx, "Addon name", "", false, checks::title),
             description: field(cx, about, "", true, checks::description),
-            tags: field(cx, "model, prop", "model", false, checks::tags),
+            tags: field(cx, "Empty: from addon.json", "", false, checks::tags),
             visibility: field(cx, "Private", "Private", false, checks::visibility),
-            content: field(cx, "/path/to/addon.gma", "", false, checks::existing),
+            content: field(cx, "Addon folder or .gma", "", false, checks::existing),
             preview: field(cx, "/path/to/preview.jpg", "", false, checks::preview),
             change_note: field(cx, "What changed", "", true, checks::description),
         }
@@ -61,5 +62,15 @@ impl PublishInputs {
             content: text(&self.content),
             change_note: text(&self.change_note),
         }
+    }
+
+    /// Typing or picking a content path re-checks it when it is an
+    /// addon folder, so rejected files show before any upload.
+    pub fn watch(&self, state: &Entity<AppState>, cx: &mut Context<Root>) -> Subscription {
+        let state = state.clone();
+        cx.observe(&self.content, move |_, input, cx| {
+            let path = input.read(cx).text().to_owned();
+            state.update(cx, |s, cx| s.check_content(&path, cx));
+        })
     }
 }

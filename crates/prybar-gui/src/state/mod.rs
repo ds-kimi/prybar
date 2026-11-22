@@ -63,6 +63,9 @@ impl AppState {
         if matches!(screen, Screen::Compile | Screen::Settings) {
             self.ensure_games(cx);
         }
+        if screen == Screen::Publish && !self.tools.steam_started {
+            self.refresh_steam(cx);
+        }
         if screen != self.screen {
             self.history.push(self.screen);
             self.screen = screen;

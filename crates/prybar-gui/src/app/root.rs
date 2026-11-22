@@ -16,7 +16,7 @@ pub struct Root {
     pub state: Entity<AppState>,
     pub forms: Forms,
     pub(super) focus: FocusHandle,
-    _subs: [Subscription; 4],
+    _subs: [Subscription; 5],
 }
 
 impl Root {
@@ -41,11 +41,12 @@ impl Root {
             })
         });
         let _full = full_view(&forms, cx);
+        let _content = forms.publish.watch(&state, cx);
         Root {
             state,
             forms,
             focus,
-            _subs: [_observe, _refocus, _search, _full],
+            _subs: [_observe, _refocus, _search, _full, _content],
         }
     }
 }
