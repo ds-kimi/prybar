@@ -6,25 +6,32 @@ use gpui::{
     Window,
 };
 
-use crate::state::AppState;
+use crate::actions::CONSOLE;
+use crate::state::{AppState, DesignKind};
 use crate::theme;
 
 pub struct Root {
     pub state: Entity<AppState>,
     focus: FocusHandle,
     _observe: Subscription,
+    _refocus: Subscription,
 }
 
 impl Root {
-    /// Takes focus at once so key bindings work before any click.
+    /// Takes focus at once so key bindings work before any click, and
+    /// takes it back whenever it is lost.
     pub fn new(state: Entity<AppState>, window: &mut Window, cx: &mut Context<Self>) -> Self {
         let focus = cx.focus_handle();
         focus.focus(window, cx);
         let _observe = cx.observe(&state, |_, _, cx| cx.notify());
+        // A clicked row that a screen change removes takes focus with it;
+        // without this, keys would reach nothing until the next click.
+        let _refocus = cx.on_focus_lost(window, |this, window, cx| this.focus.focus(window, cx));
         Root {
             state,
             focus,
             _observe,
+            _refocus,
         }
     }
 
@@ -39,8 +46,10 @@ impl Root {
 impl Render for Root {
     fn render(&mut self, _window: &mut Window, cx: &mut Context<Self>) -> impl IntoElement {
         let palette = theme::current(self.state.read(cx));
+        let console = self.state.read(cx).design == Some(DesignKind::Console);
         let root = div()
             .id("root")
+            .when(console, |el| el.key_context(CONSOLE))
             .track_focus(&self.focus)
             .size_full()
             .bg(palette.bg)
@@ -52,6 +61,7 @@ impl Render for Root {
                 s.border_2().border_color(palette.accent)
             });
         let root = Self::ui_actions(Self::navigation_actions(root, cx), cx);
+        let root = Self::console_actions(root, cx);
         Self::design_actions(root, cx).child(self.body(cx))
     }
 }

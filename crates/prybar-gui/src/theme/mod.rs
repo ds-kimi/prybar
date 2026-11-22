@@ -18,6 +18,15 @@ pub struct Palette {
     pub danger: Rgba,
 }
 
+/// The console's monospace face, one that ships with each OS.
+pub const MONO: &str = if cfg!(target_os = "macos") {
+    "Menlo"
+} else if cfg!(target_os = "windows") {
+    "Consolas"
+} else {
+    "DejaVu Sans Mono"
+};
+
 /// Neutral greys for the chooser.
 pub fn chooser() -> Palette {
     Palette {
@@ -34,7 +43,6 @@ pub fn chooser() -> Palette {
 }
 
 pub fn for_design(kind: DesignKind) -> Palette {
-    let base = chooser();
     match kind {
         DesignKind::Workbench => workbench(false),
         DesignKind::Canvas => Palette {
@@ -49,10 +57,15 @@ pub fn for_design(kind: DesignKind) -> Palette {
             danger: rgb(0xc8453c),
         },
         DesignKind::Console => Palette {
-            bg: rgb(0x0c0d0f),
-            surface: rgb(0x0c0d0f),
+            bg: rgb(0x0b0c0e),
+            surface: rgb(0x121417),
+            hover: rgb(0x1b1e22),
+            active: rgb(0x252930),
+            border: rgb(0x2a2e35),
+            text: rgb(0xf2f4f5),
+            muted: rgb(0x7f8791),
             accent: rgb(0x7fd99a),
-            ..base
+            danger: rgb(0xff6b6b),
         },
     }
 }

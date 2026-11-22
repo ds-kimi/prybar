@@ -43,6 +43,8 @@ pub struct AppState {
     pub light: bool,
     /// Decompile option: one `.qci` per QC section.
     pub split_qc: bool,
+    /// Highlighted row of the console's command list.
+    pub cursor: usize,
     /// Index into the compile screen's game list.
     pub game: usize,
     next_id: u64,
