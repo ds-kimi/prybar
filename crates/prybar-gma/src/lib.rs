@@ -11,4 +11,4 @@ pub use error::{Error, Result};
 pub use extract::{extract_all, extract_one};
 pub use format::{Entry, Header};
 pub use gma::Gma;
-pub use pack::{is_whitelisted, pack, AddonJson};
+pub use pack::{is_whitelisted, pack, rejection, scan, AddonJson};

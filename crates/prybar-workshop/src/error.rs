@@ -22,4 +22,11 @@ impl WorkshopError {
             reason: reason.into(),
         }
     }
+
+    pub(crate) fn io(path: &std::path::Path, source: std::io::Error) -> Self {
+        Self::Io {
+            path: path.to_path_buf(),
+            source,
+        }
+    }
 }

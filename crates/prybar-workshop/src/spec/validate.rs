@@ -5,8 +5,7 @@ use super::text::{check_tags, check_text, DESCRIPTION_MAX, TITLE_MAX};
 use super::ItemSpec;
 use crate::WorkshopError;
 
-/// Steam rejects previews of 1 MB or more.
-const PREVIEW_MAX: u64 = 1024 * 1024;
+use crate::preview::{PREVIEW_MAX, SOURCE_MAX};
 
 /// Every check Steam would otherwise fail on mid-upload.
 pub fn validate(spec: &ItemSpec) -> Result<(), WorkshopError> {
@@ -48,15 +47,17 @@ fn check_preview(path: &Path) -> Result<(), WorkshopError> {
     if !ok {
         return Err(WorkshopError::invalid("preview", "must be png, jpg or gif"));
     }
-    let meta = std::fs::metadata(path).map_err(|source| WorkshopError::Io {
-        path: path.to_path_buf(),
-        source,
-    })?;
-    if !meta.is_file() || meta.len() >= PREVIEW_MAX {
-        return Err(WorkshopError::invalid(
-            "preview",
-            "must be a file under 1 MB",
-        ));
+    let meta = std::fs::metadata(path).map_err(|e| WorkshopError::io(path, e))?;
+    // Stills are resized before upload; a GIF goes as is, so it must fit.
+    let gif = ext.eq_ignore_ascii_case("gif");
+    let max = if gif { PREVIEW_MAX } else { SOURCE_MAX };
+    if !meta.is_file() || meta.len() >= max {
+        let why = if gif {
+            "a GIF must be under 1 MB"
+        } else {
+            "must be a file under 32 MB"
+        };
+        return Err(WorkshopError::invalid("preview", why));
     }
     Ok(())
 }

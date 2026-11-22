@@ -69,7 +69,22 @@ const WHITELIST: &[&str] = &[
     "shaders/fxc/*.vcs",
 ];
 
+/// gmad strips these console and software-render variants even though
+/// `models/*.vtx` matches them.
+const EXCLUDED: &[&str] = &["*.sw.vtx", "*.360.vtx", "*.xbox.vtx"];
+
 /// `path` must already be lowercase with `/` separators.
 pub fn is_whitelisted(path: &str) -> bool {
-    WHITELIST.iter().any(|w| wildcard(w, path))
+    rejection(path).is_none()
+}
+
+/// Why the game refuses `path`, in words a modder can act on.
+pub fn rejection(path: &str) -> Option<&'static str> {
+    if EXCLUDED.iter().any(|w| wildcard(w, path)) {
+        return Some("console or software-render model variant, the game drops it");
+    }
+    if !WHITELIST.iter().any(|w| wildcard(w, path)) {
+        return Some("file type or folder not on Garry's Mod's whitelist");
+    }
+    None
 }

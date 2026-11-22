@@ -4846,9 +4846,12 @@ dependencies = [
 name = "prybar-workshop"
 version = "0.1.0"
 dependencies = [
+ "image",
  "proptest",
+ "prybar-gma",
  "prybar-io",
  "serde",
+ "serde_json",
  "steamworks",
  "tempfile",
  "thiserror 2.0.21",

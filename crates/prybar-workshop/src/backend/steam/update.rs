@@ -4,12 +4,8 @@ use steamworks::{AppId, Client, FileType, PublishedFileId, UpdateHandle};
 
 use super::apply::apply;
 use super::wait::{init, wait};
-use crate::spec::{stage_content, ItemSpec};
+use crate::spec::ItemSpec;
 use crate::{Progress, PublishReport, WorkshopError};
-
-fn steam_err(e: steamworks::SteamError) -> WorkshopError {
-    WorkshopError::Steam(e.to_string())
-}
 
 /// The id plus whether Steam asks for the legal agreement.
 fn create(client: &Client, app: AppId) -> Result<(u64, bool), WorkshopError> {
@@ -19,24 +15,19 @@ fn create(client: &Client, app: AppId) -> Result<(u64, bool), WorkshopError> {
         .create_item(app, FileType::Community, move |r| {
             let _ = tx.send(r);
         });
-    let (id, legal) = wait(client, &rx, || {})?.map_err(steam_err)?;
+    let (id, legal) = wait(client, &rx, || {})?.map_err(|e| WorkshopError::Steam(e.to_string()))?;
     Ok((id.0, legal))
 }
 
 /// Creates the item first when the spec has no id, then one update
-/// carries every field; the staged GMA folder lives until it returns.
+/// carries every field. Content and preview arrive already staged.
 pub fn publish(
     spec: &ItemSpec,
     progress: &mut dyn FnMut(&Progress),
 ) -> Result<PublishReport, WorkshopError> {
     let client = init(spec.app_id)?;
     let app = AppId(spec.app_id);
-    let staged = match &spec.content {
-        Some(c) => stage_content(spec.app_id, c)?,
-        None => None,
-    };
-    let content = staged.as_ref().map(|d| d.path());
-    let content = content.or(spec.content.as_deref());
+    let content = spec.content.as_deref();
     let ((id, legal_create), created) = match spec.item_id {
         Some(id) => ((id, false), false),
         None => (create(&client, app)?, true),
@@ -68,8 +59,22 @@ fn submit(
     });
     let result = wait(client, &rx, || {
         let (stage, done, total) = watch.progress();
-        let stage = format!("{stage:?}");
+        let stage = stage_name(stage).to_owned();
         progress(&Progress { stage, done, total });
     })?;
-    Ok(result.map_err(steam_err)?.1)
+    Ok(result.map_err(|e| WorkshopError::Steam(e.to_string()))?.1)
+}
+
+/// Steam has no cancel for a submitted update, so these stages are all
+/// the user can follow.
+fn stage_name(s: steamworks::UpdateStatus) -> &'static str {
+    use steamworks::UpdateStatus::*;
+    match s {
+        Invalid => "Starting",
+        PreparingConfig => "Preparing config",
+        PreparingContent => "Preparing content",
+        UploadingContent => "Uploading content",
+        UploadingPreviewFile => "Uploading preview",
+        CommittingChanges => "Committing changes",
+    }
 }

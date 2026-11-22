@@ -3,8 +3,30 @@
 
 mod apply;
 mod list;
+mod status;
 mod update;
 mod wait;
 
-pub use list::list;
-pub use update::publish;
+use super::Steam;
+use crate::spec::ItemSpec;
+use crate::{ListedItem, Progress, PublishReport, SteamStatus, WorkshopError};
+
+pub struct SteamClient;
+
+impl Steam for SteamClient {
+    fn status(&self, app_id: u32) -> SteamStatus {
+        status::status(app_id)
+    }
+
+    fn list(&self, app_id: u32) -> Result<Vec<ListedItem>, WorkshopError> {
+        list::list(app_id)
+    }
+
+    fn upload(
+        &self,
+        spec: &ItemSpec,
+        progress: &mut dyn FnMut(&Progress),
+    ) -> Result<PublishReport, WorkshopError> {
+        update::publish(spec, progress)
+    }
+}

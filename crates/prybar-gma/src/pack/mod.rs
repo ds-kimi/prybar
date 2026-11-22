@@ -3,7 +3,7 @@ mod whitelist;
 mod wildcard;
 
 pub use addon_json::AddonJson;
-pub use whitelist::is_whitelisted;
+pub use whitelist::{is_whitelisted, rejection};
 
 use crate::format::{encode, Header, VERSION};
 use crate::{Error, Result};
@@ -16,8 +16,8 @@ use wildcard::wildcard;
 pub fn pack(src: &Path, out: &Path) -> Result<usize> {
     let json = AddonJson::load(&src.join("addon.json"))?;
     let files = collect(src, &json.ignore)?;
-    let bad = files.iter().map(|f| &f.0).filter(|f| !is_whitelisted(f));
-    let bad: Vec<String> = bad.cloned().collect();
+    let bad = scan_files(&files).filter(|f| f.1.is_some()).map(|f| f.0);
+    let bad: Vec<String> = bad.collect();
     if !bad.is_empty() {
         return Err(Error::NotWhitelisted(bad));
     }
@@ -35,6 +35,20 @@ pub fn pack(src: &Path, out: &Path) -> Result<usize> {
     };
     std::fs::write(out, encode(&header, &contents))?;
     Ok(contents.len())
+}
+
+/// Every file `pack` would take, each with the reason the game refuses
+/// it (`None` = allowed), so a UI can list all problems before packing.
+pub fn scan(src: &Path) -> Result<Vec<(String, Option<&'static str>)>> {
+    let json = AddonJson::load(&src.join("addon.json"))?;
+    let files = collect(src, &json.ignore)?;
+    Ok(scan_files(&files).collect())
+}
+
+fn scan_files(
+    files: &[(String, PathBuf)],
+) -> impl Iterator<Item = (String, Option<&'static str>)> + '_ {
+    files.iter().map(|f| (f.0.clone(), rejection(&f.0)))
 }
 
 /// Lowercased like gmad, since the game's filesystem is case-insensitive

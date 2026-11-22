@@ -1,13 +1,23 @@
+use super::Steam;
 use crate::spec::ItemSpec;
-use crate::{ListedItem, Progress, PublishReport, WorkshopError};
+use crate::{ListedItem, Progress, PublishReport, SteamStatus, WorkshopError};
 
-pub fn publish(
-    _spec: &ItemSpec,
-    _progress: &mut dyn FnMut(&Progress),
-) -> Result<PublishReport, WorkshopError> {
-    Err(WorkshopError::Disabled)
-}
+pub struct Off;
 
-pub fn list(_app_id: u32) -> Result<Vec<ListedItem>, WorkshopError> {
-    Err(WorkshopError::Disabled)
+impl Steam for Off {
+    fn status(&self, _app_id: u32) -> SteamStatus {
+        SteamStatus::Disabled
+    }
+
+    fn list(&self, _app_id: u32) -> Result<Vec<ListedItem>, WorkshopError> {
+        Err(WorkshopError::Disabled)
+    }
+
+    fn upload(
+        &self,
+        _spec: &ItemSpec,
+        _progress: &mut dyn FnMut(&Progress),
+    ) -> Result<PublishReport, WorkshopError> {
+        Err(WorkshopError::Disabled)
+    }
 }

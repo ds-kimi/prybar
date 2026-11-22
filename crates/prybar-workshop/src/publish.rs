@@ -1,38 +1,21 @@
-use serde::Serialize;
-
 use crate::spec::{validate, ItemSpec};
-use crate::{backend, WorkshopError};
+use crate::stage::stage;
+use crate::{steam, ListedItem, Progress, PublishReport, Steam, SteamStatus, WorkshopError};
 
-/// Upload progress as Steam reports it; `total` is 0 while unknown.
-#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
-pub struct Progress {
-    pub stage: String,
-    pub done: u64,
-    pub total: u64,
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
-pub struct PublishReport {
-    pub dry_run: bool,
-    /// `None` only for a dry-run create: no id exists yet.
-    pub item_id: Option<u64>,
-    pub created: bool,
-    /// The item stays hidden until the owner accepts the agreement once.
-    pub needs_legal_agreement: bool,
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
-pub struct ListedItem {
-    pub item_id: u64,
-    pub title: String,
-    pub tags: Vec<String>,
-    pub time_updated: u32,
+/// [`publish_with`] on the real Steam backend.
+pub fn publish(
+    spec: &ItemSpec,
+    dry_run: bool,
+    progress: &mut dyn FnMut(&Progress),
+) -> Result<PublishReport, WorkshopError> {
+    publish_with(steam(), spec, dry_run, progress)
 }
 
 /// Validates, then creates or updates the item. `dry_run` stops after
-/// validation and never loads the Steam SDK, so it works offline and
-/// without the `workshop` feature.
-pub fn publish(
+/// validation and never touches Steam, so it works offline and without
+/// the `workshop` feature.
+pub fn publish_with(
+    steam: &dyn Steam,
     spec: &ItemSpec,
     dry_run: bool,
     progress: &mut dyn FnMut(&Progress),
@@ -46,10 +29,20 @@ pub fn publish(
             needs_legal_agreement: false,
         });
     }
-    backend::publish(spec, progress)
+    // Say so before packing anything a build without Steam cannot send.
+    if steam.status(spec.app_id) == SteamStatus::Disabled {
+        return Err(WorkshopError::Disabled);
+    }
+    let (ready, _temp) = stage(spec)?;
+    steam.upload(&ready, progress)
 }
 
 /// Items the logged-in Steam user published for `app_id` (first page).
 pub fn list_items(app_id: u32) -> Result<Vec<ListedItem>, WorkshopError> {
-    backend::list(app_id)
+    steam().list(app_id)
+}
+
+/// Is Steam running, logged in and owning `app_id`?
+pub fn status(app_id: u32) -> SteamStatus {
+    steam().status(app_id)
 }
