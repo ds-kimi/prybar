@@ -17,7 +17,9 @@ ignore = [
 [licenses]
 unused-allowed-license = "allow"
 version = 2
-allow = ["MIT", "Apache-2.0", "Apache-2.0 WITH LLVM-exception", "Unicode-3.0", "BSD-2-Clause", "BSD-3-Clause", "ISC", "Zlib", "Unlicense", "CC0-1.0"]
+# MPL-2.0: file-level copyleft, pulled by GPUI (dwrote, cbindgen, option-ext)
+# and used unmodified, so it puts no terms on prybar code.
+allow = ["MPL-2.0", "MIT", "Apache-2.0", "Apache-2.0 WITH LLVM-exception", "Unicode-3.0", "BSD-2-Clause", "BSD-3-Clause", "ISC", "Zlib", "Unlicense", "CC0-1.0"]
 
 [bans]
 multiple-versions = "warn"
@@ -26,6 +28,16 @@ wildcards = "allow"
 [sources]
 unknown-registry = "deny"
 unknown-git = "deny"
+# GPUI is only published as part of the Zed repository; it pulls these forks.
+allow-git = [
+    "https://github.com/zed-industries/zed",
+    "https://github.com/zed-industries/font-kit",
+    "https://github.com/zed-industries/oo7",
+    "https://github.com/zed-industries/scap",
+    "https://github.com/zed-industries/wasm_thread",
+    "https://github.com/zed-industries/xim-rs.git",
+    "https://github.com/gfx-rs/wgpu",
+]
 
 [licenses.private]
 # Workspace crates carry the custom LICENSE file, not an SPDX id.
