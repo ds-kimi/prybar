@@ -1,6 +1,7 @@
-//! Design views. Workbench has its own; the others share this stub
+//! Design views. Workbench and Canvas have their own; Console shares this stub
 //! (same screens and data, in their palette) until their lots land.
 
+mod canvas;
 mod content;
 mod placeholder;
 mod side;
@@ -15,6 +16,7 @@ use crate::theme::{self, Palette};
 pub fn render(kind: DesignKind, state: Entity<AppState>, cx: &mut Context<Root>) -> AnyElement {
     match kind {
         DesignKind::Workbench => workbench::render(state, cx),
+        DesignKind::Canvas => canvas::render(state, cx),
         _ => stub(kind, state, cx),
     }
 }
