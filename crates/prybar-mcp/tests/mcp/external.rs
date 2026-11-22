@@ -33,7 +33,10 @@ async fn publish_workshop_checks_its_spec() {
         err && v["error"].as_str().unwrap().contains("content"),
         "{v}"
     );
-    std::fs::write(&spec, "not json").unwrap();
     let (_, v) = call(&c, "publish_workshop", json!({ "spec": spec })).await;
+    assert_eq!(v["kind"], "usage", "a real publish without confirm: {v}");
+    std::fs::write(&spec, "not json").unwrap();
+    let args = json!({ "spec": spec, "dry_run": true });
+    let (_, v) = call(&c, "publish_workshop", args).await;
     assert_eq!(v["kind"], "invalid_input");
 }

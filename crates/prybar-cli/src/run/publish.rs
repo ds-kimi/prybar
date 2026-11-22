@@ -4,6 +4,10 @@ use crate::output::Output;
 use prybar_service::{tools, Result, ServiceError};
 
 pub fn publish(a: &PublishArgs, out: &Output) -> Result<u8> {
+    if let Some(app_id) = a.status {
+        out.emit(&tools::steam_status(app_id), pretty);
+        return Ok(0);
+    }
     if let Some(app_id) = a.list {
         let items = tools::workshop_list(app_id)?;
         out.emit(&items, pretty);

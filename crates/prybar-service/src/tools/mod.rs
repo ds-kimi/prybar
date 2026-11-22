@@ -6,6 +6,7 @@ mod games;
 mod publish;
 mod spec;
 mod view;
+mod workshop;
 
 pub use compile::{compile, compile_streamed};
 pub use config::{config_get, config_remove, config_set, ConfigReport};
@@ -15,6 +16,7 @@ pub use prybar_tools::paths::steam_libraries;
 pub use publish::{publish, workshop_list};
 pub use spec::load_spec;
 pub use view::{view, ViewReport};
+pub use workshop::{addon_check, steam_status};
 
 use crate::ServiceError;
 use prybar_tools::ToolError;

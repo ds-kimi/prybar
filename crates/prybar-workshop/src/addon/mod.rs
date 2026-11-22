@@ -49,14 +49,7 @@ pub fn check_addon(dir: &Path) -> Result<AddonCheck, WorkshopError> {
     }
     let json = prybar_gma::AddonJson::load(&json_path).map_err(gma)?;
     let scan = prybar_gma::scan(dir).map_err(gma)?;
-    let rejected: Vec<Rejected> = scan
-        .iter()
-        .filter_map(|(path, why)| why.map(|r| (path, r)))
-        .map(|(path, reason)| Rejected {
-            path: path.clone(),
-            reason: reason.into(),
-        })
-        .collect();
+    let rejected = rejected(&scan);
     let mut problems = check_meta(&json);
     if scan.is_empty() {
         problems.push("the folder has no files to pack besides addon.json".into());
@@ -69,4 +62,13 @@ pub fn check_addon(dir: &Path) -> Result<AddonCheck, WorkshopError> {
         rejected,
         problems,
     })
+}
+
+fn rejected(scan: &[(String, Option<&'static str>)]) -> Vec<Rejected> {
+    let bad = scan.iter().filter_map(|(path, why)| why.map(|r| (path, r)));
+    bad.map(|(path, reason)| Rejected {
+        path: path.clone(),
+        reason: reason.into(),
+    })
+    .collect()
 }

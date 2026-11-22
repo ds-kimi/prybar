@@ -14,7 +14,7 @@ pub fn workshop_list(app_id: u32) -> Result<Vec<ListedItem>> {
     prybar_workshop::list_items(app_id).map_err(workshop_error)
 }
 
-fn workshop_error(e: WorkshopError) -> ServiceError {
+pub(super) fn workshop_error(e: WorkshopError) -> ServiceError {
     match e {
         WorkshopError::Invalid { .. } => ServiceError::invalid("workshop item", e),
         WorkshopError::Io { path, source } => ServiceError::Io { path, source },

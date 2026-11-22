@@ -52,7 +52,7 @@ impl Prybar {
             return blocking(move || tools::workshop_list(app_id)).await;
         }
         match a.spec.as_deref().map(|s| guard::absolute("spec", s)) {
-            Some(Ok(spec)) => blocking(move || publish(&spec, a.dry_run)).await,
+            Some(Ok(spec)) => blocking(move || publish(&spec, a.dry_run, a.confirm)).await,
             Some(Err(e)) => failure(&e),
             None => failure(&ServiceError::Usage("pass `spec` or `list_app_id`".into())),
         }
@@ -61,7 +61,19 @@ impl Prybar {
 
 /// Paths inside the spec are checked like tool arguments: a relative one
 /// would resolve against the server's working directory.
-fn publish(spec: &std::path::Path, dry_run: bool) -> Result<prybar_workshop::PublishReport> {
+/// A real upload also needs `confirm`, so an agent cannot publish by
+/// forgetting `dry_run`.
+fn publish(
+    spec: &std::path::Path,
+    dry_run: bool,
+    confirm: bool,
+) -> Result<prybar_workshop::PublishReport> {
+    if !dry_run && !confirm {
+        return Err(ServiceError::Usage(
+            "a real publish needs `confirm: true`; run with `dry_run` first and ask the user"
+                .into(),
+        ));
+    }
     let item = tools::load_spec(spec)?;
     for (field, path) in [("preview", &item.preview), ("content", &item.content)] {
         if let Some(p) = path {

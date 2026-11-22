@@ -21,7 +21,7 @@ pub struct ViewArgs {
 pub struct PublishArgs {
     /// Item spec JSON: app_id, item_id (update) or none (create), title,
     /// description, tags, visibility, preview, content, change_note.
-    #[arg(required_unless_present = "list")]
+    #[arg(required_unless_present_any = ["list", "status"])]
     pub spec: Option<PathBuf>,
     /// Validate only; never contacts Steam.
     #[arg(long)]
@@ -29,6 +29,9 @@ pub struct PublishArgs {
     /// List your published items for this Steam app id instead.
     #[arg(long, value_name = "APP_ID", conflicts_with = "spec")]
     pub list: Option<u32>,
+    /// Check Steam for this app id: running, logged in, owns the game.
+    #[arg(long, value_name = "APP_ID", conflicts_with_all = ["spec", "list"])]
+    pub status: Option<u32>,
 }
 
 #[derive(Debug, Args)]
