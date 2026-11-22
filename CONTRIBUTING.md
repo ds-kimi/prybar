@@ -90,6 +90,20 @@ actionlint
 4 fns per `.rs` file, 30 lines per fn, 10 `.rs` files per folder, no
 trailing spaces.
 
+A file may go past one limit only when it is obligated (a trait whose
+required methods must live in one impl, generated or macro code, a match
+that reads better whole) or clearly better than splitting. Say so in its
+first 5 lines:
+
+```rust
+// limits: allow fns -- EntityInputHandler needs all its methods in one impl
+```
+
+The kind is `fns`, `lines` or `files` (for `files`, put the marker in any
+file of the folder); the reason after `--` is required. The script prints
+every exemption. Keep the overrun as small as you can.
+`sh scripts/check-limits/test-marker.sh` tests the marker itself.
+
 ## Tests
 
 - Unit tests sit next to the code; integration tests in
