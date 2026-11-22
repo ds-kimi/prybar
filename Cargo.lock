@@ -4481,6 +4481,7 @@ dependencies = [
  "clap",
  "prybar-gma",
  "prybar-service",
+ "prybar-update",
  "prybar-vpk",
  "prybar-workshop",
  "serde",
@@ -4559,6 +4560,7 @@ version = "0.1.0"
 dependencies = [
  "prybar-gma",
  "prybar-service",
+ "prybar-update",
  "prybar-workshop",
  "rmcp",
  "schemars",

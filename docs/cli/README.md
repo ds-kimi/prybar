@@ -15,6 +15,8 @@ prybar [--json] [--quiet] <command> [args]
 | `view <mdl> -g <game>` | hlmv of the configured game, detached |
 | `publish <spec.json> [--dry-run]` / `publish --list <app_id>` | Steam Workshop create/update (needs `--features workshop`) |
 | `games [--detect] [--save]` | Configured games; detect Steam installs |
+| `version [--check]` | Version; `--check` gives `{current, latest, update_available}` (`latest` is `null` offline) |
+| `self-update` | Download, verify (SHA256SUMS + minisign) and install the latest release; `{current, latest, action, detail}` with `action` `up_to_date`, `installed` or `manual` (command or link in `detail`) |
 
 ## Model inputs
 
@@ -35,6 +37,18 @@ decompiled.
 stderr. Errors in JSON mode: `{"error": {"message": "...", "code": N}}`.
 A batch never stops on a bad model: it lands in `failures` with its own
 code.
+
+## Update notice
+
+At most once a day (cached), a background check may print one line on
+stderr at the end of a command:
+`prybar 0.3.0 is available (you have 0.2.1): prybar self-update`.
+stdout and `--json` output never change. The check is skipped with
+`--quiet`, when stderr is not a terminal, when `CI` is set, or with
+`PRYBAR_NO_UPDATE_CHECK=1`. It sends nothing but a plain GitHub API
+request. Installed by Homebrew, `cargo install` or a package manager,
+`self-update` prints that tool's command instead of replacing files;
+an unsigned release gives the download link only.
 
 ## Exit codes (stable)
 

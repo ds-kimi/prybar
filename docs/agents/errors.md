@@ -78,6 +78,8 @@ Format of the message: `<input>: <detail>`.
 | `cannot start <exe>: <os error>` | the configured studiomdl or hlmv path does not exist or is not executable (on Linux and macOS it is a Windows exe: use Wine) |
 | `steam: <detail>` | Steam is not running, not signed in, or the app is not owned; start Steam and retry |
 | `tool task failed: ...` | the task crashed; retry |
+| `update check: <detail>` | `self-update` could not reach GitHub; check the network and retry |
+| `network: ...`, `no release asset for ...`, `cannot install here: ...` | `self-update` download or install failed; use the release page |
 
 A compile that ran but failed is not an MCP error: `compile_model` returns `success: false` with the studiomdl log. The CLI exits 6 for it.
 

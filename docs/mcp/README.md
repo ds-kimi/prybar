@@ -24,10 +24,16 @@ shared `prybar-service` crate.
 | `games_list` | configured games, `detect` Steam installs, `save` |
 | `config_get` | config path + games |
 | `config_set` | add/replace/remove one game (name, game_dir, packer) |
+| `check_update` | `{current, latest, update_available, command}`; never installs (the user runs `prybar self-update`) |
 
 Agent-facing reference (errors, recipes, troubleshooting): `docs/agents/`. Client snippets: `docs/agents/mcp-config.md`.
 
 ## Rules
+
+- Updates: at start the server refreshes a daily cached release check in
+  the background; when a newer release is cached, the `initialize`
+  instructions say so. The server never replaces itself. Off with
+  `PRYBAR_NO_UPDATE_CHECK=1` or `CI`.
 
 - Every path is absolute. Windows UNC and device paths (`\host\share`,
   `\?\UNC\...`, `\.\pipe\...`) are refused: opening one leaks NTLM

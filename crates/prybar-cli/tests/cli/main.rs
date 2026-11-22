@@ -6,6 +6,7 @@ mod model;
 mod package;
 mod packed;
 mod tools;
+mod update;
 
 #[path = "../../../prybar-mdl/tests/common/mod.rs"]
 mod mdl_common;

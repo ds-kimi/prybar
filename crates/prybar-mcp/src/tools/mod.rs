@@ -5,3 +5,6 @@ mod config;
 mod external;
 mod model;
 mod package;
+mod update;
+
+pub use update::{background_check, update_notice};

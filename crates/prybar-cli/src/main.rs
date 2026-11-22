@@ -3,6 +3,7 @@
 mod cli;
 mod output;
 mod run;
+mod update;
 
 use clap::Parser;
 
@@ -12,5 +13,8 @@ fn main() -> std::process::ExitCode {
         json: cli.json,
         quiet: cli.quiet,
     };
-    std::process::ExitCode::from(run::run(cli.command, &out))
+    let notice = update::Notice::start(&cli.command, &out);
+    let code = run::run(cli.command, &out);
+    notice.finish();
+    std::process::ExitCode::from(code)
 }

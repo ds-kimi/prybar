@@ -20,6 +20,8 @@ pub fn run(cmd: Command, out: &Output) -> u8 {
         Command::View(a) => tools::view(&a, out),
         Command::Publish(a) => publish::publish(&a, out),
         Command::Games(a) => tools::games(&a, out),
+        Command::Version(a) => crate::update::version(&a, out),
+        Command::SelfUpdate => crate::update::self_update(out),
     };
     result.unwrap_or_else(|e| out.error(&e))
 }

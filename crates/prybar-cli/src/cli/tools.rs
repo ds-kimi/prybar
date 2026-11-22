@@ -40,3 +40,10 @@ pub struct GamesArgs {
     #[arg(long)]
     pub save: bool,
 }
+
+#[derive(Debug, Args)]
+pub struct VersionArgs {
+    /// Also check for a newer release (ignores the 24 h cache).
+    #[arg(long)]
+    pub check: bool,
+}

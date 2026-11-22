@@ -5,6 +5,7 @@ use rmcp::ServiceExt;
 
 #[tokio::main]
 async fn main() -> std::process::ExitCode {
+    prybar_mcp::background_check();
     let server = prybar_mcp::Prybar::new();
     let running = match server.serve(rmcp::transport::stdio()).await {
         Ok(r) => r,

@@ -13,6 +13,7 @@ path = "src/main.rs"
 [dependencies]
 prybar-service = { path = "../prybar-service" }
 prybar-workshop = { path = "../prybar-workshop" }
+prybar-update = { path = "../prybar-update" }
 clap = { version = "4", features = ["derive"] }
 serde.workspace = true
 serde_json.workspace = true
@@ -22,6 +23,7 @@ workshop = ["prybar-service/workshop"]
 
 [dev-dependencies]
 assert_cmd = "2"
+prybar-update = { path = "../prybar-update" }
 tempfile.workspace = true
 serde_json.workspace = true
 prybar-vpk = { path = "../prybar-vpk" }

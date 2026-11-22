@@ -8,3 +8,4 @@ mod server;
 mod tools;
 
 pub use server::Prybar;
+pub use tools::background_check;

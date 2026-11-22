@@ -8,6 +8,7 @@
 mod apply;
 mod check;
 mod download;
+mod env;
 mod error;
 mod key;
 mod net;
@@ -20,6 +21,7 @@ use std::time::Duration;
 pub use apply::{apply, install_plan, Applied, Plan};
 pub use check::{cached_status, check, Status};
 pub use download::{download_verified, Verified};
+pub use env::{checks_disabled, fresh_status, CHECK_EVERY};
 pub use error::UpdateError;
 pub use key::embedded_key;
 pub use release::{asset_for, target_triple, Asset, Kind, Release};

@@ -8,6 +8,10 @@ use std::path::{Path, PathBuf};
 pub fn prybar(tmp: &Path) -> Command {
     let mut cmd = Command::cargo_bin("prybar").unwrap();
     cmd.env("PRYBAR_CONFIG", tmp.join("config.toml"));
+    // Tests never reach GitHub: update tests point this at a local server.
+    cmd.env("PRYBAR_NO_UPDATE_CHECK", "1");
+    cmd.env("PRYBAR_UPDATE_URL", "http://127.0.0.1:9/");
+    cmd.env("PRYBAR_UPDATE_CACHE", tmp.join("update-cache"));
     cmd
 }
 

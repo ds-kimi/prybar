@@ -2,7 +2,7 @@ use serde_json::Value;
 use std::io::{BufRead, BufReader, Write};
 use std::process::{Command, Stdio};
 
-const TOOLS: [&str; 11] = [
+const TOOLS: [&str; 12] = [
     "inspect_model",
     "decompile_model",
     "list_package",
@@ -14,6 +14,7 @@ const TOOLS: [&str; 11] = [
     "games_list",
     "config_get",
     "config_set",
+    "check_update",
 ];
 
 /// Replays `scripts/mcp/handshake.jsonl` (the same file a person pipes
@@ -25,6 +26,7 @@ fn stdio_handshake_lists_every_tool() {
         "/../../scripts/mcp/handshake.jsonl"
     );
     let mut child = Command::new(env!("CARGO_BIN_EXE_prybar-mcp"))
+        .env("PRYBAR_NO_UPDATE_CHECK", "1")
         .stdin(Stdio::piped())
         .stdout(Stdio::piped())
         .spawn()

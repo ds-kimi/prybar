@@ -7,6 +7,7 @@ mod external;
 mod model;
 mod package;
 mod stdio;
+mod update;
 
 #[path = "../../../prybar-mdl/tests/common/mod.rs"]
 mod mdl_common;

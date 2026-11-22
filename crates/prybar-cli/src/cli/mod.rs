@@ -7,7 +7,7 @@ mod tools;
 
 pub use model::{DecompileArgs, InspectArgs};
 pub use package::{ListArgs, PackArgs, UnpackArgs};
-pub use tools::{CompileArgs, GamesArgs, PublishArgs, ViewArgs};
+pub use tools::{CompileArgs, GamesArgs, PublishArgs, VersionArgs, ViewArgs};
 
 use clap::{Parser, Subcommand};
 
@@ -57,4 +57,9 @@ pub enum Command {
     Publish(PublishArgs),
     /// Show configured games; detect Steam installs.
     Games(GamesArgs),
+    /// Print the version; `--check` asks GitHub for the latest release.
+    Version(VersionArgs),
+    /// Download, verify and install the latest release (or print the
+    /// package-manager command when prybar is managed by one).
+    SelfUpdate,
 }

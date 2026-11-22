@@ -38,3 +38,15 @@ Read the returned log. Frequent causes:
 ## Workshop
 
 `built without the workshop feature`: rebuild with `--features workshop`. `steam: ...`: Steam must be running and signed in. Run with `--dry-run` first: it validates without contacting Steam. Visibility defaults to `private`.
+
+## Updates
+
+- `prybar version --check --json`: `latest: null` means GitHub was not
+  reachable (offline, proxy, rate limit); it is never an error.
+- `self-update` exits 6 when the check fails, 4 when the download does
+  not match SHA256SUMS or its signature (nothing is installed), 5 when
+  the install dir cannot be written. `action: "manual"` gives the
+  command (Homebrew, cargo) or link to use instead.
+- MCP: call `check_update`; tell the user to run `prybar self-update`
+  and restart the MCP server.
+
