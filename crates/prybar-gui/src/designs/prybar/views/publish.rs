@@ -4,26 +4,23 @@ use gpui::{div, prelude::*, px, AnyElement};
 
 use super::super::widgets::{self, Kind};
 use super::preview::region;
-use crate::state::{AppState, Placeholder};
+use crate::app::Forms;
+use crate::state::Placeholder;
 use crate::theme::prybar::Tokens;
 
-pub fn view(s: &AppState, t: Tokens) -> AnyElement {
-    let title = s
-        .selected
-        .and_then(|i| s.documents.get(i))
-        .map_or_else(|| "Untitled addon".into(), |d| d.title());
+pub fn view(f: &Forms, t: Tokens) -> AnyElement {
     div()
         .size_full()
         .flex()
         .flex_col()
         .gap_4()
-        .child(form(title, t))
+        .child(form(f, t))
         .child(region(Placeholder::PublishProgress, t))
         .into_any_element()
 }
 
 /// Buttons stay disabled until the upload is built.
-fn form(title: String, t: Tokens) -> impl IntoElement {
+fn form(f: &Forms, t: Tokens) -> impl IntoElement {
     let off =
         |id: &'static str, label: &'static str, kind| widgets::button(id, label, kind, false, t);
     div()
@@ -37,9 +34,10 @@ fn form(title: String, t: Tokens) -> impl IntoElement {
                 .text_color(t.muted)
                 .child("Upload an addon to the Steam Workshop."),
         )
-        .child(widgets::field("pb-pub-title", "Title", title, t))
-        .child(widgets::field("pb-pub-vis", "Visibility", "Private", t))
-        .child(widgets::field("pb-pub-tags", "Tags", "model", t))
+        .child(widgets::field("Title", &f.title, t).debug_selector(|| "pb-pub-title".into()))
+        .child(widgets::field("Description", &f.description, t))
+        .child(widgets::field("Tags", &f.tags, t))
+        .child(widgets::field("Visibility", &f.visibility, t))
         .child(
             div()
                 .flex()

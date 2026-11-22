@@ -2,7 +2,9 @@
 
 use std::path::PathBuf;
 
-use gpui::{Context, Div, InteractiveElement as _, PathPromptOptions, Stateful};
+use gpui::{
+    Context, Div, Focusable as _, InteractiveElement as _, PathPromptOptions, Stateful, Window,
+};
 
 use super::root::Root;
 use crate::actions::{Back, Open, Search};
@@ -36,18 +38,31 @@ impl Root {
 
     pub(super) fn navigation_actions(el: Stateful<Div>, cx: &mut Context<Self>) -> Stateful<Div> {
         el.on_action(cx.listener(|this, _: &Open, _, cx| this.prompt_open(cx)))
-            .on_action(
-                cx.listener(|this, _: &Back, _, cx| this.state.update(cx, |s, cx| s.back(cx))),
-            )
-            .on_action(cx.listener(|this, _: &Search, _, cx| {
-                this.state.update(cx, |s, cx| {
-                    s.search = if s.search.is_some() {
-                        None
-                    } else {
-                        Some(String::new())
-                    };
-                    cx.notify();
-                })
+            .on_action(cx.listener(|this, _: &Back, window, cx| {
+                if this.state.read(cx).search.is_some() {
+                    this.close_search(window, cx);
+                }
+                this.state.update(cx, |s, cx| s.back(cx))
             }))
+            .on_action(cx.listener(|this, _: &Search, window, cx| {
+                if this.state.read(cx).search.is_some() {
+                    return this.close_search(window, cx);
+                }
+                this.state.update(cx, |s, cx| {
+                    s.search = Some(String::new());
+                    cx.notify();
+                });
+                this.forms.search.focus_handle(cx).focus(window, cx);
+            }))
+    }
+
+    /// Search closes empty and hands keys back to the window.
+    fn close_search(&mut self, window: &mut Window, cx: &mut Context<Self>) {
+        self.forms.search.update(cx, |i, cx| i.set_text("", cx));
+        self.state.update(cx, |s, cx| {
+            s.search = None;
+            cx.notify();
+        });
+        self.focus.focus(window, cx);
     }
 }

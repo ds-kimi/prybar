@@ -1,34 +1,40 @@
-//! Form widgets. Text entry is later work, so fields show their value
-//! and still take hover and focus like a real input.
+//! Form widgets: a labeled text field, a read-only value, a switch.
 
-use gpui::{div, prelude::*, px, Div, ElementId, SharedString, Stateful};
+use gpui::{div, prelude::*, px, Div, ElementId, Entity, SharedString, Stateful};
 
+use super::input::TextInput;
 use super::ring;
 use crate::theme::prybar::Tokens;
 
-/// A labeled single-line field; the label sits above, never inside.
-pub fn field(
-    id: impl Into<ElementId>,
-    label: &'static str,
-    value: impl Into<SharedString>,
-    t: Tokens,
-) -> Div {
-    let input = ring(div().id(id), t)
+/// A labeled field; the label sits above, never inside.
+pub fn field(label: &'static str, input: &Entity<TextInput>, t: Tokens) -> Div {
+    div()
+        .flex()
+        .flex_col()
+        .gap_1()
+        .child(div().text_xs().text_color(t.muted).child(label))
+        .child(input.clone())
+}
+
+/// A value the app chooses, shown like a disabled field: no border to
+/// hover and no tab stop, so it never looks typeable.
+pub fn readonly(label: &'static str, value: impl Into<SharedString>, t: Tokens) -> Div {
+    let value = div()
         .h_8()
         .px_2()
         .flex()
         .items_center()
         .rounded_md()
-        .border_color(t.border)
-        .bg(t.bg)
-        .hover(move |s| s.border_color(t.muted))
+        .bg(t.surface)
+        .text_color(t.muted)
+        .truncate()
         .child(value.into());
     div()
         .flex()
         .flex_col()
         .gap_1()
         .child(div().text_xs().text_color(t.muted).child(label))
-        .child(input)
+        .child(value)
 }
 
 /// An on/off switch: the knob sits right and the track turns rust when on.

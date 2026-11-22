@@ -4,10 +4,11 @@ use gpui::{div, prelude::*, px, AnyElement};
 
 use super::super::widgets;
 use crate::actions::{ToggleTheme, MOD};
+use crate::app::Forms;
 use crate::state::AppState;
 use crate::theme::prybar::Tokens;
 
-pub fn view(s: &AppState, t: Tokens) -> AnyElement {
+pub fn view(s: &AppState, f: &Forms, t: Tokens) -> AnyElement {
     div()
         .max_w(px(520.))
         .flex()
@@ -16,12 +17,7 @@ pub fn view(s: &AppState, t: Tokens) -> AnyElement {
         .child(widgets::heading("Settings"))
         .child(appearance(s, t))
         .child(widgets::section("Games", t))
-        .child(widgets::field(
-            "pb-config",
-            "Games config",
-            config_path(),
-            t,
-        ))
+        .child(widgets::field("Games config", &f.config, t).debug_selector(|| "pb-config".into()))
         .child(
             div()
                 .text_color(t.muted)
@@ -42,10 +38,4 @@ fn appearance(s: &AppState, t: Tokens) -> impl IntoElement {
         .child(widgets::section("Appearance", t))
         .child(theme)
         .child(div().text_xs().text_color(t.muted).child(hint))
-}
-
-fn config_path() -> String {
-    prybar_tools::config::config_path()
-        .map(|p| p.display().to_string())
-        .unwrap_or_else(|_| "No config folder on this system".into())
 }

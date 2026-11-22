@@ -1,9 +1,10 @@
+mod input;
 mod shell;
 mod views;
 
 use gpui::{AppContext as _, Entity, Modifiers, TestAppContext, VisualTestContext};
 
-use crate::app::Root;
+use crate::app::{Forms, Root};
 use crate::state::AppState;
 
 pub(super) fn window(
@@ -66,4 +67,13 @@ pub(super) fn open_sample(state: &Entity<AppState>, cx: &mut VisualTestContext) 
     cx.run_until_parked();
     state.update(cx, |st, cx| st.open(s.package, cx));
     cx.run_until_parked();
+}
+
+/// The text fields of the window's root view.
+pub(super) fn forms(cx: &mut VisualTestContext) -> Forms {
+    let root = cx
+        .update(|window, _| window.root::<Root>())
+        .flatten()
+        .expect("root view");
+    root.read_with(cx, |r, _| r.forms.clone())
 }

@@ -1,22 +1,13 @@
 //! Decompile screen: input, output, the one option, run, last result.
 
-use std::path::PathBuf;
-
 use gpui::{div, prelude::*, px, AnyElement, Context};
 
 use super::super::widgets::{self, Kind};
-use crate::app::Root;
+use crate::app::{Forms, Root};
 use crate::state::AppState;
 use crate::theme::prybar::Tokens;
 
-/// Output goes to a temp folder until a folder picker lands.
-fn out_dir() -> PathBuf {
-    std::env::temp_dir()
-        .join("prybar-gui-out")
-        .join("decompile")
-}
-
-pub fn view(s: &AppState, t: Tokens, cx: &Context<Root>) -> AnyElement {
+pub fn view(s: &AppState, f: &Forms, t: Tokens, cx: &Context<Root>) -> AnyElement {
     let target = s
         .selected
         .and_then(|i| s.documents.get(i))
@@ -35,20 +26,20 @@ pub fn view(s: &AppState, t: Tokens, cx: &Context<Root>) -> AnyElement {
                 .text_color(t.muted)
                 .child("Turn a model back into QC and SMD files."),
         )
-        .child(widgets::field("pb-target", "Input", input, t))
-        .child(widgets::field(
-            "pb-out",
-            "Output folder",
-            out_dir().display().to_string(),
+        .child(widgets::readonly("Input", input, t))
+        .child(widgets::field("Output folder", &f.out, t).debug_selector(|| "pb-out".into()))
+        .child(run(
+            s,
+            target.is_some() && f.out.read(cx).error().is_none(),
             t,
+            cx,
         ))
-        .child(run(s, target.is_some(), t, cx))
         .child(result(s, t))
         .into_any_element()
 }
 
-/// The option, then the button: disabled with no file, and while a
-/// decompile already runs.
+/// The option, then the button: disabled with no file or no usable
+/// output folder, and while a decompile already runs.
 fn run(s: &AppState, has_target: bool, t: Tokens, cx: &Context<Root>) -> AnyElement {
     let split = widgets::switch("pb-split", "One .qci file per QC section", s.split_qc, t)
         .debug_selector(|| "pb-split".into())
@@ -65,8 +56,8 @@ fn run(s: &AppState, has_target: bool, t: Tokens, cx: &Context<Root>) -> AnyElem
         .debug_selector(|| "pb-decompile".into())
         .when(ready, |el| {
             el.on_click(cx.listener(|this, _, _, cx| {
-                this.state
-                    .update(cx, |s, cx| s.decompile_selected(out_dir(), cx))
+                let out = this.forms.out.read(cx).text().trim().into();
+                this.state.update(cx, |s, cx| s.decompile_selected(out, cx))
             }))
         });
     div()

@@ -14,11 +14,11 @@ use gpui::{div, prelude::*, AnyElement, Context};
 
 use super::motion;
 use super::widgets::{self, Kind};
-use crate::app::Root;
+use crate::app::{Forms, Root};
 use crate::state::{AppState, Document, Screen};
 use crate::theme::prybar::Tokens;
 
-pub fn screen(s: &AppState, t: Tokens, cx: &Context<Root>) -> AnyElement {
+pub fn screen(s: &AppState, f: &Forms, t: Tokens, cx: &Context<Root>) -> AnyElement {
     let ix = Screen::ALL.iter().position(|x| *x == s.screen).unwrap_or(0);
     let body = div()
         .id("pb-view")
@@ -30,7 +30,7 @@ pub fn screen(s: &AppState, t: Tokens, cx: &Context<Root>) -> AnyElement {
         .flex_col()
         .gap_4()
         .overflow_y_scroll()
-        .child(content(s, t, cx));
+        .child(content(s, f, t, cx));
     motion::enter(div().flex_1().min_h_0().child(body), ("pb-view-in", ix))
 }
 
@@ -42,7 +42,7 @@ fn pick(s: &AppState, model: bool) -> Option<&Document> {
     selected.or_else(|| s.documents.iter().rev().find(fits))
 }
 
-fn content(s: &AppState, t: Tokens, cx: &Context<Root>) -> AnyElement {
+fn content(s: &AppState, f: &Forms, t: Tokens, cx: &Context<Root>) -> AnyElement {
     match s.screen {
         Screen::Home => home::view(s, t, cx),
         Screen::Inspector => {
@@ -50,14 +50,14 @@ fn content(s: &AppState, t: Tokens, cx: &Context<Root>) -> AnyElement {
         }
         Screen::Package => match pick(s, false) {
             Some(Document::Package { report, .. }) => {
-                package::view(report, s.search.as_deref(), t, cx)
+                package::view(report, s.search.as_deref(), f, t, cx)
             }
             _ => empty(s.screen, t, cx),
         },
-        Screen::Decompile => decompile::view(s, t, cx),
-        Screen::Compile => compile::view(s, t, cx),
-        Screen::Publish => publish::view(s, t),
-        Screen::Settings => settings::view(s, t),
+        Screen::Decompile => decompile::view(s, f, t, cx),
+        Screen::Compile => compile::view(s, f, t, cx),
+        Screen::Publish => publish::view(f, t),
+        Screen::Settings => settings::view(s, f, t),
         Screen::ModelPreview | Screen::TexturePreview => preview::view(s.screen, pick(s, true), t),
     }
 }

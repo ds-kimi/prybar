@@ -8,13 +8,15 @@ mod tests;
 mod views;
 mod widgets;
 
+pub use widgets::input;
+
 use gpui::{div, prelude::*, AnyElement, Context, Entity};
 
-use crate::app::Root;
+use crate::app::{Forms, Root};
 use crate::state::AppState;
 use crate::theme::prybar::tokens;
 
-pub fn render(state: Entity<AppState>, cx: &mut Context<Root>) -> AnyElement {
+pub fn render(state: Entity<AppState>, f: &Forms, cx: &mut Context<Root>) -> AnyElement {
     let s = state.read(cx);
     let t = tokens(s.light);
     div()
@@ -26,7 +28,7 @@ pub fn render(state: Entity<AppState>, cx: &mut Context<Root>) -> AnyElement {
         .text_color(t.text)
         .text_sm()
         .child(shell::bar(s, t, cx))
-        .child(views::screen(s, t, cx))
+        .child(views::screen(s, f, t, cx))
         .child(shell::toasts::stack(s, t))
         .children(s.palette.then(|| shell::palette::overlay(t, cx)))
         .into_any_element()

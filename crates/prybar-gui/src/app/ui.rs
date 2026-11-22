@@ -1,7 +1,6 @@
-//! Window-level toggles: command palette, theme variant, keyboard focus,
-//! and typing into the search field.
+//! Window-level toggles: command palette, theme variant, keyboard focus.
 
-use gpui::{Context, Div, InteractiveElement as _, KeyDownEvent, Stateful};
+use gpui::{Context, Div, InteractiveElement as _, Stateful};
 
 use super::root::Root;
 use crate::actions::{FocusNext, FocusPrev, TogglePalette, ToggleTheme};
@@ -19,29 +18,5 @@ impl Root {
         }))
         .on_action(cx.listener(|_, _: &FocusNext, window, cx| window.focus_next(cx)))
         .on_action(cx.listener(|_, _: &FocusPrev, window, cx| window.focus_prev(cx)))
-        .on_key_down(cx.listener(|this, ev: &KeyDownEvent, _, cx| this.type_search(ev, cx)))
-    }
-
-    /// While search is open, plain typing edits the query; shortcuts
-    /// with cmd or ctrl still reach their bindings.
-    fn type_search(&mut self, ev: &KeyDownEvent, cx: &mut Context<Self>) {
-        let m = &ev.keystroke.modifiers;
-        if m.platform || m.control {
-            return;
-        }
-        let key = ev.keystroke.key.as_str();
-        let typed = ev.keystroke.key_char.clone();
-        self.state.update(cx, |s, cx| {
-            let printable = typed.as_ref().filter(|c| !c.chars().any(char::is_control));
-            let Some(query) = s.search.as_mut() else {
-                return;
-            };
-            match (key, printable) {
-                ("backspace", _) => drop(query.pop()),
-                (_, Some(c)) => query.push_str(c),
-                _ => return,
-            }
-            cx.notify();
-        });
     }
 }

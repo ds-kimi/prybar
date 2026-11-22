@@ -3,10 +3,11 @@
 
 mod button;
 mod field;
+pub mod input;
 mod nav;
 
 pub use button::{button, Kind};
-pub use field::{field, switch};
+pub use field::{field, readonly, switch};
 pub use nav::nav_item;
 
 use gpui::{div, prelude::*, Div, ElementId, FontWeight, SharedString, Stateful};

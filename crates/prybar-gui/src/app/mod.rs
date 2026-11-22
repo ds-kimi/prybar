@@ -1,12 +1,14 @@
 //! Window setup: key bindings, launch options and the root view.
 
 mod assets;
+mod forms;
 mod handlers;
 mod root;
 #[cfg(test)]
 mod tests;
 mod ui;
 
+pub use forms::Forms;
 pub use root::Root;
 
 use gpui::{px, size, App, AppContext as _, Bounds, WindowAppearance, WindowBounds, WindowOptions};

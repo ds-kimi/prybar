@@ -73,3 +73,9 @@ pub fn tokens(light_theme: bool) -> Tokens {
         dark()
     }
 }
+
+/// The theme as an app global, for views that draw outside the root,
+/// like text fields; the root sets it on every frame.
+pub struct Light(pub bool);
+
+impl gpui::Global for Light {}

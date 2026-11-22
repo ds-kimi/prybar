@@ -4,7 +4,7 @@ use gpui::{div, prelude::*, px, AnyElement, Context};
 
 use super::super::widgets::{self, Kind};
 use super::preview::region;
-use crate::app::Root;
+use crate::app::{Forms, Root};
 use crate::state::{AppState, Placeholder};
 use crate::theme::prybar::Tokens;
 
@@ -16,19 +16,19 @@ const GAMES: [&str; 4] = [
     "Half-Life 2",
 ];
 
-pub fn view(s: &AppState, t: Tokens, cx: &Context<Root>) -> AnyElement {
+pub fn view(s: &AppState, f: &Forms, t: Tokens, cx: &Context<Root>) -> AnyElement {
     div()
         .size_full()
         .flex()
         .flex_col()
         .gap_4()
-        .child(form(s, t, cx))
+        .child(form(s, f, t, cx))
         .child(region(Placeholder::CompileLog, t))
         .into_any_element()
 }
 
-/// Compile stays disabled until QC picking and the log stream land.
-fn form(s: &AppState, t: Tokens, cx: &Context<Root>) -> impl IntoElement {
+/// Compile stays disabled until the log stream lands.
+fn form(s: &AppState, f: &Forms, t: Tokens, cx: &Context<Root>) -> impl IntoElement {
     div()
         .max_w(px(520.))
         .flex()
@@ -40,7 +40,7 @@ fn form(s: &AppState, t: Tokens, cx: &Context<Root>) -> impl IntoElement {
                 .text_color(t.muted)
                 .child("Build a QC with the game's studiomdl."),
         )
-        .child(widgets::field("pb-qc", "QC file", "No QC chosen", t))
+        .child(widgets::field("QC file", &f.qc, t).debug_selector(|| "pb-qc".into()))
         .child(widgets::section("Game", t))
         .child(games(s, t, cx))
         .child(div().flex().child(widgets::button(

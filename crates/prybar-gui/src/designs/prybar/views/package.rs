@@ -5,14 +5,20 @@ use gpui::{div, prelude::*, AnyElement, Context};
 use prybar_service::ops::ListReport;
 
 use super::super::widgets::{self, Kind};
-use crate::actions::{Search, MOD};
-use crate::app::Root;
+use crate::actions::MOD;
+use crate::app::{Forms, Root};
 use crate::theme::prybar::Tokens;
 
 /// Rows drawn before "and N more"; keeps huge packages responsive.
 const MAX_ROWS: usize = 300;
 
-pub fn view(r: &ListReport, search: Option<&str>, t: Tokens, cx: &Context<Root>) -> AnyElement {
+pub fn view(
+    r: &ListReport,
+    search: Option<&str>,
+    f: &Forms,
+    t: Tokens,
+    cx: &Context<Root>,
+) -> AnyElement {
     let query = search.unwrap_or("").to_ascii_lowercase();
     let hits: Vec<(&str, u64)> = r
         .entries
@@ -27,7 +33,7 @@ pub fn view(r: &ListReport, search: Option<&str>, t: Tokens, cx: &Context<Root>)
         .flex_col()
         .gap_3()
         .child(header(r, t, cx))
-        .child(search_bar(search, hits.len(), t))
+        .child(search_bar(f, hits.len(), search.is_some(), t))
         .child(tree(&hits, t))
         .children(tail)
         .into_any_element()
@@ -64,26 +70,26 @@ fn header(r: &ListReport, t: Tokens, cx: &Context<Root>) -> impl IntoElement {
         .child(extract)
 }
 
-/// Shows the query typed while search is open (`MOD-f`).
-fn search_bar(search: Option<&str>, hits: usize, t: Tokens) -> AnyElement {
-    let text = match search {
-        Some(q) => format!("{q}▏  {hits} match"),
-        None => format!("Filter files  {MOD}-f"),
-    };
-    widgets::ring(div().id("pb-search"), t)
-        .debug_selector(|| "pb-search".into())
-        .h_8()
-        .px_2()
+/// The search field, with the match count once a query is typed.
+fn search_bar(f: &Forms, hits: usize, open: bool, t: Tokens) -> AnyElement {
+    let count = open.then(|| {
+        div()
+            .text_xs()
+            .text_color(t.muted)
+            .child(format!("{hits} match"))
+    });
+    let hint = format!("Filter files  {MOD}-f");
+    div()
         .flex()
-        .items_center()
-        .rounded_md()
-        .border_color(if search.is_some() { t.rust } else { t.border })
-        .bg(t.surface)
-        .text_color(if search.is_some() { t.text } else { t.muted })
-        .cursor_text()
-        .hover(move |st| st.border_color(t.muted))
-        .on_click(|_, window, cx| window.dispatch_action(Box::new(Search), cx))
-        .child(text)
+        .flex_col()
+        .gap_1()
+        .child(div().text_xs().text_color(t.muted).child(hint))
+        .child(
+            div()
+                .debug_selector(|| "pb-search".into())
+                .child(f.search.clone()),
+        )
+        .children(count)
         .into_any_element()
 }
 

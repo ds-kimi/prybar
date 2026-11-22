@@ -1,6 +1,7 @@
 //! App state: what is open, where the user is,
 //! and what runs in the background.
 
+pub mod checks;
 mod document;
 mod job;
 mod ops;
