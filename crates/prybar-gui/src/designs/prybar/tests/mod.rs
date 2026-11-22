@@ -1,4 +1,5 @@
 mod shell;
+mod views;
 
 use gpui::{AppContext as _, Entity, Modifiers, TestAppContext, VisualTestContext};
 
@@ -54,4 +55,16 @@ fn nav_reaches_every_bar_screen(cx: &mut TestAppContext) {
             assert!(cx.debug_bounds("pb-view").is_some());
         }
     }
+}
+
+/// Opens the synthetic model, then the package, so the package ends up
+/// selected and both kinds of screen have data.
+pub(super) fn open_sample(state: &Entity<AppState>, cx: &mut VisualTestContext) {
+    cx.executor().allow_parking();
+    let dir = tempfile::tempdir().expect("tempdir").keep();
+    let s = crate::sample::write(&dir).expect("sample written");
+    state.update(cx, |st, cx| st.open(s.model, cx));
+    cx.run_until_parked();
+    state.update(cx, |st, cx| st.open(s.package, cx));
+    cx.run_until_parked();
 }
