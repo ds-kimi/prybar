@@ -59,3 +59,10 @@ fn bad_file_becomes_error_toast(cx: &mut TestAppContext) {
         assert_eq!(s.toasts.len(), 1);
     });
 }
+
+#[test]
+fn companions_of_a_missing_package_are_all_missing() {
+    let path = std::path::Path::new("/nowhere/pak_dir.vpk:models/a.mdl");
+    let found = crate::state::companions::found(path, &[".vvd", ".phy"]);
+    assert_eq!(found, vec![(".vvd", false), (".phy", false)]);
+}

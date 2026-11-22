@@ -6,8 +6,16 @@ use prybar_mdl::Summary;
 use prybar_service::ops::ListReport;
 
 pub enum Document {
-    Model { path: PathBuf, summary: Summary },
-    Package { path: PathBuf, report: ListReport },
+    Model {
+        path: PathBuf,
+        summary: Summary,
+        /// Looked up once: inside a package that means reading its index.
+        companions: Vec<(&'static str, bool)>,
+    },
+    Package {
+        path: PathBuf,
+        report: ListReport,
+    },
 }
 
 /// Companion files a model needs next to it, by extension suffix.
@@ -27,6 +35,7 @@ impl Document {
             return Ok(Document::Model {
                 path: path.to_owned(),
                 summary,
+                companions: super::companions::found(path, &COMPANIONS),
             });
         }
         let report = prybar_service::ops::list(path, None, None).map_err(|e| e.to_string())?;
@@ -52,18 +61,9 @@ impl Document {
 
     /// Which companions sit next to a model, as (suffix, found).
     pub fn companions(&self) -> Vec<(&'static str, bool)> {
-        let Document::Model { path, .. } = self else {
-            return Vec::new();
-        };
-        let stem = path.with_extension("");
-        COMPANIONS
-            .iter()
-            .map(|s| {
-                (
-                    *s,
-                    PathBuf::from(format!("{}{s}", stem.display())).is_file(),
-                )
-            })
-            .collect()
+        match self {
+            Document::Model { companions, .. } => companions.clone(),
+            Document::Package { .. } => Vec::new(),
+        }
     }
 }

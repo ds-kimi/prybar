@@ -2,6 +2,7 @@
 //! and what runs in the background.
 
 pub mod checks;
+pub(crate) mod companions;
 mod document;
 mod job;
 mod ops;
