@@ -30,7 +30,8 @@ fn loaded(v: &mut Viewport, scene: Result<Scene, String>, cx: &mut Context<Viewp
             return cx.notify();
         }
     };
-    v.camera = Some(Orbit::fit(&scene.bounds));
+    v.fit = Some(Orbit::fit(&scene.bounds));
+    v.camera = v.fit;
     v.triangles = scene.triangles();
     if v.worker.is_none() {
         let worker = Worker::spawn();

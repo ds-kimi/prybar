@@ -33,10 +33,10 @@ pub fn view(screen: Screen, doc: Option<&Document>, f: &Forms, t: Tokens) -> Any
         .into_any_element()
 }
 
-/// The model the 3D preview should show, once its screen is open: the
-/// GPU only starts for people who look at a model.
+/// The model the 3D view should show, once a screen with it is open:
+/// the GPU only starts for people who look at a model.
 pub fn wanted(s: &AppState) -> Option<PathBuf> {
-    (s.screen == Screen::ModelPreview)
+    matches!(s.screen, Screen::Inspector | Screen::ModelPreview)
         .then(|| super::pick(s, true))
         .flatten()
         .map(|d| d.path().to_owned())

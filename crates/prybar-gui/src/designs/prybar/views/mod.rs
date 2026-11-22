@@ -48,7 +48,7 @@ fn content(s: &AppState, f: &Forms, t: Tokens, cx: &Context<Root>) -> AnyElement
     match s.screen {
         Screen::Home => home::view(s, t, cx),
         Screen::Inspector => {
-            pick(s, true).map_or_else(|| empty(s.screen, t, cx), |d| model::view(d, t, cx))
+            pick(s, true).map_or_else(|| empty(s.screen, t, cx), |d| model::view(d, f, t, cx))
         }
         Screen::Package => match pick(s, false) {
             Some(Document::Package { report, .. }) => {

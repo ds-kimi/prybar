@@ -8,14 +8,15 @@ use gpui::{
 
 use super::Forms;
 use crate::designs::input::InputEvent;
-use crate::state::AppState;
+use crate::state::{AppState, Screen};
 use crate::theme::prybar::{tokens, Light};
+use crate::viewport::view::Full;
 
 pub struct Root {
     pub state: Entity<AppState>,
     pub forms: Forms,
     pub(super) focus: FocusHandle,
-    _subs: [Subscription; 3],
+    _subs: [Subscription; 4],
 }
 
 impl Root {
@@ -43,11 +44,12 @@ impl Root {
                 cx.notify();
             })
         });
+        let _full = full_view(&forms, cx);
         Root {
             state,
             forms,
             focus,
-            _subs: [_observe, _refocus, _search],
+            _subs: [_observe, _refocus, _search, _full],
         }
     }
 }
@@ -79,4 +81,18 @@ impl Focusable for Root {
     fn focus_handle(&self, _cx: &App) -> FocusHandle {
         self.focus.clone()
     }
+}
+
+/// The viewport asks for full size; the 3D preview screen is that mode,
+/// so the same key goes back to the model screen.
+fn full_view(forms: &Forms, cx: &mut Context<Root>) -> Subscription {
+    cx.subscribe(&forms.viewport, |this, _, _: &Full, cx| {
+        this.state.update(cx, |s, cx| {
+            let to = match s.screen {
+                Screen::ModelPreview => Screen::Inspector,
+                _ => Screen::ModelPreview,
+            };
+            s.navigate(to, cx)
+        })
+    })
 }

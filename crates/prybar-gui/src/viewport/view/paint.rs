@@ -1,15 +1,18 @@
 use gpui::{canvas, div, prelude::*, Context, Corners, Rgba, Window};
 
 use super::frame::native;
+use super::{drag, input, overlay};
 use super::{Colors, Status, Viewport};
 use crate::theme::prybar::{tokens, Light, Tokens};
 
 impl Render for Viewport {
     fn render(&mut self, _: &mut Window, cx: &mut Context<Self>) -> impl IntoElement {
         let t = tokens(cx.try_global::<Light>().is_some_and(|l| l.0));
-        let colors = colors(&t);
+        let colors = colors(&t, self.backdrop);
         let surface = surface(self, cx.entity(), colors);
-        div()
+        let focus = self.focus.get_or_insert_with(|| cx.focus_handle()).clone();
+        let el = input::keys(input::attach(div(), cx), cx);
+        el.track_focus(&focus)
             .debug_selector(|| "pb-viewport".into())
             .relative()
             .flex_1()
@@ -21,17 +24,23 @@ impl Render for Viewport {
             .overflow_hidden()
             .child(surface.absolute().size_full())
             .child(label(self, &t))
+            .children((self.status == Status::Ready).then(|| overlay::controls(self, &t, cx)))
     }
 }
 
-fn colors(t: &Tokens) -> Colors {
+fn colors(t: &Tokens, backdrop: bool) -> Colors {
     let c = |r: Rgba| [r.r, r.g, r.b, r.a];
     let mut grid = c(t.border);
     grid[3] = 0.9;
     let mut wire = c(t.text);
     wire[3] = 0.28;
     Colors {
-        clear: c(t.surface),
+        // Mid grey reads both dark and light silhouettes.
+        clear: if backdrop {
+            [0.36, 0.37, 0.39, 1.0]
+        } else {
+            c(t.surface)
+        },
         grid,
         wire,
     }
@@ -39,17 +48,25 @@ fn colors(t: &Tokens) -> Colors {
 
 /// Requests a frame at the device size of the region at prepaint,
 /// paints the newest one, and frees replaced ones from the atlas.
-fn surface(v: &mut Viewport, this: gpui::Entity<Viewport>, colors: Colors) -> gpui::Canvas<()> {
+type Surface = gpui::Canvas<gpui::Entity<Viewport>>;
+
+fn surface(v: &mut Viewport, this: gpui::Entity<Viewport>, colors: Colors) -> Surface {
     let image = v.image.clone();
     let drops = std::mem::take(&mut v.drops);
     canvas(
         move |b, window, cx| {
-            let s = window.scale_factor();
-            let w = (f32::from(b.size.width) * s).round().max(1.0) as u32;
-            let h = (f32::from(b.size.height) * s).round().max(1.0) as u32;
-            this.update(cx, |v, _| v.request(w, h, colors));
+            let px =
+                |l: gpui::Pixels| (f32::from(l) * window.scale_factor()).round().max(1.0) as u32;
+            let (w, h) = (px(b.size.width), px(b.size.height));
+            this.update(cx, |v, _| {
+                v.area = b;
+                v.step(window);
+                v.request(w, h, colors)
+            });
+            this
         },
-        move |b, _, window, _| {
+        move |b, this, window, _| {
+            drag::listen(window, this);
             for d in drops {
                 let _ = window.drop_image(d);
             }

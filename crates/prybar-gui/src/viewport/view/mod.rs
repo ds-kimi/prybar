@@ -2,8 +2,12 @@
 //! asks the render thread for frames at the exact device size, and
 //! paints the newest one.
 
+mod aim;
+mod drag;
 mod frame;
+mod input;
 mod load;
+mod overlay;
 mod paint;
 #[cfg(test)]
 mod tests;
@@ -11,9 +15,9 @@ mod tests;
 use std::path::PathBuf;
 use std::sync::Arc;
 
-use gpui::{Context, RenderImage, Task};
+use gpui::{Bounds, Context, EventEmitter, FocusHandle, Pixels, RenderImage, Task};
 
-use super::camera::Orbit;
+use super::camera::{Inertia, Orbit};
 use super::render::{Flags, Output, Request, Worker};
 
 #[derive(Debug, Clone, Default, PartialEq)]
@@ -47,6 +51,33 @@ pub struct Viewport {
     pub triangles: usize,
     pub ms: f32,
     tasks: Vec<Task<()>>,
+    /// The fitted view, where `F` and `R` come back to.
+    fit: Option<Orbit>,
+    inertia: Inertia,
+    drag: Option<drag::Drag>,
+    /// Last glide frame; `None` restarts the clock after a pause.
+    tick: Option<std::time::Instant>,
+    clock_origin: Clock,
+    /// Window position of the region, for cursor math.
+    area: Bounds<Pixels>,
+    focus: Option<FocusHandle>,
+    /// Neutral grey behind the model instead of the theme surface, to
+    /// judge silhouettes.
+    pub backdrop: bool,
+}
+
+/// Asks the host to switch between the side-by-side and full-size view.
+pub struct Full;
+
+impl EventEmitter<Full> for Viewport {}
+
+/// Start of the drag sample clock; only differences matter.
+struct Clock(std::time::Instant);
+
+impl Default for Clock {
+    fn default() -> Self {
+        Self(std::time::Instant::now())
+    }
 }
 
 impl Viewport {
@@ -58,6 +89,9 @@ impl Viewport {
         }
         self.path = path.clone();
         self.camera = None;
+        self.fit = None;
+        self.inertia = Inertia::default();
+        self.drag = None;
         self.last = None;
         self.drops.extend(self.image.take());
         self.status = if path.is_some() {

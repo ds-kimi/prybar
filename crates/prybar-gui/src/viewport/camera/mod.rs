@@ -1,7 +1,14 @@
 //! Orbit camera around the model, Source axes (Z up).
 
+mod control;
+mod inertia;
+#[cfg(test)]
+mod motion_tests;
+mod pick;
 #[cfg(test)]
 mod tests;
+
+pub use inertia::Inertia;
 
 use glam::{Mat4, Vec3};
 
@@ -18,13 +25,15 @@ pub struct Orbit {
     /// Model radius, so clip planes follow the model and not the zoom.
     pub radius: f32,
     pub fov_y: f32,
+    /// Center of the model, where pan limits and reframing come back to.
+    pub home: Vec3,
 }
 
 /// Checked on HL2 characters: their face looks down -X in model space,
 /// so a three-quarter front view sits on that side.
 const START_YAW: f32 = std::f32::consts::PI + 0.6;
 const START_PITCH: f32 = 0.3;
-const PITCH_LIMIT: f32 = 1.55;
+pub(super) const PITCH_LIMIT: f32 = 1.55;
 
 impl Orbit {
     /// Frames the whole box with a small margin at any aspect >= 1.
@@ -38,6 +47,7 @@ impl Orbit {
             distance: radius / (fov_y * 0.5).sin() * 1.05,
             radius,
             fov_y,
+            home: Vec3::from(b.center()),
         }
     }
 

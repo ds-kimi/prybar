@@ -12,7 +12,12 @@ actions!(
         ToggleTheme,
         FocusNext,
         FocusPrev,
-        Quit
+        Quit,
+        FrameModel,
+        ResetView,
+        ToggleFullView,
+        ToggleWire,
+        ToggleBones
     ]
 );
 
@@ -47,5 +52,12 @@ pub fn bindings() -> Vec<KeyBinding> {
         KeyBinding::new("tab", FocusNext, None),
         KeyBinding::new("shift-tab", FocusPrev, None),
         KeyBinding::new(key!("q"), Quit, None),
+        // Plain letters only while the viewport has focus, so typing in
+        // a field never moves the camera.
+        KeyBinding::new("f", FrameModel, Some("Viewport")),
+        KeyBinding::new("r", ResetView, Some("Viewport")),
+        KeyBinding::new("shift-f", ToggleFullView, Some("Viewport")),
+        KeyBinding::new("w", ToggleWire, Some("Viewport")),
+        KeyBinding::new("b", ToggleBones, Some("Viewport")),
     ]
 }

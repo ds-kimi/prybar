@@ -1,25 +1,43 @@
-//! Model screen: the facts in one aligned block, companions, then the
-//! material lists. Previews hang off the header since they need a model.
+//! Model screen: the live 3D view beside the facts, companions and
+//! material lists, so opening a model shows it at once.
 
 mod facts;
 
 use gpui::{div, prelude::*, AnyElement, Context};
 
 use super::super::widgets::{self, Kind};
-use crate::app::Root;
+use crate::app::{Forms, Root};
 use crate::state::{Document, Screen};
 use crate::theme::prybar::Tokens;
 use facts::{companions, facts, list};
 
-pub fn view(doc: &Document, t: Tokens, cx: &Context<Root>) -> AnyElement {
+pub fn view(doc: &Document, f: &Forms, t: Tokens, cx: &Context<Root>) -> AnyElement {
     let Document::Model { summary: m, .. } = doc else {
         return div().into_any_element();
     };
+    // Fixed height: the screen scrolls, and a flex child of a scroll
+    // area would collapse to nothing.
+    let view = div().flex_1().min_w_64().h(gpui::px(520.0)).flex();
+    let row = div().flex().items_start().gap_4();
     div()
         .flex()
         .flex_col()
         .gap_3()
         .child(head(doc, t, cx))
+        .child(
+            row.child(details(doc, m, t))
+                .child(view.child(f.viewport.clone())),
+        )
+        .into_any_element()
+}
+
+fn details(doc: &Document, m: &prybar_mdl::Summary, t: Tokens) -> impl IntoElement {
+    div()
+        .flex()
+        .flex_col()
+        .gap_3()
+        .w(gpui::px(380.0))
+        .flex_none()
         .child(facts(m, t))
         .child(widgets::section("Companion files", t))
         .child(companions(doc, t))
@@ -29,7 +47,6 @@ pub fn view(doc: &Document, t: Tokens, cx: &Context<Root>) -> AnyElement {
         .child(list(&m.material_dirs, "No material folders.", t))
         .children((!m.notes.is_empty()).then(|| widgets::section("Not recovered", t)))
         .children((!m.notes.is_empty()).then(|| list(&m.notes, "", t)))
-        .into_any_element()
 }
 
 fn head(doc: &Document, t: Tokens, cx: &Context<Root>) -> impl IntoElement {
@@ -45,6 +62,5 @@ fn head(doc: &Document, t: Tokens, cx: &Context<Root>) -> impl IntoElement {
         .items_center()
         .gap_2()
         .child(widgets::heading(doc.title()).flex_1())
-        .child(go("pb-to-3d", Screen::ModelPreview))
         .child(go("pb-to-tex", Screen::TexturePreview))
 }

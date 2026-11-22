@@ -1,6 +1,6 @@
 use super::*;
 
-fn unit() -> Bounds {
+pub(super) fn unit() -> Bounds {
     Bounds {
         min: [-1.0, -2.0, 0.0],
         max: [1.0, 2.0, 4.0],
