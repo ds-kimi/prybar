@@ -11,7 +11,8 @@ mkdir -p "$tmp"
 keychain="$tmp/sign.keychain-db"
 kc_pass="$(openssl rand -hex 32)"
 
-# Decoded secrets go to private temp files so they never appear in argv.
+# Decoded files go to private temp files. `security` only takes passwords as
+# arguments; that is accepted because this job runs no third-party code.
 printf '%s' "$MACOS_CERT_P12_BASE64" | base64 --decode > "$tmp/cert.p12"
 printf '%s' "$APPLE_API_KEY_P8_BASE64" | base64 --decode > "$tmp/api_key.p8"
 
@@ -38,8 +39,17 @@ done
 
 # notarytool takes a zip; command line tools are notarized inside it.
 ditto -c -k --keepParent "$dir" "$tmp/notarize.zip"
-xcrun notarytool submit "$tmp/notarize.zip" --wait \
-  --key "$tmp/api_key.p8" --key-id "$APPLE_API_KEY_ID" --issuer "$APPLE_API_ISSUER_ID"
+key_args="--key $tmp/api_key.p8 --key-id $APPLE_API_KEY_ID --issuer $APPLE_API_ISSUER_ID"
+# Word splitting of key_args is wanted; none of its parts contain spaces.
+# shellcheck disable=SC2086
+out="$(xcrun notarytool submit "$tmp/notarize.zip" --wait --timeout 30m $key_args)" || status=$?
+echo "$out"
+if [ "${status:-0}" != 0 ] || ! printf '%s' "$out" | grep -q 'status: Accepted'; then
+  id="$(printf '%s' "$out" | awk '/^ *id:/ { print $2; exit }')"
+  # shellcheck disable=SC2086
+  [ -n "$id" ] && xcrun notarytool log "$id" $key_args
+  exit 1
+fi
 rm -f "$tmp/notarize.zip"
 xcrun stapler staple "$dir/Prybar.app"
 spctl -a -vv -t exec "$dir/Prybar.app"

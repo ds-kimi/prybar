@@ -8,7 +8,13 @@ app="$out/Prybar.app"
 rm -rf "$app"
 mkdir -p "$app/Contents/MacOS" "$app/Contents/Resources"
 cp "$bin" "$app/Contents/MacOS/prybar-gui"
-# Tags look like v1.2.3; the bundle wants the bare number.
-sed "s/__VERSION__/${version#v}/g" "$here/crates/prybar-gui/bundle/Info.plist" > "$app/Contents/Info.plist"
+# Apple wants up to three dot-separated integers; anything else (rc tags,
+# slashes) would break the plist or the sed below, so refuse it.
+number="${version#v}"
+if ! printf '%s' "$number" | grep -Eq '^[0-9]+(\.[0-9]+){0,2}$'; then
+  echo "bundle version must look like v1.2.3, got: $version" >&2
+  exit 1
+fi
+sed "s/__VERSION__/$number/g" "$here/crates/prybar-gui/bundle/Info.plist" > "$app/Contents/Info.plist"
 plutil -lint "$app/Contents/Info.plist" >/dev/null
 echo "$app"

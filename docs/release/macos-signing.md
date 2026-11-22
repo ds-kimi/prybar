@@ -5,14 +5,26 @@ certificate and notarized by Apple, but only when the six repository secrets
 below exist. Without them the release workflow prints a notice and ships
 unsigned builds, as before.
 
+If only some of the six are set, the release fails instead of shipping
+unsigned builds quietly.
+
 Signing happens only in GitHub Actions, only for `v*` tag pushes on
-`ds-kimi/prybar`, never on pull requests or forks. Secrets are scoped to the
-single signing step. The certificate lives in a temporary keychain with a
-random password that is deleted at the end of the job.
+`ds-kimi/prybar`, never on pull requests or forks. It runs in its own job
+(`macos`) that downloads the already built files and runs no cargo or other
+third-party build code, so nothing untrusted shares the runner with the
+secrets. The secrets live in the `release` environment, not at repository
+level, and are passed only to the signing step. The certificate lives in a
+temporary keychain with a random password that is deleted at the end of the
+job. Notarization gives up after 30 minutes and prints Apple's log when a
+submission is rejected.
+
+Tags must look like `v1.2.3`: the app bundle version only allows numbers, so
+a tag such as `v1.2.0-rc.1` fails the macOS build.
 
 ## What gets signed
 
-Each macOS archive (`prybar-<tag>-<target>.zip`) contains:
+Each macOS archive (`prybar-<tag>-<target>.zip`, a zip since signing was
+added; it used to be `.tar.gz`) contains:
 
 - `prybar` and `prybar-mcp`, signed with the hardened runtime;
 - `Prybar.app` (the desktop interface), signed, notarized and stapled.
@@ -49,28 +61,40 @@ chat.
 2. Download the `.p8` file (only possible once). Note the Key ID and the Issuer
    ID shown on the page.
 
-### 3. Repository secrets
+### 3. Protect release tags and the `release` environment
+
+The workflow file comes from the tagged commit, so anyone who can push a `v*`
+tag could change it. Limit who can:
+
+1. Settings > Rules > Rulesets > New tag ruleset: target `v*`, restrict
+   creations, updates and deletions to yourself (bypass list).
+2. Settings > Environments > New environment `release`. Under Deployment
+   branches and tags, choose Selected and add the tag pattern `v*`.
+   Optionally add yourself as a required reviewer, so every signing run waits
+   for your click.
+
+### 4. Environment secrets
 
 From the repo folder, with the GitHub CLI logged in:
 
 ```sh
-base64 -i DeveloperID.p12 | gh secret set MACOS_CERT_P12_BASE64
-gh secret set MACOS_CERT_PASSWORD          # prompts, paste the p12 password
-gh secret set MACOS_SIGN_IDENTITY          # prompts, paste the identity name
-base64 -i AuthKey_XXXXXXXXXX.p8 | gh secret set APPLE_API_KEY_P8_BASE64
-gh secret set APPLE_API_KEY_ID             # prompts
-gh secret set APPLE_API_ISSUER_ID          # prompts
+base64 -i DeveloperID.p12 | gh secret set MACOS_CERT_P12_BASE64 --env release
+gh secret set MACOS_CERT_PASSWORD --env release       # prompts, paste the p12 password
+gh secret set MACOS_SIGN_IDENTITY --env release       # prompts, paste the identity name
+base64 -i AuthKey_XXXXXXXXXX.p8 | gh secret set APPLE_API_KEY_P8_BASE64 --env release
+gh secret set APPLE_API_KEY_ID --env release          # prompts
+gh secret set APPLE_API_ISSUER_ID --env release       # prompts
 ```
 
 `gh secret set` without a value reads from a hidden prompt, so nothing lands in
 your shell history. Then delete the exported `.p12` and keep the `.p8` in a
 password manager or delete it.
 
-### 4. Release
+### 5. Release
 
-Push a tag (`git tag v0.2.0 && git push origin v0.2.0`). In the macOS jobs,
-the step "sign and notarize" should run and end with `spctl` reporting
-`source=Notarized Developer ID`.
+Push a tag (`git tag v0.2.0 && git push origin v0.2.0`). In the
+`macos` jobs, the step "sign and notarize" should run and end with `spctl`
+reporting `source=Notarized Developer ID`.
 
 ## Check a download
 
@@ -87,13 +111,14 @@ xcrun stapler validate Prybar.app
 - Certificate: revoke it on the developer site only if it leaked (apps already
   notarized keep working unless Apple revokes them). Create a new one, rerun the
   three `MACOS_*` commands.
-- Stop signing: `gh secret delete MACOS_CERT_P12_BASE64`; the next release is
-  unsigned.
+- Stop signing: delete all six with `gh secret delete <NAME> --env release`;
+  the next release is unsigned (deleting only some makes it fail).
 
 ## Files
 
 - `.github/workflows/release.yml`: build, bundle, sign, archive, publish.
 - `scripts/release/macos-bundle.sh`: builds `Prybar.app`.
+- `scripts/release/macos-secrets-check.sh`: sign, skip, or fail on a partial setup.
 - `scripts/release/macos-sign.sh`: keychain, codesign, notarytool, staple.
 - `scripts/release/macos-cleanup.sh`: removes the keychain and decoded files.
 - `crates/prybar-gui/bundle/`: `Info.plist` template and entitlements.
