@@ -21,6 +21,8 @@ pub struct Release {
     pub version: Version,
     pub page: String,
     pub assets: Vec<Asset>,
+    /// Release notes (Markdown), shown before an update; may be empty.
+    pub notes: String,
 }
 
 #[derive(Deserialize)]
@@ -42,6 +44,18 @@ struct RawRelease {
     prerelease: bool,
     #[serde(default)]
     assets: Vec<RawAsset>,
+    #[serde(default)]
+    body: Option<String>,
+}
+
+impl From<RawAsset> for Asset {
+    fn from(a: RawAsset) -> Self {
+        Self {
+            name: a.name,
+            url: a.browser_download_url,
+            size: a.size,
+        }
+    }
 }
 
 impl Release {
@@ -58,20 +72,13 @@ impl Release {
         if !version.pre.is_empty() {
             return Err(UpdateError::BadRelease("prerelease tag".into()));
         }
-        let assets = raw
-            .assets
-            .into_iter()
-            .map(|a| Asset {
-                name: a.name,
-                url: a.browser_download_url,
-                size: a.size,
-            })
-            .collect();
+        let assets = raw.assets.into_iter().map(Asset::from).collect();
         Ok(Self {
             tag: raw.tag_name,
             version,
             page: raw.html_url,
             assets,
+            notes: raw.body.unwrap_or_default(),
         })
     }
 
