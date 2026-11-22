@@ -13,6 +13,8 @@ mod flex_fixture;
 mod packs;
 #[path = "../../../crates/prybar-mdl/tests/phy/fixture.rs"]
 mod phy_fixture;
+#[path = "../../../crates/prybar-vtf/tests/support/mod.rs"]
+mod vtf_support;
 
 use std::path::Path;
 
@@ -40,4 +42,7 @@ fn main() {
     save("phy", "one.phy", &phy_fixture::build());
     save("vvd", "v49.vvd", &mdl_common::geometry::vvd());
     save("vtx", "v49.vtx", &mdl_common::geometry::vtx());
+    let dxt1 = vtf_support::dxt1_red_blue();
+    save("vtf", "dxt1.vtf", &vtf_support::vtf(5, 13, (4, 4), 1, &dxt1));
+    save("vtf", "bgr888_mips.vtf", &vtf_support::vtf(1, 3, (2, 2), 2, &[9; 15]));
 }

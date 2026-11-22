@@ -4542,6 +4542,7 @@ dependencies = [
  "prybar-mdl",
  "prybar-tools",
  "prybar-vpk",
+ "prybar-vtf",
  "prybar-workshop",
  "rayon",
  "serde",
@@ -4583,6 +4584,15 @@ dependencies = [
  "tempfile",
  "thiserror 2.0.21",
  "walkdir",
+]
+
+[[package]]
+name = "prybar-vtf"
+version = "0.1.0"
+dependencies = [
+ "criterion 0.5.1",
+ "proptest",
+ "thiserror 2.0.21",
 ]
 
 [[package]]

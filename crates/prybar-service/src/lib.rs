@@ -7,6 +7,7 @@ pub mod model;
 pub mod ops;
 pub mod package;
 pub mod source;
+pub mod texture;
 pub mod tools;
 
 pub use error::{ExitCode, ServiceError};

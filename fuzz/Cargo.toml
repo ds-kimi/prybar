@@ -20,6 +20,7 @@ prybar-hfs = { path = "../crates/prybar-hfs" }
 prybar-mdl = { path = "../crates/prybar-mdl" }
 prybar-tools = { path = "../crates/prybar-tools" }
 prybar-export = { path = "../crates/prybar-export" }
+prybar-vtf = { path = "../crates/prybar-vtf" }
 
 [profile.release]
 debug = 1
@@ -108,6 +109,13 @@ bench = false
 [[bin]]
 name = "studiomdl_log"
 path = "fuzz_targets/studiomdl_log.rs"
+test = false
+doc = false
+bench = false
+
+[[bin]]
+name = "vtf"
+path = "fuzz_targets/vtf.rs"
 test = false
 doc = false
 bench = false

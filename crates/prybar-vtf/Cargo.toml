@@ -1,0 +1,21 @@
+[package]
+name = "prybar-vtf"
+version.workspace = true
+edition.workspace = true
+license-file.workspace = true
+publish.workspace = true
+description = "Reader for Source engine VTF textures"
+
+[dependencies]
+thiserror.workspace = true
+
+[dev-dependencies]
+proptest.workspace = true
+criterion.workspace = true
+
+[[bench]]
+name = "vtf"
+harness = false
+
+[lints]
+workspace = true

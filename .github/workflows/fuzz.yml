@@ -26,7 +26,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        target: [vpk, gma, apk, hfs, mdl, mdl_ani, vvd, vtx, vdf, phy, mdl_qc, studiomdl_log]
+        target: [vpk, gma, apk, hfs, mdl, mdl_ani, vvd, vtx, vdf, phy, mdl_qc, studiomdl_log, vtf]
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@nightly

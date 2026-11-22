@@ -13,6 +13,7 @@ prybar-gma = { path = "../prybar-gma" }
 prybar-apk = { path = "../prybar-apk" }
 prybar-hfs = { path = "../prybar-hfs" }
 prybar-mdl = { path = "../prybar-mdl" }
+prybar-vtf = { path = "../prybar-vtf" }
 prybar-export = { path = "../prybar-export" }
 prybar-tools = { path = "../prybar-tools" }
 prybar-workshop = { path = "../prybar-workshop" }

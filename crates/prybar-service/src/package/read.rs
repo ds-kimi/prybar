@@ -28,6 +28,16 @@ impl Package {
         Ok(Some(data))
     }
 
+    /// Whether an entry exists, matched like `read` without reading it.
+    pub fn contains(&self, path: &str) -> bool {
+        self.index.contains_key(&path.to_ascii_lowercase())
+    }
+
+    /// The package file this was opened from.
+    pub fn path(&self) -> &Path {
+        &self.path
+    }
+
     /// Writes every entry under `out`; returns the file count.
     pub fn extract_all(&self, out: &Path) -> Result<usize> {
         match &self.kind {

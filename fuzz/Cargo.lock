@@ -183,6 +183,7 @@ dependencies = [
  "prybar-mdl",
  "prybar-tools",
  "prybar-vpk",
+ "prybar-vtf",
  "tempfile",
 ]
 
@@ -241,6 +242,13 @@ dependencies = [
  "prybar-io",
  "thiserror",
  "walkdir",
+]
+
+[[package]]
+name = "prybar-vtf"
+version = "0.1.0"
+dependencies = [
+ "thiserror",
 ]
 
 [[package]]
