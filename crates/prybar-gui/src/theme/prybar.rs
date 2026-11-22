@@ -28,6 +28,9 @@ pub struct Tokens {
     pub primary: Rgba,
     pub on_primary: Rgba,
     pub danger: Rgba,
+    /// Solid green for the one good-news action: an update is ready.
+    pub success: Rgba,
+    pub on_success: Rgba,
 }
 
 /// Near-black graphite, the default.
@@ -45,6 +48,8 @@ fn dark() -> Tokens {
         primary: rgb(0xeceef1),
         on_primary: rgb(0x131417),
         danger: rgb(0xf2837a),
+        success: rgb(0x3fb37f),
+        on_success: rgb(0x0d1f16),
     }
 }
 
@@ -63,6 +68,8 @@ fn light() -> Tokens {
         primary: rgb(0x1b1a18),
         on_primary: rgb(0xf7f5f1),
         danger: rgb(0xb3362c),
+        success: rgb(0x1d7a4c),
+        on_success: rgb(0xffffff),
     }
 }
 

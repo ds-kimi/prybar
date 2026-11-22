@@ -64,10 +64,13 @@ fn start_on(state: &gpui::Entity<AppState>, screen: Option<crate::state::Screen>
 fn initial_state(launch: Launch, cx: &mut gpui::Context<AppState>) -> AppState {
     let mut state = AppState::default();
     state.prefs = crate::state::prefs::default_path();
-    state.light = state
-        .prefs
-        .as_deref()
-        .is_some_and(crate::state::prefs::load_light);
+    if let Some(p) = state.prefs.as_deref().map(crate::state::prefs::load) {
+        state.light = p.light;
+        state.updates.auto = p.auto_update;
+    }
+    if !prybar_update::checks_disabled() {
+        state.check_updates(false, cx);
+    }
     let mut files = launch.files;
     if launch.sample {
         match crate::sample::write(&crate::sample::default_dir()) {

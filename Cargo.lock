@@ -4529,6 +4529,7 @@ dependencies = [
  "prybar-mdl",
  "prybar-service",
  "prybar-tools",
+ "prybar-update",
  "prybar-vpk",
  "prybar-vtf",
  "prybar-workshop",

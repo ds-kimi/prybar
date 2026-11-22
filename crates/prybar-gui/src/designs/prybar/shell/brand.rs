@@ -81,12 +81,15 @@ fn glyph(icon: &'static str, light: bool, t: Tokens) -> AnyElement {
 }
 
 /// The tooltip doubles as the button's name, since the icon has no text.
-struct Tip(SharedString, Tokens);
+pub(super) struct Tip(pub SharedString, pub Tokens);
 
 impl Render for Tip {
     fn render(&mut self, _: &mut Window, _: &mut Context<Self>) -> impl IntoElement {
         let t = self.1;
+        // Release notes also land here, so long text wraps instead of
+        // stretching across the window.
         div()
+            .max_w(gpui::px(360.))
             .px_2()
             .py_1()
             .rounded_md()

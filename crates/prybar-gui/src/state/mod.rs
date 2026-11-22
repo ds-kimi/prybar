@@ -49,6 +49,8 @@ pub struct AppState {
     pub split_qc: bool,
     /// Games config, compile and publish runs.
     pub tools: Tools,
+    /// Release check, download and restart.
+    pub updates: crate::update::Updates,
     /// Where the theme choice is saved; `None` keeps it in memory.
     pub prefs: Option<PathBuf>,
     next_id: u64,

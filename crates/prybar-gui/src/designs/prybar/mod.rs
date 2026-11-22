@@ -4,7 +4,7 @@
 mod motion;
 mod shell;
 #[cfg(test)]
-mod tests;
+pub(crate) mod tests;
 mod views;
 mod widgets;
 

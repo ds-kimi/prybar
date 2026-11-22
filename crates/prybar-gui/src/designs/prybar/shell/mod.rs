@@ -1,11 +1,12 @@
 //! The frame: one horizontal top bar holding the logo, the screens,
-//! job status, the theme toggle and settings; toasts and the command
+//! job status, the update button, the theme toggle and settings; toasts and the command
 //! palette float above.
 
 mod brand;
 pub mod palette;
 mod status;
 pub mod toasts;
+mod update;
 
 use gpui::{div, prelude::*, AnyElement, Context};
 
@@ -44,6 +45,7 @@ pub fn bar(s: &AppState, t: Tokens, cx: &Context<Root>) -> AnyElement {
         .children(items)
         .child(div().flex_1())
         .children(status::job(s, t))
+        .children(update::button(s, t, cx))
         .child(brand::theme_toggle(s.light, t, cx))
         .child(nav(Screen::Settings, s, t, cx))
         .children(status::sweep(s, t))

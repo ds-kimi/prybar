@@ -8,7 +8,7 @@ use gpui::{AppContext as _, Entity, Modifiers, TestAppContext, VisualTestContext
 use crate::app::{Forms, Root};
 use crate::state::AppState;
 
-pub(super) fn window(
+pub(crate) fn window(
     cx: &mut TestAppContext,
     light: bool,
 ) -> (Entity<AppState>, VisualTestContext) {

@@ -8,6 +8,7 @@ mod sample;
 mod state;
 mod textures;
 mod theme;
+mod update;
 mod viewport;
 
 fn main() {

@@ -1,6 +1,9 @@
-//! Settings: appearance, and the games config (detect, edit, save).
+//! Settings: appearance, updates, and the games config (detect, edit,
+//! save).
 
 mod games;
+mod status;
+mod updates;
 
 use gpui::{div, prelude::*, px, AnyElement, Context};
 
@@ -32,6 +35,7 @@ pub fn view(s: &AppState, f: &Forms, t: Tokens, cx: &Context<Root>) -> AnyElemen
         .gap_3()
         .child(widgets::heading("Settings"))
         .child(appearance(s, t))
+        .child(updates::section(s, t, cx))
         .child(widgets::section("Games", t))
         .child(widgets::readonly("Games config", path, t))
         .child(div().flex().child(detect))
