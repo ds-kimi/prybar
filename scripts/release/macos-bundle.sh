@@ -8,6 +8,9 @@ app="$out/Prybar.app"
 rm -rf "$app"
 mkdir -p "$app/Contents/MacOS" "$app/Contents/Resources"
 cp "$bin" "$app/Contents/MacOS/prybar-gui"
+# The GUI links the Steam API (@loader_path) for Workshop upload.
+steam_lib="$(dirname "$bin")/libsteam_api.dylib"
+if [ -f "$steam_lib" ]; then cp "$steam_lib" "$app/Contents/MacOS/"; fi
 cp "$here/assets/icon/Prybar.icns" "$app/Contents/Resources/Prybar.icns"
 # Apple wants up to three dot-separated integers; anything else (rc tags,
 # slashes) would break the plist or the sed below, so refuse it.

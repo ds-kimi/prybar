@@ -30,6 +30,10 @@ sign() {
   codesign --force --options runtime --timestamp --keychain "$keychain" \
     --sign "$MACOS_SIGN_IDENTITY" "$@"
 }
+# Nested code is signed before what loads it, or notarization refuses it.
+for lib in "$dir/libsteam_api.dylib" "$dir/Prybar.app/Contents/MacOS/libsteam_api.dylib"; do
+  if [ -f "$lib" ]; then sign "$lib"; fi
+done
 sign "$dir/prybar"
 sign "$dir/prybar-mcp"
 sign --entitlements "$here/crates/prybar-gui/bundle/entitlements.plist" "$dir/Prybar.app"
