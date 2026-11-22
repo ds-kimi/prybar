@@ -1,0 +1,13 @@
+{
+  "name": "prybar",
+  "owner": { "name": "Kimi", "url": "https://github.com/ds-kimi" },
+  "metadata": { "description": "Source engine modding tools: decompile, compile and package GMod/Source models and addons." },
+  "plugins": [
+    {
+      "name": "prybar",
+      "source": "./plugins/prybar",
+      "description": "Skill + MCP server for the prybar CLI: MDL 04-53 decompile, QC/SMD, VPK/GMA pack/unpack, studiomdl, Steam Workshop.",
+      "category": "development"
+    }
+  ]
+}

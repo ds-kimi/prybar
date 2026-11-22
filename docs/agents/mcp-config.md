@@ -4,6 +4,14 @@ Build or download `prybar-mcp`, then register the absolute path of the binary. I
 
 ## Claude Code
 
+Plugin with the skill and the MCP server (needs `prybar-mcp` on PATH):
+
+```
+/plugin install prybar --marketplace ds-kimi/prybar
+```
+
+MCP only:
+
 ```sh
 claude mcp add prybar -- /abs/path/to/prybar-mcp
 ```
@@ -39,6 +47,8 @@ claude mcp add prybar -- /abs/path/to/prybar-mcp
 ```
 
 ## Codex / ChatGPT agents (`~/.codex/config.toml`)
+
+Or in one step: `codex mcp add prybar -- /abs/path/to/prybar-mcp`.
 
 ```toml
 [mcp_servers.prybar]

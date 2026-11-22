@@ -21,7 +21,7 @@ prybar publish <spec.json> --dry-run
 - Keep companions (`.vvd`, `.vtx`, `.phy`, `.ani`) next to the `.mdl`.
 - Do not commit or redistribute decompiled game assets.
 
-Docs for agents: `docs/agents/usecases.md` (recipes), `docs/agents/errors.md` (every error and fix), `docs/agents/troubleshooting.md`. Claude Code skill: `skills/claude/prybar/SKILL.md`.
+Docs for agents: `docs/agents/usecases.md` (recipes), `docs/agents/errors.md` (every error and fix), `docs/agents/troubleshooting.md`. Claude Code skill: `plugins/prybar/skills/prybar/SKILL.md`.
 
 ## Working on the repo
 

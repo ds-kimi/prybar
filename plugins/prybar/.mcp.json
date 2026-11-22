@@ -1,0 +1,5 @@
+{
+  "mcpServers": {
+    "prybar": { "command": "prybar-mcp", "args": [] }
+  }
+}

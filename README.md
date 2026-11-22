@@ -54,8 +54,33 @@ Add `--json` for one machine-readable document on stdout. Exit codes are stable:
 
 ## For AI agents
 
-- Claude Code skill: [skills/claude/prybar/SKILL.md](skills/claude/prybar/SKILL.md)
-- Codex, ChatGPT and other agents: [AGENTS.md](AGENTS.md)
+Put `prybar` and `prybar-mcp` from the [releases](https://github.com/ds-kimi/prybar/releases) on your PATH first.
+
+**Claude Code** (skill + MCP server in one plugin):
+
+```
+/plugin install prybar --marketplace ds-kimi/prybar
+```
+
+On older Claude Code versions: `/plugin marketplace add ds-kimi/prybar`, then `/plugin install prybar@prybar`.
+
+**Codex CLI:**
+
+```sh
+codex mcp add prybar -- prybar-mcp
+```
+
+**Cursor:** [Add to Cursor](https://cursor.com/en/install-mcp?name=prybar&config=eyJjb21tYW5kIjoicHJ5YmFyLW1jcCJ9)
+
+**VS Code:**
+
+```sh
+code --add-mcp '{"name":"prybar","command":"prybar-mcp"}'
+```
+
+**Claude Desktop and others:** config snippets in [docs/agents/mcp-config.md](docs/agents/mcp-config.md). ChatGPT on the web and in the app only connects to remote MCP servers, so use Codex there, or any agent with a shell through the CLI ([AGENTS.md](AGENTS.md)).
+
+- Skill source: [plugins/prybar/skills/prybar/SKILL.md](plugins/prybar/skills/prybar/SKILL.md)
 - Error reference, recipes, troubleshooting: [docs/agents/](docs/agents/)
 
 ## Documentation
