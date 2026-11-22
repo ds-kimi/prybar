@@ -38,7 +38,10 @@ meshes, sequences, materials, flex, body parts, companions found or missing),
 package listing with filter and extract, decompile to a folder with split QC,
 game list in settings and compile.
 
-Placeholder (labelled regions): 3D model preview, texture preview, compile log
-stream, workshop upload progress. The publish form is laid out but does not
-upload.
+Compile runs the picked game's studiomdl (through Wine or `PRYBAR_WINE` off
+Windows) with the log streamed line by line, cancel and copy. Settings
+detects games and edits a game's folder and studiomdl. Publish validates
+with Dry run; real uploads need a build with the Steamworks SDK:
+`cargo run -p prybar-gui --features workshop`, Steam running and logged in.
+Without them the screen says which one is missing.
 

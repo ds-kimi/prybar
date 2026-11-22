@@ -4467,6 +4467,7 @@ dependencies = [
  "prybar-tools",
  "prybar-vpk",
  "prybar-vtf",
+ "prybar-workshop",
  "tempfile",
  "wgpu",
 ]
