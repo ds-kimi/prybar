@@ -187,4 +187,6 @@ Conventional commits (`feat(vpk): ...`, `fix(mdl): ...`).
 `.github/workflows/`: `ci.yml` (fmt, clippy, test, check-limits on
 Windows/Linux/macOS + cargo-deny), `fuzz.yml` (60 s smoke on PRs touching
 parsers, 30 min nightly), `release.yml` (tag `v*`: `prybar` and
-`prybar-mcp` for Windows, Linux and macOS with SHA-256 checksums).
+`prybar-mcp` for Windows, Linux and macOS with SHA-256 checksums, plus
+`Prybar.app` on macOS; signed and notarized when the secrets in
+`docs/release/macos-signing.md` are set).

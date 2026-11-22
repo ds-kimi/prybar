@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!-- Empty on purpose: the hardened runtime defaults are enough, Metal shaders
+     compiled at launch do not need a JIT exception. -->
+<plist version="1.0">
+<dict/>
+</plist>
