@@ -164,6 +164,8 @@ jobs:
   publish:
     needs: [build, macos]
     runs-on: ubuntu-latest
+    # Holds UPDATE_SIGNING_KEY; this job runs no build code.
+    environment: release
     permissions:
       contents: write
     steps:
@@ -172,8 +174,36 @@ jobs:
           pattern: dist-*
           merge-multiple: true
       - run: cat ./*.sha256 > SHA256SUMS
+      # Without the key the release ships unsigned and updaters only offer a
+      # download link; see docs/release/updates.md.
+      - name: check update signing key
+        id: updsign
+        if: github.repository == 'ds-kimi/prybar' && startsWith(github.ref, 'refs/tags/v')
+        env:
+          KEY_SET: ${{ secrets.UPDATE_SIGNING_KEY != '' }}
+        run: |
+          if [ "$KEY_SET" = "true" ]; then echo "enabled=true" >> "$GITHUB_OUTPUT"
+          else echo "::notice::UPDATE_SIGNING_KEY not set, SHA256SUMS ships unsigned"; echo "enabled=false" >> "$GITHUB_OUTPUT"; fi
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        if: steps.updsign.outputs.enabled == 'true'
+        with:
+          persist-credentials: false
+          path: src
+          sparse-checkout: scripts/release
+      - name: sign SHA256SUMS
+        if: steps.updsign.outputs.enabled == 'true'
+        env:
+          UPDATE_SIGNING_KEY: ${{ secrets.UPDATE_SIGNING_KEY }}
+          UPDATE_SIGNING_KEY_PASSWORD: ${{ secrets.UPDATE_SIGNING_KEY_PASSWORD }}
+        run: |
+          sudo apt-get install -y --no-install-recommends minisign >/dev/null
+          sh src/scripts/release/sign-sums.sh SHA256SUMS
+      - name: remove update signing key
+        if: always() && steps.updsign.outputs.enabled == 'true'
+        run: sh src/scripts/release/sign-sums-cleanup.sh
       - uses: softprops/action-gh-release@3bb12739c298aeb8a4eeaf626c5b8d85266b0e65 # v2
         with:
           files: |
             prybar-*
             SHA256SUMS
+            SHA256SUMS.minisig
