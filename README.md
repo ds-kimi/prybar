@@ -77,3 +77,7 @@ Prybar is source-available under **MIT + Commons Clause 1.0**. It is not OSI ope
 - Do not sell Prybar itself, as is or repacked.
 
 Full text in [LICENSE](LICENSE).
+
+## Thanks
+
+Prybar is inspired by [Crowbar](https://github.com/ZeqMacaw/Crowbar). Thanks to ZeqMacaw for creating it and to everyone who worked on it over the years. Without it, this project would not exist.
