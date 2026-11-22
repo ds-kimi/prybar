@@ -8,6 +8,7 @@ use gpui::{Context, Window};
 
 use super::Viewport;
 use crate::viewport::pose::{joints, skin, Clip};
+use crate::viewport::render::Cmd;
 
 impl Viewport {
     /// Plays sequence `seq` from the start; `None` goes back to the bind
@@ -62,7 +63,7 @@ impl Viewport {
             skin(bind, &clip.skinning(&world), &mut scene.vertices);
             scene.bones = joints(&world, &clip.parents);
         }
-        worker.scene(scene);
+        worker.send(Cmd::Scene(Box::new(scene)));
         self.last = None;
     }
 }

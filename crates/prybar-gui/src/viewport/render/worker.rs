@@ -3,9 +3,11 @@ use std::sync::mpsc;
 use super::{Frame, Renderer, Request};
 use crate::viewport::mesh::Scene;
 
-enum Cmd {
+/// What the UI asks of the render thread.
+pub enum Cmd {
     Scene(Box<Scene>),
     Frame(Request),
+    Materials(std::sync::Arc<Vec<Vec<prybar_vtf::Image>>>),
 }
 
 pub enum Output {
@@ -39,12 +41,10 @@ impl Worker {
         Self { tx, rx }
     }
 
-    pub fn scene(&self, scene: Scene) {
-        let _ = self.tx.send(Cmd::Scene(Box::new(scene)));
-    }
-
-    pub fn frame(&self, req: Request) {
-        let _ = self.tx.send(Cmd::Frame(req));
+    /// Never blocks; the render thread drains everything queued and
+    /// draws only the newest frame request.
+    pub fn send(&self, cmd: Cmd) {
+        let _ = self.tx.send(cmd);
     }
 }
 
@@ -61,6 +61,7 @@ fn run(cmds: &mpsc::Receiver<Cmd>, out: &async_channel::Sender<Output>) {
             match cmd {
                 Cmd::Scene(s) => r.set_scene(&s),
                 Cmd::Frame(q) => req = Some(q),
+                Cmd::Materials(m) => r.materials.set(&r.gpu, &m),
             }
         }
         if let Some(q) = req {

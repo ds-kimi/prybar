@@ -54,7 +54,12 @@ fn model_links_and_empty_open(cx: &mut TestAppContext) {
         state.read_with(&cx, |s, _| s.screen),
         Screen::TexturePreview
     );
-    assert!(cx.debug_bounds("pb-placeholder").is_some());
+    cx.run_until_parked();
+    assert!(cx.debug_bounds("pb-tex-preview").is_some());
+    assert!(
+        cx.debug_bounds("pb-tex-0").is_some(),
+        "sample material listed"
+    );
 }
 
 /// Recent row reopens, decompile runs and reports, the option and the

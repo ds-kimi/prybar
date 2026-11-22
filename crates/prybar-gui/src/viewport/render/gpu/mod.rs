@@ -1,6 +1,8 @@
+pub mod material;
 pub mod pipelines;
 mod states;
 pub mod targets;
+mod texels;
 
 use std::sync::{Arc, Mutex};
 

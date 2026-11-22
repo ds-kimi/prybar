@@ -5,6 +5,8 @@ use gpui::{App, AppContext as _, Entity};
 
 use crate::designs::input::{any, Spec, TextInput};
 use crate::state::checks;
+use crate::state::AppState;
+use crate::textures::view::TextureView;
 use crate::viewport::view::Viewport;
 
 #[derive(Clone)]
@@ -19,6 +21,8 @@ pub struct Forms {
     pub config: Entity<TextInput>,
     /// The 3D preview, kept so its GPU thread and camera survive tabs.
     pub viewport: Entity<Viewport>,
+    /// The texture screen, kept so its decoded image and pan survive tabs.
+    pub textures: Entity<TextureView>,
 }
 
 type Check = fn(&str) -> Option<&'static str>;
@@ -49,6 +53,23 @@ impl Forms {
             visibility: field(cx, "Private", "Private", false, checks::visibility),
             config: field(cx, "/path/to/games.toml", &config, false, checks::required),
             viewport: cx.new(|_| Viewport::default()),
+            textures: cx.new(|_| TextureView::default()),
+        }
+    }
+
+    /// Points the 3D view and the texture screen at the model the state
+    /// wants; each loads only when its screen first shows that model.
+    pub fn follow(&self, state: &Entity<AppState>, cx: &mut App) {
+        let s = state.read(cx);
+        let (model, textures) = (
+            crate::designs::wanted(s),
+            crate::designs::wanted_textures(s),
+        );
+        if let Some(path) = model {
+            self.viewport.update(cx, |v, cx| v.show(Some(path), cx));
+        }
+        if let Some(path) = textures {
+            self.textures.update(cx, |v, cx| v.show(Some(path), cx));
         }
     }
 }

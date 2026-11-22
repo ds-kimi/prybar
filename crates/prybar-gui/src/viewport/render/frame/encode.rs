@@ -1,5 +1,6 @@
 use super::color::linear;
 use super::upload::SceneBuffers;
+use crate::viewport::render::gpu::material::Materials;
 use crate::viewport::render::gpu::pipelines::Pipes;
 use crate::viewport::render::gpu::targets::Targets;
 use crate::viewport::render::Request;
@@ -11,11 +12,14 @@ pub fn pass(
     p: &Pipes,
     b: &SceneBuffers,
     req: &Request,
-    bind: &wgpu::BindGroup,
+    (globals, materials): (&wgpu::BindGroup, &Materials),
 ) {
     let mut pass = begin(enc, t, req.clear);
-    pass.set_bind_group(0, bind, &[]);
-    draw(&mut pass, p, b, req);
+    pass.set_bind_group(0, globals, &[]);
+    // Every pipeline shares the layout, so group 1 must be set before
+    // the grid too, even though the line shader never reads it.
+    pass.set_bind_group(1, materials.get(usize::MAX), &[]);
+    draw(&mut pass, p, b, req, materials);
 }
 
 fn begin<'a>(
@@ -48,14 +52,17 @@ fn begin<'a>(
     })
 }
 
-fn draw(pass: &mut wgpu::RenderPass, p: &Pipes, b: &SceneBuffers, req: &Request) {
+fn draw(pass: &mut wgpu::RenderPass, p: &Pipes, b: &SceneBuffers, req: &Request, m: &Materials) {
     pass.set_pipeline(&p.grid);
     pass.set_vertex_buffer(0, b.grid.slice(..));
     pass.draw(0..b.grid_points.len() as u32, 0..1);
     pass.set_index_buffer(b.index.slice(..), wgpu::IndexFormat::Uint32);
     pass.set_vertex_buffer(0, b.vertex.slice(..));
     pass.set_pipeline(&p.model);
-    pass.draw_indexed(0..b.indices, 0, 0..1);
+    for part in &b.parts {
+        pass.set_bind_group(1, m.get(part.material), &[]);
+        pass.draw_indexed(part.first..part.first + part.count, 0, 0..1);
+    }
     if let (true, Some(wire)) = (req.flags.wire, &p.wire) {
         pass.set_pipeline(wire);
         pass.draw_indexed(0..b.indices, 0, 0..1);

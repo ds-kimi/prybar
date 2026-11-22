@@ -2,4 +2,4 @@
 
 mod prybar;
 
-pub use prybar::{input, render, wanted};
+pub use prybar::{input, render, wanted, wanted_textures};

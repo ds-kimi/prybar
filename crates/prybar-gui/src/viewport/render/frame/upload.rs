@@ -9,6 +9,8 @@ pub struct SceneBuffers {
     pub vertex: wgpu::Buffer,
     pub index: wgpu::Buffer,
     pub indices: u32,
+    /// Draw ranges, one material each.
+    pub parts: Vec<crate::viewport::mesh::Part>,
     pub bones: wgpu::Buffer,
     pub bone_vertices: u32,
     pub grid: wgpu::Buffer,
@@ -32,6 +34,7 @@ pub fn upload(device: &wgpu::Device, scene: &Scene) -> SceneBuffers {
         vertex,
         index: init("indices", &index_bytes, wgpu::BufferUsages::INDEX),
         indices: scene.indices.len() as u32,
+        parts: scene.parts.clone(),
         bones: init(
             "bones",
             &lines(&bone_points, BONE),

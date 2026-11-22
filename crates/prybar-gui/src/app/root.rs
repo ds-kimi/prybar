@@ -26,11 +26,7 @@ impl Root {
         let focus = cx.focus_handle();
         focus.focus(window, cx);
         let _observe = cx.observe(&state, |this: &mut Self, state, cx| {
-            if let Some(path) = crate::designs::wanted(state.read(cx)) {
-                this.forms
-                    .viewport
-                    .update(cx, |v, cx| v.show(Some(path), cx));
-            }
+            this.forms.follow(&state, cx);
             cx.notify()
         });
         // A clicked row that a screen change removes takes focus with it;

@@ -12,7 +12,7 @@ mod settings;
 
 use gpui::{div, prelude::*, AnyElement, Context};
 
-pub use preview::wanted;
+pub use preview::{wanted, wanted_textures};
 
 use super::motion;
 use super::widgets::{self, Kind};

@@ -54,8 +54,8 @@ fn worker_answers_with_a_frame_or_an_error() {
     let w = Worker::spawn();
     let scene = sample_scene();
     let req = request(&scene, 40, 30);
-    w.scene(scene);
-    w.frame(req);
+    w.send(Cmd::Scene(Box::new(scene)));
+    w.send(Cmd::Frame(req));
     loop {
         match w.rx.recv_blocking() {
             Ok(Output::Ready { .. }) => continue,

@@ -16,6 +16,17 @@ pub fn base_texture(text: &str) -> Option<Result<String, String>> {
     include.map(Err)
 }
 
+/// Whether any of `keys` is set to a non-zero value (`$alphatest 1`).
+pub fn flag(text: &str, keys: &[&str]) -> bool {
+    let mut tokens = tokens(text);
+    while let Some(key) = tokens.next() {
+        if keys.iter().any(|k| key.eq_ignore_ascii_case(k)) {
+            return tokens.next().is_some_and(|v| v.trim() != "0");
+        }
+    }
+    false
+}
+
 /// Quoted or bare words; braces and `//` comments are dropped.
 fn tokens(text: &str) -> impl Iterator<Item = &str> {
     text.lines()

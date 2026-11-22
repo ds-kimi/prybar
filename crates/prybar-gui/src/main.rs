@@ -6,6 +6,7 @@ mod cli;
 mod designs;
 mod sample;
 mod state;
+mod textures;
 mod theme;
 mod viewport;
 

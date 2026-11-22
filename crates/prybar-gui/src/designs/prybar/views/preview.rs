@@ -28,6 +28,7 @@ pub fn view(screen: Screen, doc: Option<&Document>, f: &Forms, t: Tokens) -> Any
         )
         .child(match (screen, doc) {
             (Screen::ModelPreview, Some(_)) => f.viewport.clone().into_any_element(),
+            (Screen::TexturePreview, Some(_)) => f.textures.clone().into_any_element(),
             _ => region(ph, t),
         })
         .into_any_element()
@@ -37,6 +38,15 @@ pub fn view(screen: Screen, doc: Option<&Document>, f: &Forms, t: Tokens) -> Any
 /// the GPU only starts for people who look at a model.
 pub fn wanted(s: &AppState) -> Option<PathBuf> {
     matches!(s.screen, Screen::Inspector | Screen::ModelPreview)
+        .then(|| super::pick(s, true))
+        .flatten()
+        .map(|d| d.path().to_owned())
+}
+
+/// The model the texture screen should list, once it is open: opening
+/// every game VPK is only worth it for people who look at textures.
+pub fn wanted_textures(s: &AppState) -> Option<PathBuf> {
+    (s.screen == Screen::TexturePreview)
         .then(|| super::pick(s, true))
         .flatten()
         .map(|d| d.path().to_owned())

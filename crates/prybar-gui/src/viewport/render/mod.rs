@@ -13,7 +13,7 @@ use std::time::Instant;
 use super::camera::Orbit;
 use super::mesh::Scene;
 
-pub use worker::{Output, Worker};
+pub use worker::{Cmd, Output, Worker};
 
 #[derive(Debug, Clone, Copy, Default, PartialEq)]
 pub struct Flags {
@@ -49,17 +49,20 @@ pub struct Renderer {
     pipes: gpu::pipelines::Pipes,
     targets: Option<gpu::targets::Targets>,
     scene: Option<frame::upload::SceneBuffers>,
+    materials: gpu::material::Materials,
 }
 
 impl Renderer {
     pub fn new() -> Result<Self, String> {
         let gpu = gpu::open()?;
-        let pipes = gpu::pipelines::build(&gpu);
+        let materials = gpu::material::Materials::new(&gpu);
+        let pipes = gpu::pipelines::build(&gpu, &materials.layout);
         Ok(Self {
             gpu,
             pipes,
             targets: None,
             scene: None,
+            materials,
         })
     }
 
@@ -79,7 +82,8 @@ impl Renderer {
         q.write_buffer(&self.gpu.globals, 0, &frame::color::globals(&req));
         q.write_buffer(&b.grid, 0, &grid);
         let mut enc = self.gpu.device.create_command_encoder(&Default::default());
-        frame::encode::pass(&mut enc, t, &self.pipes, b, &req, &self.gpu.bind);
+        let binds = (&self.gpu.bind, &self.materials);
+        frame::encode::pass(&mut enc, t, &self.pipes, b, &req, binds);
         let bgra = frame::readback::read(&self.gpu, t, enc)?;
         if let Some(e) = self.gpu.errors.lock().ok().and_then(|mut e| e.take()) {
             return Err(format!("GPU error: {e}"));

@@ -1,7 +1,8 @@
 use std::sync::Arc;
 
-use gpui::{point, px, size, Bounds, Pixels, RenderImage};
+use gpui::{point, px, size, Bounds, Context, Pixels, RenderImage, Task};
 
+use super::Viewport;
 use crate::viewport::render::Frame;
 
 /// Frames are drawn at device size, so they map 1:1 to pixels. A frame
@@ -21,4 +22,18 @@ pub fn native(b: Bounds<Pixels>, img: &RenderImage, scale: f32) -> Bounds<Pixels
 pub fn image(f: Frame) -> Option<Arc<RenderImage>> {
     let buf = image::RgbaImage::from_raw(f.width, f.height, f.bgra)?;
     Some(Arc::new(RenderImage::new(vec![image::Frame::new(buf)])))
+}
+
+/// Moves render thread answers onto the UI thread as they arrive.
+pub fn pump(
+    rx: async_channel::Receiver<crate::viewport::render::Output>,
+    cx: &mut Context<Viewport>,
+) -> Task<()> {
+    cx.spawn(async move |this, cx| {
+        while let Ok(msg) = rx.recv().await {
+            if this.update(cx, |v, cx| v.accept(msg, cx)).is_err() {
+                break;
+            }
+        }
+    })
 }

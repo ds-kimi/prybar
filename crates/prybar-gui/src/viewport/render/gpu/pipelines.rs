@@ -23,8 +23,8 @@ const TARGET: wgpu::ColorTargetState = wgpu::ColorTargetState {
     write_mask: wgpu::ColorWrites::ALL,
 };
 
-pub fn build(gpu: &Gpu) -> Pipes {
-    let (layout, m, l) = setup(gpu);
+pub fn build(gpu: &Gpu, material: &wgpu::BindGroupLayout) -> Pipes {
+    let (layout, m, l) = setup(gpu, material);
     let tri = wgpu::PrimitiveTopology::TriangleList;
     let line = wgpu::PrimitiveTopology::LineList;
     let kind = |module, attrs, topology, polygon, depth| Kind {
@@ -50,8 +50,11 @@ pub fn build(gpu: &Gpu) -> Pipes {
     }
 }
 
-/// The shared layout and both shader modules.
-fn setup(gpu: &Gpu) -> (wgpu::PipelineLayout, wgpu::ShaderModule, wgpu::ShaderModule) {
+/// The shared layout (globals, then the material) and both shader modules.
+fn setup(
+    gpu: &Gpu,
+    material: &wgpu::BindGroupLayout,
+) -> (wgpu::PipelineLayout, wgpu::ShaderModule, wgpu::ShaderModule) {
     let module = |name, src: &str| {
         gpu.device
             .create_shader_module(wgpu::ShaderModuleDescriptor {
@@ -63,7 +66,7 @@ fn setup(gpu: &Gpu) -> (wgpu::PipelineLayout, wgpu::ShaderModule, wgpu::ShaderMo
         .device
         .create_pipeline_layout(&wgpu::PipelineLayoutDescriptor {
             label: None,
-            bind_group_layouts: &[Some(&gpu.layout)],
+            bind_group_layouts: &[Some(&gpu.layout), Some(material)],
             immediate_size: 0,
         });
     (

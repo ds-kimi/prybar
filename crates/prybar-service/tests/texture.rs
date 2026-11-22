@@ -23,27 +23,28 @@ fn vmt_keys_and_patches() {
     assert_eq!(base_texture("\"unterminated"), None);
 }
 
-#[test]
-fn finds_texture_next_to_the_model_tree() {
-    let tmp = tempfile::tempdir().unwrap();
-    let root = tmp.path();
+/// `root/models/props/crate.mdl`'s material `Crate` with a DXT1 texture.
+fn tree(root: &std::path::Path) {
     std::fs::create_dir_all(root.join("models/props")).unwrap();
     std::fs::create_dir_all(root.join("materials/models/props")).unwrap();
     let vmt = "VertexLitGeneric { $basetexture \"models/props/wood\" }";
     std::fs::write(root.join("materials/models/props/crate.vmt"), vmt).unwrap();
     let vtf = vtf_support::vtf(5, 13, (4, 4), 1, &vtf_support::dxt1_red_blue());
     std::fs::write(root.join("materials/models/props/wood.vtf"), vtf).unwrap();
+}
+
+#[test]
+fn finds_texture_next_to_the_model_tree() {
+    let tmp = tempfile::tempdir().unwrap();
+    let root = tmp.path();
+    tree(root);
     let ir = ModelIr {
-        materials: vec![
-            Material {
-                name: "Crate".into(),
+        materials: ["Crate", "gone"]
+            .map(|n| Material {
+                name: n.into(),
                 flags: 0,
-            },
-            Material {
-                name: "gone".into(),
-                flags: 0,
-            },
-        ],
+            })
+            .to_vec(),
         material_dirs: vec!["models\\props\\".into()],
         ..Default::default()
     };

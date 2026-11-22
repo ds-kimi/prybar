@@ -36,7 +36,7 @@ fn opens_package_and_extracts(cx: &mut TestAppContext) {
     let out = tmp.path().join("x");
     state.update(cx, |s, cx| {
         assert_eq!(s.screen, Screen::Package);
-        assert!(matches!(&s.documents[0], Document::Package { report, .. } if report.total == 3));
+        assert!(matches!(&s.documents[0], Document::Package { report, .. } if report.total == 5));
         s.decompile_selected(out.join("d"), cx);
         s.extract_selected(out.join("e"), cx);
     });

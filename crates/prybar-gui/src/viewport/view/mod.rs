@@ -24,7 +24,7 @@ use prybar_mdl::ir::ModelIr;
 use super::camera::{Inertia, Orbit};
 use super::mesh::{Pick, Scene};
 use super::pose::Play;
-use super::render::{Flags, Output, Request, Worker};
+use super::render::{Cmd, Flags, Output, Request, Worker};
 
 #[derive(Debug, Clone, Default, PartialEq)]
 pub enum Status {
@@ -79,6 +79,8 @@ pub struct Viewport {
     pub play: Play,
     /// Only the newest variant build matters.
     rebuild: Option<Task<()>>,
+    /// Materials and base textures of the open model, once found.
+    pub textures: Option<Arc<crate::textures::TextureSet>>,
 }
 
 /// Asks the host to switch between the side-by-side and full-size view.
@@ -109,7 +111,7 @@ impl Viewport {
         self.drag = None;
         self.last = None;
         self.drops.extend(self.image.take());
-        (self.ir, self.bind, self.rebuild) = (None, None, None);
+        (self.ir, self.bind, self.rebuild, self.textures) = (None, None, None, None);
         (self.pick, self.play) = (Pick::default(), Play::default());
         self.status = if path.is_some() {
             Status::Loading
@@ -140,7 +142,7 @@ impl Viewport {
         };
         if self.last != Some(req) {
             self.last = Some(req);
-            worker.frame(req);
+            worker.send(Cmd::Frame(req));
         }
     }
 

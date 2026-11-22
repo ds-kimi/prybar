@@ -1,6 +1,6 @@
 //! Material name -> VMT -> base texture, with where each was looked for.
 
-use super::{normalize, vmt, Sources};
+use super::{normalize, vmt, Found, Sources};
 use prybar_mdl::ir::ModelIr;
 use serde::Serialize;
 
@@ -14,6 +14,8 @@ pub struct MaterialReport {
     pub base_texture: Option<String>,
     /// Location of the base texture VTF; `None` when it was not found.
     pub texture_location: Option<String>,
+    /// Alpha test or translucency: the texture alpha cuts the surface.
+    pub cutout: bool,
     /// VMT paths tried, for the "missing" message.
     pub tried: Vec<String>,
 }
@@ -27,6 +29,27 @@ pub fn materials(ir: &ModelIr, sources: &Sources) -> Vec<MaterialReport> {
 }
 
 fn material(ir: &ModelIr, name: &str, sources: &Sources) -> MaterialReport {
+    let (tried, vmt) = find_vmt(ir, name, sources);
+    let text = vmt
+        .as_ref()
+        .map(|(_, f)| String::from_utf8_lossy(&f.bytes).into_owned());
+    let base = text.as_deref().and_then(|t| follow(t, sources));
+    let cutout = text.is_some_and(|t| vmt::flag(&t, &["$alphatest", "$translucent"]));
+    let texture_location = base
+        .as_ref()
+        .and_then(|b| sources.locate(&format!("materials/{b}.vtf")));
+    MaterialReport {
+        name: name.to_owned(),
+        vmt: vmt.map(|(p, f)| (p, f.location)),
+        base_texture: base,
+        texture_location,
+        cutout,
+        tried,
+    }
+}
+
+/// Tries the name under every `$cdmaterials` folder, in model order.
+fn find_vmt(ir: &ModelIr, name: &str, sources: &Sources) -> (Vec<String>, Option<(String, Found)>) {
     let dirs = if ir.material_dirs.is_empty() {
         vec![String::new()]
     } else {
@@ -39,19 +62,7 @@ fn material(ir: &ModelIr, name: &str, sources: &Sources) -> MaterialReport {
     let vmt = tried
         .iter()
         .find_map(|p| sources.read(p).ok().flatten().map(|f| (p.clone(), f)));
-    let base = vmt
-        .as_ref()
-        .and_then(|(_, f)| follow(&String::from_utf8_lossy(&f.bytes), sources));
-    let texture_location = base
-        .as_ref()
-        .and_then(|b| sources.locate(&format!("materials/{b}.vtf")));
-    MaterialReport {
-        name: name.to_owned(),
-        vmt: vmt.map(|(p, f)| (p, f.location)),
-        base_texture: base,
-        texture_location,
-        tried,
-    }
+    (tried, vmt)
 }
 
 /// `$basetexture`, following one patch `include` when the VMT has none.
