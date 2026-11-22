@@ -6,10 +6,11 @@ pub enum DesignKind {
     Workbench,
     Canvas,
     Console,
+    Prybar,
 }
 
 impl DesignKind {
-    pub const ALL: [DesignKind; 3] = [Self::Workbench, Self::Canvas, Self::Console];
+    pub const ALL: [DesignKind; 4] = [Self::Workbench, Self::Canvas, Self::Console, Self::Prybar];
 
     /// Reads the `--design` value; `None` for anything unknown.
     pub fn parse(name: &str) -> Option<Self> {
@@ -23,6 +24,7 @@ impl DesignKind {
             Self::Workbench => "Workbench",
             Self::Canvas => "Canvas",
             Self::Console => "Console",
+            Self::Prybar => "Prybar",
         }
     }
 
@@ -31,6 +33,7 @@ impl DesignKind {
             Self::Workbench => "Dense pro tool: panels, trees and tables at a glance.",
             Self::Canvas => "Friendly visual flow: big cards, one step at a time.",
             Self::Console => "Keyboard first and minimal: type, run, read.",
+            Self::Prybar => "Workbench calm with a top bar, dark or light.",
         }
     }
 }

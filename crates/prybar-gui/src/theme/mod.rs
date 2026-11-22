@@ -1,6 +1,8 @@
 //! Colors. The chooser stays neutral so no design wins by its frame;
 //! each design gets its own palette, refined in its own lot.
 
+pub mod prybar;
+
 use gpui::{rgb, Rgba};
 
 use crate::state::{AppState, DesignKind};
@@ -45,6 +47,7 @@ pub fn chooser() -> Palette {
 pub fn for_design(kind: DesignKind) -> Palette {
     match kind {
         DesignKind::Workbench => workbench(false),
+        DesignKind::Prybar => prybar::palette(false),
         DesignKind::Canvas => Palette {
             bg: rgb(0xf4f1ec),
             surface: rgb(0xffffff),
@@ -104,6 +107,7 @@ pub fn current(state: &AppState) -> Palette {
     match state.design {
         None => chooser(),
         Some(DesignKind::Workbench) => workbench(state.light),
+        Some(DesignKind::Prybar) => prybar::palette(state.light),
         Some(kind) => for_design(kind),
     }
 }

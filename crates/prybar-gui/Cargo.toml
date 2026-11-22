@@ -19,6 +19,8 @@ gpui = { git = "https://github.com/zed-industries/zed", rev = "d31d1074a07b7bbaa
 gpui_platform = { git = "https://github.com/zed-industries/zed", rev = "d31d1074a07b7bbaa43a52fef7847a00dd491baf", features = ["font-kit", "wayland", "x11", "runtime_shaders"] }
 prybar-service = { path = "../prybar-service" }
 prybar-mdl = { path = "../prybar-mdl" }
+# Only for the config folder, where the theme choice is saved too.
+prybar-tools = { path = "../prybar-tools" }
 # Only to pack the synthetic sample package shown by `--sample`.
 prybar-vpk = { path = "../prybar-vpk" }
 

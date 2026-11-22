@@ -5,6 +5,7 @@ mod design;
 mod document;
 mod job;
 mod ops;
+pub mod prefs;
 mod run;
 mod screen;
 #[cfg(test)]
@@ -47,6 +48,8 @@ pub struct AppState {
     pub cursor: usize,
     /// Index into the compile screen's game list.
     pub game: usize,
+    /// Where the theme choice is saved; `None` keeps it in memory.
+    pub prefs: Option<PathBuf>,
     next_id: u64,
 }
 

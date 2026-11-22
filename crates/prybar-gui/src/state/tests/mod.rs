@@ -29,3 +29,18 @@ fn navigate_and_back(cx: &mut TestAppContext) {
         assert_eq!((s.screen, s.design), (Screen::Home, None));
     });
 }
+
+#[gpui::test]
+fn theme_is_remembered(cx: &mut TestAppContext) {
+    let dir = tempfile::tempdir().expect("tempdir");
+    let path = dir.path().join("prybar").join("gui.txt");
+    assert!(!super::prefs::load_light(&path), "dark by default");
+    let state = cx.new(|_| AppState {
+        prefs: Some(path.clone()),
+        ..AppState::default()
+    });
+    state.update(cx, |s, cx| s.toggle_theme(cx));
+    assert!(super::prefs::load_light(&path));
+    state.update(cx, |s, cx| s.toggle_theme(cx));
+    assert!(!super::prefs::load_light(&path));
+}
