@@ -1,5 +1,4 @@
-//! Buttons: primary in the strong neutral, secondary outlined, ghost
-//! bare until hovered.
+//! Buttons: primary in the strong neutral, secondary outlined.
 
 use gpui::{div, prelude::*, Div, ElementId, FontWeight, SharedString, Stateful};
 
@@ -10,7 +9,6 @@ use crate::theme::prybar::Tokens;
 pub enum Kind {
     Primary,
     Secondary,
-    Ghost,
 }
 
 /// Disabled buttons keep their place and contrast-safe text but take no
@@ -24,7 +22,7 @@ pub fn button(
 ) -> Stateful<Div> {
     let (bg, fg) = match kind {
         Kind::Primary => (t.primary, t.on_primary),
-        Kind::Secondary | Kind::Ghost => (gpui::transparent_black().into(), t.text),
+        Kind::Secondary => (gpui::transparent_black().into(), t.text),
     };
     let el = ring(div().id(id), t)
         .h_8()

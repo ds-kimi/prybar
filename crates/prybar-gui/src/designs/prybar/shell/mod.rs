@@ -1,15 +1,15 @@
-//! The frame: one horizontal top bar holding the wordmark, the screens,
+//! The frame: one horizontal top bar holding the logo, the screens,
 //! job status, the theme toggle and settings; toasts and the command
 //! palette float above.
 
+mod brand;
 pub mod palette;
 mod status;
 pub mod toasts;
 
-use gpui::{div, prelude::*, AnyElement, Context, FontWeight};
+use gpui::{div, prelude::*, AnyElement, Context};
 
-use super::widgets::{self, Kind};
-use crate::actions::ToggleTheme;
+use super::widgets;
 use crate::app::Root;
 use crate::state::{AppState, Screen};
 use crate::theme::prybar::Tokens;
@@ -27,10 +27,6 @@ const MAIN: [Screen; 6] = [
 
 pub fn bar(s: &AppState, t: Tokens, cx: &Context<Root>) -> AnyElement {
     let items = MAIN.into_iter().map(|screen| nav(screen, s, t, cx));
-    let brand = div()
-        .pr_3()
-        .font_weight(FontWeight::SEMIBOLD)
-        .child("prybar");
     div()
         .id("pb-nav")
         .debug_selector(|| "pb-nav".into())
@@ -44,11 +40,11 @@ pub fn bar(s: &AppState, t: Tokens, cx: &Context<Root>) -> AnyElement {
         .bg(t.surface)
         .border_b_1()
         .border_color(t.border)
-        .child(brand)
+        .child(brand::logo(t, cx))
         .children(items)
         .child(div().flex_1())
         .children(status::job(s, t))
-        .child(theme_toggle(s.light, t, cx))
+        .child(brand::theme_toggle(s.light, t, cx))
         .child(nav(Screen::Settings, s, t, cx))
         .children(status::sweep(s, t))
         .into_any_element()
@@ -63,14 +59,5 @@ fn nav(screen: Screen, s: &AppState, t: Tokens, cx: &Context<Root>) -> AnyElemen
                 this.state.update(cx, |s, cx| s.navigate(screen, cx))
             }),
         )
-        .into_any_element()
-}
-
-/// Names the theme it switches to, so the label is the action.
-fn theme_toggle(light: bool, t: Tokens, cx: &Context<Root>) -> AnyElement {
-    let label = if light { "Dark" } else { "Light" };
-    widgets::button("pb-theme", label, Kind::Ghost, true, t)
-        .debug_selector(|| "pb-theme".into())
-        .on_click(cx.listener(|_, _, window, cx| window.dispatch_action(Box::new(ToggleTheme), cx)))
         .into_any_element()
 }

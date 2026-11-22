@@ -47,3 +47,15 @@ fn status_and_toasts_show(cx: &mut TestAppContext) {
     assert!(cx.debug_bounds("pb-job").is_some());
     assert!(cx.debug_bounds("pb-toasts").is_some());
 }
+
+/// The logo is the way back Home from any screen.
+#[gpui::test]
+fn logo_goes_home(cx: &mut TestAppContext) {
+    let (state, mut cx) = window(cx, false);
+    let settings = cx.debug_bounds("nav-settings").expect("settings entry");
+    cx.simulate_click(settings.center(), Modifiers::none());
+    assert_eq!(state.read_with(&cx, |s, _| s.screen), Screen::Settings);
+    let logo = cx.debug_bounds("pb-logo").expect("logo");
+    cx.simulate_click(logo.center(), Modifiers::none());
+    assert_eq!(state.read_with(&cx, |s, _| s.screen), Screen::Home);
+}

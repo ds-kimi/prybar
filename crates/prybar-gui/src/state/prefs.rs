@@ -32,6 +32,7 @@ impl AppState {
     /// tests leave it unset so they never touch the real config.
     pub fn toggle_theme(&mut self, cx: &mut Context<Self>) {
         self.light = !self.light;
+        crate::app::follow_appearance(self.light, cx);
         if let Some(path) = self.prefs.clone() {
             if let Err(e) = save_light(&path, self.light) {
                 self.toast(ToastKind::Error, format!("Theme not saved: {e}"), cx);

@@ -1,5 +1,6 @@
 //! Window setup: key bindings, launch options and the root view.
 
+mod assets;
 mod handlers;
 mod root;
 #[cfg(test)]
@@ -8,32 +9,35 @@ mod ui;
 
 pub use root::Root;
 
-use gpui::{px, size, App, AppContext as _, Bounds, WindowBounds, WindowOptions};
+use gpui::{px, size, App, AppContext as _, Bounds, WindowAppearance, WindowBounds, WindowOptions};
 
 use crate::actions::{self, Quit};
 use crate::cli::Launch;
 use crate::state::AppState;
 
 pub fn run(launch: Launch) {
-    gpui_platform::application().run(move |cx: &mut App| {
-        cx.bind_keys(actions::bindings());
-        cx.on_action(|_: &Quit, cx| cx.quit());
-        let bounds = Bounds::centered(None, size(px(1200.), px(780.)), cx);
-        let options = WindowOptions {
-            window_bounds: Some(WindowBounds::Windowed(bounds)),
-            ..Default::default()
-        };
-        let opened = cx.open_window(options, |window, cx| {
-            let screen = launch.screen;
-            let state = cx.new(|cx| initial_state(launch, cx));
-            start_on(&state, screen, cx);
-            cx.new(|cx| Root::new(state, window, cx))
+    gpui_platform::application()
+        .with_assets(assets::Assets)
+        .run(move |cx: &mut App| {
+            cx.bind_keys(actions::bindings());
+            cx.on_action(|_: &Quit, cx| cx.quit());
+            let bounds = Bounds::centered(None, size(px(1200.), px(780.)), cx);
+            let options = WindowOptions {
+                window_bounds: Some(WindowBounds::Windowed(bounds)),
+                ..Default::default()
+            };
+            let opened = cx.open_window(options, |window, cx| {
+                let screen = launch.screen;
+                let state = cx.new(|cx| initial_state(launch, cx));
+                follow_appearance(state.read(cx).light, cx);
+                start_on(&state, screen, cx);
+                cx.new(|cx| Root::new(state, window, cx))
+            });
+            // A window that fails to open leaves nothing to show, so quit cleanly.
+            if opened.is_err() {
+                cx.quit();
+            }
         });
-        // A window that fails to open leaves nothing to show, so quit cleanly.
-        if opened.is_err() {
-            cx.quit();
-        }
-    });
 }
 
 /// Files load in the background and move to their own screen when done,
@@ -70,4 +74,15 @@ fn initial_state(launch: Launch, cx: &mut gpui::Context<AppState>) -> AppState {
         state.open(path, cx);
     }
     state
+}
+
+/// The title bar is drawn by macOS, so it follows the app theme only
+/// through the app-wide appearance; other platforms ignore it.
+pub fn follow_appearance(light: bool, cx: &App) {
+    let look = if light {
+        WindowAppearance::Light
+    } else {
+        WindowAppearance::Dark
+    };
+    cx.set_window_appearance(Some(look));
 }
