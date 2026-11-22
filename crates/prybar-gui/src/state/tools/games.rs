@@ -18,7 +18,7 @@ impl AppState {
             |s, list| {
                 let n = list.len();
                 s.set_games(list);
-                format!("{n} game(s) configured")
+                format!("{n} {} configured", if n == 1 { "game" } else { "games" })
             },
             cx,
         );
@@ -33,7 +33,7 @@ impl AppState {
             |s, list| {
                 let n = list.len();
                 s.set_games(list);
-                format!("Saved {n} game(s)")
+                format!("Saved {n} {}", if n == 1 { "game" } else { "games" })
             },
             cx,
         );

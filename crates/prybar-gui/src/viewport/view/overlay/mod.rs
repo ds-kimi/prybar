@@ -14,6 +14,8 @@ type Act = fn(&mut Viewport, &mut Context<Viewport>);
 pub use timeline::timeline;
 pub use variants::variants;
 
+/// Narrow viewports wrap the chips instead of sliding under the variant
+/// pickers on the left.
 pub fn controls(v: &Viewport, t: &Tokens, cx: &mut Context<Viewport>) -> impl IntoElement {
     let f = v.flags;
     let chips: [(&'static str, &'static str, bool, Act); 6] = [
@@ -36,7 +38,12 @@ pub fn controls(v: &Viewport, t: &Tokens, cx: &mut Context<Viewport>) -> impl In
             cx.emit(Full)
         }),
     ];
-    let row = div().absolute().top_2().right_2().flex().gap_1();
+    let row = div()
+        .absolute()
+        .top_2()
+        .right_2()
+        .max_w(gpui::relative(0.62));
+    let row = row.flex().flex_wrap().justify_end().gap_1();
     row.children(chips.map(|(id, label, on, act)| chip(id, label, on, t, cx, act)))
 }
 

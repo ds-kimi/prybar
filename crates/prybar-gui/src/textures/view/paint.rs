@@ -85,7 +85,10 @@ fn details(v: &TextureView, t: &Tokens) -> Div {
         (Some(s), None) => facts::missing(s, v),
         (None, None) => Vec::new(),
     };
+    // Bounded width so long source paths end in an ellipsis instead of running off the window.
     let col = div()
+        .w_full()
+        .min_w_0()
         .flex()
         .flex_col()
         .gap_0p5()
@@ -96,5 +99,5 @@ fn details(v: &TextureView, t: &Tokens) -> Div {
             .clone()
             .map(|p| div().text_color(t.danger).child(p)),
     )
-    .children(lines)
+    .children(lines.into_iter().map(|l| div().truncate().child(l)))
 }

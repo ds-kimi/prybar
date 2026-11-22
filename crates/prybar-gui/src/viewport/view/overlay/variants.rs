@@ -13,7 +13,12 @@ use crate::viewport::view::Viewport;
 type Choice = (String, String, Pick);
 
 pub fn variants(v: &Viewport, t: &Tokens, cx: &mut Context<Viewport>) -> impl IntoElement {
-    let row = div().absolute().top_2().left_2().flex().flex_wrap().gap_1();
+    let row = div()
+        .absolute()
+        .top_2()
+        .left_2()
+        .max_w(gpui::relative(0.36));
+    let row = row.flex().flex_wrap().gap_1();
     let Some(ir) = v.ir.as_deref() else {
         return row;
     };
