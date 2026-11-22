@@ -42,4 +42,3 @@ Placeholder (labelled regions): 3D model preview, texture preview, compile log
 stream, workshop upload progress. The publish form is laid out but does not
 upload.
 
-Screenshots of every screen in both themes: `docs/evidence/gui-J/`.
