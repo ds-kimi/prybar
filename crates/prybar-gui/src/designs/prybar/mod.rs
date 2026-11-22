@@ -9,7 +9,7 @@ mod views;
 mod widgets;
 
 pub use views::{wanted, wanted_textures};
-pub use widgets::input;
+pub use widgets::{input, Tipped};
 
 use gpui::{div, prelude::*, AnyElement, Context, Entity};
 

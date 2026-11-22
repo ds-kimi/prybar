@@ -17,6 +17,7 @@ pub use preview::{wanted, wanted_textures};
 pub use privacy::notice;
 
 use super::motion;
+use super::widgets::Tipped as _;
 use super::widgets::{self, Kind};
 use crate::app::{Forms, Root};
 use crate::state::{AppState, Document, Screen};
@@ -76,6 +77,7 @@ fn empty(screen: Screen, t: Tokens, cx: &Context<Root>) -> AnyElement {
     };
     let go = widgets::button("pb-empty-open", "Open file", Kind::Primary, true, t)
         .debug_selector(|| "pb-empty-open".into())
+        .tip("Pick a file to open", t)
         .on_click(cx.listener(|this, _, _, cx| {
             this.state.update(cx, |s, cx| s.navigate(Screen::Home, cx))
         }));

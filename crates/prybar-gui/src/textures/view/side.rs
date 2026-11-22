@@ -3,6 +3,7 @@
 use gpui::{div, prelude::*, AnyElement, Context};
 
 use super::{Status, TextureView};
+use crate::designs::Tipped as _;
 use crate::textures::Slot;
 use crate::theme::prybar::Tokens;
 
@@ -33,6 +34,7 @@ fn row(i: usize, s: &Slot, on: bool, t: &Tokens, cx: &mut Context<TextureView>) 
     div()
         .id(id)
         .debug_selector(move || format!("pb-tex-{i}"))
+        .tip("Show this texture", *t)
         .px_2()
         .py_1()
         .rounded_md()
@@ -90,6 +92,7 @@ pub fn chip(
     let (hover, active) = (t.hover, t.active);
     div()
         .id(id)
+        .tip(super::about::texture(id), *t)
         .debug_selector(move || id.into())
         .px_2()
         .py_0p5()

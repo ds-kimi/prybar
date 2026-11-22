@@ -4,6 +4,7 @@ use std::path::Path;
 
 use gpui::{div, prelude::*, AnyElement, Context};
 
+use super::super::widgets::Tipped as _;
 use super::super::widgets::{self, Kind};
 use crate::actions::{Open, MOD};
 use crate::app::Root;
@@ -26,6 +27,7 @@ pub fn view(s: &AppState, t: Tokens, cx: &Context<Root>) -> AnyElement {
 fn zone(t: Tokens) -> impl IntoElement {
     let open = widgets::button("pb-open", "Open file", Kind::Primary, true, t)
         .debug_selector(|| "pb-open".into())
+        .tip("Pick a model (.mdl) or a package (VPK, GMA) to open", t)
         .on_click(|_, window, cx| window.dispatch_action(Box::new(Open), cx));
     div()
         .id("pb-drop")
@@ -59,6 +61,7 @@ fn recent(s: &AppState, t: Tokens, cx: &Context<Root>) -> AnyElement {
         let open = path.clone();
         widgets::row(("pb-recent", ix), false, t)
             .debug_selector(move || format!("pb-recent-{ix}"))
+            .tip("Open this file again", t)
             .on_click(cx.listener(move |this, _, _, cx| this.open_paths(vec![open.clone()], cx)))
             .child(split(path).0)
             .child(

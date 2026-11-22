@@ -6,6 +6,7 @@ mod sequences;
 
 use gpui::{div, prelude::*, AnyElement, Context};
 
+use super::super::widgets::Tipped as _;
 use super::super::widgets::{self, Kind};
 use crate::app::{Forms, Root};
 use crate::state::{Document, Screen};
@@ -63,6 +64,13 @@ fn head(doc: &Document, t: Tokens, cx: &Context<Root>) -> impl IntoElement {
     let go = |id: &'static str, screen: Screen| {
         widgets::button(id, screen.label(), Kind::Secondary, true, t)
             .debug_selector(move || id.into())
+            .tip(
+                format!(
+                    "Open the {} screen for this model",
+                    screen.label().to_lowercase()
+                ),
+                t,
+            )
             .on_click(cx.listener(move |this, _, _, cx| {
                 this.state.update(cx, |s, cx| s.navigate(screen, cx))
             }))

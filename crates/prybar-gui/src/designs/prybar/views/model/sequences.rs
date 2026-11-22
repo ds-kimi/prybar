@@ -3,6 +3,7 @@
 
 use gpui::{div, prelude::*, px, AnyElement, Context, SharedString};
 
+use super::super::super::widgets::Tipped as _;
 use crate::app::{Forms, Root};
 use crate::theme::prybar::Tokens;
 
@@ -45,6 +46,7 @@ fn row(
 ) -> impl IntoElement {
     let vp = f.viewport.clone();
     item(i, on, t)
+        .tip("Play this sequence in the 3D view; click again to stop", t)
         .on_click(cx.listener(move |_, _, _, cx| {
             vp.update(cx, |v, cx| v.play((!on).then_some(i), cx));
             // The list shows which one plays; the viewport does not

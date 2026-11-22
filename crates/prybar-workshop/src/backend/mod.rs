@@ -1,8 +1,11 @@
+mod avatar;
 pub mod mock;
 #[cfg(not(feature = "workshop"))]
 mod off;
 #[cfg(feature = "workshop")]
 mod steam;
+
+pub use avatar::avatar;
 
 use crate::spec::ItemSpec;
 use crate::{ListedItem, Progress, PublishReport, SteamStatus, WorkshopError};

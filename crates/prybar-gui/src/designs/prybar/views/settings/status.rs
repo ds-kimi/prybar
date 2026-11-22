@@ -5,6 +5,7 @@ use std::time::SystemTime;
 use gpui::{prelude::*, Context};
 
 use super::super::super::widgets;
+use super::super::super::widgets::Tipped as _;
 use crate::app::Root;
 use crate::state::AppState;
 use crate::theme::prybar::Tokens;
@@ -42,6 +43,10 @@ pub fn auto_switch(s: &AppState, t: Tokens, cx: &Context<Root>) -> impl IntoElem
         t,
     )
     .debug_selector(|| "pb-auto-update".into())
+    .tip(
+        "Download updates in the background and install them on restart",
+        t,
+    )
     .on_click(cx.listener(|this, _, _, cx| {
         this.state
             .update(cx, |s, cx| s.set_auto_update(!s.updates.auto, cx))

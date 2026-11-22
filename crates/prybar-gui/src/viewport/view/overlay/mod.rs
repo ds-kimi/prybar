@@ -3,10 +3,12 @@
 
 use gpui::{div, prelude::*, Context, SharedString};
 
+mod about;
 mod timeline;
 mod variants;
 
 use super::{Full, Viewport};
+use crate::designs::Tipped as _;
 use crate::theme::prybar::Tokens;
 
 type Act = fn(&mut Viewport, &mut Context<Viewport>);
@@ -59,9 +61,11 @@ pub(super) fn chip(
 ) -> impl IntoElement {
     let (hover, active, id) = (t.hover, t.active, id.into());
     let selector = id.to_string();
+    let tip = about::about(&selector);
     div()
         .id(id)
         .debug_selector(move || selector.clone())
+        .tip(tip, *t)
         .px_2()
         .py_0p5()
         .rounded_md()

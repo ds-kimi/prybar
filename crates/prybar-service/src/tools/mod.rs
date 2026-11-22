@@ -16,7 +16,7 @@ pub use prybar_tools::paths::steam_libraries;
 pub use publish::{publish, workshop_list};
 pub use spec::load_spec;
 pub use view::{view, ViewReport};
-pub use workshop::{addon_check, steam_status};
+pub use workshop::{addon_check, steam_avatar, steam_status};
 
 use crate::ServiceError;
 use prybar_tools::ToolError;

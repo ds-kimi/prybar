@@ -11,6 +11,7 @@ mod update;
 use gpui::{div, prelude::*, AnyElement, Context};
 
 use super::widgets;
+use super::widgets::Tipped as _;
 use crate::app::Root;
 use crate::state::{AppState, Screen};
 use crate::theme::prybar::Tokens;
@@ -56,10 +57,27 @@ fn nav(screen: Screen, s: &AppState, t: Tokens, cx: &Context<Root>) -> AnyElemen
     let label = screen.label();
     widgets::nav_item(label, label, screen == s.screen, t)
         .debug_selector(move || format!("nav-{}", label.to_lowercase()))
+        .tip(about(screen), t)
         .on_click(
             cx.listener(move |this, _, _, cx| {
                 this.state.update(cx, |s, cx| s.navigate(screen, cx))
             }),
         )
         .into_any_element()
+}
+
+/// One line on what each screen is for.
+fn about(screen: Screen) -> &'static str {
+    match screen {
+        Screen::Home => "Open a file, drop one on the window, or pick a recent one",
+        Screen::Inspector => {
+            "Everything inside the open model: bones, meshes, sequences, materials"
+        }
+        Screen::Package => "Browse and extract the files of a VPK or GMA",
+        Screen::Decompile => "Turn the model back into QC and SMD files",
+        Screen::Compile => "Build a model from a QC file with the game's studiomdl",
+        Screen::Publish => "Upload an addon to the Steam Workshop or update one",
+        Screen::Settings => "Games, theme, updates and privacy",
+        _ => "Go to this screen",
+    }
 }

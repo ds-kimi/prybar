@@ -4,6 +4,7 @@
 use gpui::{div, prelude::*, AnyElement, Context};
 use prybar_service::ops::ListReport;
 
+use super::super::widgets::Tipped as _;
 use super::super::widgets::{self, Kind};
 use crate::actions::MOD;
 use crate::app::{Forms, Root};
@@ -44,6 +45,7 @@ fn header(r: &ListReport, t: Tokens, cx: &Context<Root>) -> impl IntoElement {
     let out = std::env::temp_dir().join("prybar-gui-out").join("extract");
     let extract = widgets::button("pb-extract", "Extract all", Kind::Primary, true, t)
         .debug_selector(|| "pb-extract".into())
+        .tip("Extract every file of the package to the output folder", t)
         .on_click(cx.listener(move |this, _, _, cx| {
             let out = out.clone();
             this.state.update(cx, |s, cx| s.extract_selected(out, cx))

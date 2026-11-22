@@ -9,6 +9,7 @@ use crate::state::AppState;
 use crate::theme::prybar::Tokens;
 use crate::update::{Phase, VERSION};
 
+use super::super::super::widgets::Tipped as _;
 use super::status::{auto_switch, status};
 
 pub fn section(s: &AppState, t: Tokens, cx: &Context<Root>) -> AnyElement {
@@ -36,6 +37,7 @@ fn controls(s: &AppState, t: Tokens, cx: &Context<Root>) -> impl IntoElement {
         t,
     )
     .debug_selector(|| "pb-check-update".into())
+    .tip("Ask GitHub for a newer release now", t)
     .when(!checking, |el| {
         el.on_click(
             cx.listener(|this, _, _, cx| this.state.update(cx, |s, cx| s.check_updates(true, cx))),
@@ -64,6 +66,7 @@ fn failure(s: &AppState, t: Tokens, cx: &Context<Root>) -> Option<AnyElement> {
         t,
     )
     .debug_selector(|| "pb-update-link".into())
+    .tip("Open the release page in the browser", t)
     .on_click(cx.listener(move |_, _, _, cx| cx.open_url(&link)));
     let el = div()
         .flex()

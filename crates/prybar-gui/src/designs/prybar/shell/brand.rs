@@ -6,10 +6,10 @@ use std::time::Duration;
 
 use gpui::{
     div, ease_out_quint, img, prelude::*, radians, svg, Animation, AnimationExt as _, AnyElement,
-    Context, FontWeight, SharedString, Transformation, Window,
+    Context, SharedString, Transformation,
 };
 
-use super::super::widgets::ring;
+use super::super::widgets::{ring, Tipped};
 use crate::actions::ToggleTheme;
 use crate::app::Root;
 use crate::state::Screen;
@@ -21,6 +21,7 @@ pub fn logo(t: Tokens, cx: &Context<Root>) -> AnyElement {
         .id("pb-logo")
         .debug_selector(|| "pb-logo".into())
         .aria_label("Home")
+        .tip("Home: open a file or pick a recent one", t)
         .size_8()
         .mr_2()
         .flex()
@@ -57,7 +58,7 @@ pub fn theme_toggle(light: bool, t: Tokens, cx: &Context<Root>) -> AnyElement {
         .cursor_pointer()
         .hover(move |s| s.bg(t.hover))
         .active(move |s| s.bg(t.active))
-        .tooltip(move |_, cx| cx.new(|_| Tip(tip.into(), t)).into())
+        .tip(tip, t)
         .on_click(cx.listener(|_, _, w, cx| w.dispatch_action(Box::new(ToggleTheme), cx)))
         .child(glyph(icon, light, t));
     ring(el, t).into_any_element()
@@ -78,27 +79,4 @@ fn glyph(icon: &'static str, light: bool, t: Tokens) -> AnyElement {
             },
         )
         .into_any_element()
-}
-
-/// The tooltip doubles as the button's name, since the icon has no text.
-pub(super) struct Tip(pub SharedString, pub Tokens);
-
-impl Render for Tip {
-    fn render(&mut self, _: &mut Window, _: &mut Context<Self>) -> impl IntoElement {
-        let t = self.1;
-        // Release notes also land here, so long text wraps instead of
-        // stretching across the window.
-        div()
-            .max_w(gpui::px(360.))
-            .px_2()
-            .py_1()
-            .rounded_md()
-            .bg(t.surface)
-            .border_1()
-            .border_color(t.border)
-            .text_xs()
-            .font_weight(FontWeight::MEDIUM)
-            .text_color(t.text)
-            .child(self.0.clone())
-    }
 }

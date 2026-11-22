@@ -3,6 +3,7 @@
 use gpui::{div, prelude::*, AnyElement, Context, Entity};
 use prybar_service::tools::Game;
 
+use super::super::super::widgets::Tipped as _;
 use super::super::super::widgets::{self, Kind};
 use crate::app::{Forms, Root};
 use crate::designs::input::TextInput;
@@ -28,6 +29,7 @@ pub fn list(s: &AppState, f: &Forms, t: Tokens, cx: &Context<Root>) -> AnyElemen
         let (dir_in, tool_in) = (f.game_dir.clone(), f.studiomdl.clone());
         widgets::row(("pb-set-game", ix), s.tools.editing == Some(ix), t)
             .debug_selector(move || format!("pb-set-game-{ix}"))
+            .tip("Edit this game's folder and studiomdl path", t)
             .on_click(cx.listener(move |this, _, _, cx| {
                 dir_in.update(cx, |i, cx| i.set_text(&dir, cx));
                 tool_in.update(cx, |i, cx| i.set_text(&tool, cx));
@@ -70,6 +72,7 @@ pub fn editor(s: &AppState, f: &Forms, t: Tokens, cx: &Context<Root>) -> AnyElem
 fn save(name: String, ok: bool, t: Tokens, cx: &Context<Root>) -> impl IntoElement {
     widgets::button("pb-save-game", "Save", Kind::Primary, ok, t)
         .debug_selector(|| "pb-save-game".into())
+        .tip("Save this game to the games config", t)
         .when(ok, |el| {
             el.on_click(cx.listener(move |this, _, _, cx| {
                 let text = |e: &Entity<TextInput>| e.read(cx).text().trim().to_owned();

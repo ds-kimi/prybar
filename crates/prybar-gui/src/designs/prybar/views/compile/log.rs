@@ -3,6 +3,7 @@
 
 use gpui::{div, prelude::*, AnyElement, ClipboardItem, Context, Rgba};
 
+use super::super::super::widgets::Tipped as _;
 use super::super::super::widgets::{self, Kind};
 use crate::app::{Forms, Root};
 use crate::state::tools::CompileOutcome;
@@ -89,6 +90,7 @@ fn header(s: &AppState, t: Tokens, cx: &Context<Root>) -> impl IntoElement {
 fn copy(has_log: bool, t: Tokens, cx: &Context<Root>) -> impl IntoElement {
     widgets::button("pb-log-copy", "Copy log", Kind::Secondary, has_log, t)
         .debug_selector(|| "pb-log-copy".into())
+        .tip("Copy the whole log to the clipboard", t)
         .when(has_log, |el| {
             el.on_click(cx.listener(|this, _, _, cx| {
                 let lines = &this.state.read(cx).tools.compile.lines;

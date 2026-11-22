@@ -2,4 +2,4 @@
 
 pub(crate) mod prybar;
 
-pub use prybar::{input, render, wanted, wanted_textures};
+pub use prybar::{input, render, wanted, wanted_textures, Tipped};

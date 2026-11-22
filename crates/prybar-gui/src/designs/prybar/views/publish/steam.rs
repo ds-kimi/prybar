@@ -4,6 +4,7 @@
 use gpui::{div, prelude::*, AnyElement, Context};
 use prybar_workshop::{ListedItem, SteamStatus};
 
+use super::super::super::widgets::Tipped as _;
 use super::super::super::widgets::{self, Kind};
 use crate::app::Root;
 use crate::state::AppState;
@@ -57,6 +58,7 @@ fn line(s: &AppState, t: Tokens, cx: &Context<Root>) -> impl IntoElement {
         t,
     )
     .debug_selector(|| "pb-pub-retry".into())
+    .tip("Ask Steam again, after starting it or logging in", t)
     .on_click(cx.listener(|this, _, _, cx| this.state.update(cx, |s, cx| s.refresh_steam(cx))));
     div()
         .debug_selector(|| "pb-pub-steam".into())
@@ -86,6 +88,7 @@ fn items(list: &[ListedItem], t: Tokens, cx: &Context<Root>) -> impl IntoElement
         );
         widgets::row(("pb-pub-item", i), false, t)
             .debug_selector(move || format!("pb-pub-item-{i}"))
+            .tip("Fill the form with this item, to update it", t)
             .child(div().flex_1().truncate().child(item.title.clone()))
             .child(div().text_xs().text_color(t.muted).child(meta))
             .on_click(cx.listener(move |this, _, _, cx| {

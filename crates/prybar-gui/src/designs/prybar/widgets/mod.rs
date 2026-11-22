@@ -5,10 +5,12 @@ mod button;
 mod field;
 pub mod input;
 mod nav;
+pub mod tip;
 
 pub use button::{button, Kind};
 pub use field::{field, readonly, switch};
 pub use nav::nav_item;
+pub use tip::Tipped;
 
 use gpui::{div, prelude::*, Div, ElementId, FontWeight, SharedString, Stateful};
 

@@ -3,6 +3,7 @@
 use gpui::{div, prelude::*, px, relative, AnyElement, Context, Div};
 use prybar_workshop::PublishReport;
 
+use super::super::super::widgets::Tipped as _;
 use super::super::super::widgets::{self, Kind};
 use crate::app::Root;
 use crate::state::AppState;
@@ -49,6 +50,7 @@ fn published(body: Div, r: &PublishReport, t: Tokens, cx: &Context<Root>) -> Any
     };
     let url = format!("{ITEM_URL}{id}");
     let open = widgets::button("pb-pub-open", "Open in Steam", Kind::Secondary, true, t)
+        .tip("Open the item's Workshop page in Steam", t)
         .on_click(cx.listener(move |_, _, _, cx| cx.open_url(&url)));
     let note =
         format!("It stays hidden until you accept the Workshop agreement once: {AGREEMENT_URL}");

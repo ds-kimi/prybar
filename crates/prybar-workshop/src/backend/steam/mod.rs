@@ -3,7 +3,7 @@
 
 mod apply;
 mod list;
-mod status;
+pub(super) mod status;
 mod update;
 mod wait;
 

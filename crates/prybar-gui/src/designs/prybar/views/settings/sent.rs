@@ -5,6 +5,7 @@ use gpui::{div, prelude::*, AnyElement, Context};
 use prybar_telemetry::{Entry, Event};
 
 use super::super::super::widgets;
+use super::super::super::widgets::Tipped as _;
 use crate::app::Root;
 use crate::state::AppState;
 use crate::theme::prybar::Tokens;
@@ -35,6 +36,7 @@ fn entry(s: &AppState, i: usize, t: Tokens, cx: &Context<Root>) -> Vec<AnyElemen
     let open = s.privacy.open == Some(i);
     let row = widgets::row(("pb-sent", i), open, t)
         .debug_selector(move || format!("pb-sent-{i}"))
+        .tip("Show exactly what was sent", t)
         .child(line(e))
         .on_click(cx.listener(move |this, _, _, cx| {
             this.state.update(cx, |s, cx| {

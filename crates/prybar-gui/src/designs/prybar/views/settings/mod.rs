@@ -9,6 +9,7 @@ mod updates;
 
 use gpui::{div, prelude::*, px, AnyElement, Context};
 
+use super::super::widgets::Tipped as _;
 use super::super::widgets::{self, Kind};
 use crate::actions::{ToggleTheme, MOD};
 use crate::app::{Forms, Root};
@@ -38,6 +39,7 @@ pub fn view(s: &AppState, f: &Forms, t: Tokens, cx: &Context<Root>) -> AnyElemen
 fn appearance(s: &AppState, t: Tokens) -> impl IntoElement {
     let theme = widgets::switch("pb-light", "Light theme", s.light, t)
         .debug_selector(|| "pb-light".into())
+        .tip("Switch between the dark and the light theme", t)
         .on_click(|_, window, cx| window.dispatch_action(Box::new(ToggleTheme), cx));
     let hint = format!("Also {MOD}-shift-l. Saved for next time.");
     div()
@@ -59,6 +61,7 @@ fn detect(s: &AppState, t: Tokens, cx: &Context<Root>) -> impl IntoElement {
         t,
     )
     .debug_selector(|| "pb-detect".into())
+    .tip("Find Source games installed through Steam and add them", t)
     .when(!busy, |el| {
         el.on_click(cx.listener(|this, _, _, cx| this.state.update(cx, |s, cx| s.detect_games(cx))))
     })

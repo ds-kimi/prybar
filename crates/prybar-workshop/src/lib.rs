@@ -5,6 +5,7 @@
 //! runs against [`mock::MockSteam`] in tests.
 
 pub mod addon;
+mod avatar;
 mod backend;
 mod error;
 pub mod preview;
@@ -13,7 +14,8 @@ mod report;
 pub mod spec;
 mod stage;
 
-pub use backend::{mock, steam, Steam};
+pub use avatar::Avatar;
+pub use backend::{avatar as account_avatar, mock, steam, Steam};
 pub use error::WorkshopError;
 pub use publish::{list_items, publish, publish_with, status};
 pub use report::{ListedItem, Progress, PublishReport, SteamStatus};

@@ -3,6 +3,7 @@
 
 use gpui::{div, prelude::*, AnyElement, Context};
 
+use super::super::super::widgets::Tipped as _;
 use super::super::super::widgets::{self, Kind};
 use crate::app::Root;
 use crate::state::AppState;
@@ -18,6 +19,10 @@ pub fn section(s: &AppState, t: Tokens, cx: &Context<Root>) -> AnyElement {
         t,
     )
     .debug_selector(|| "pb-telemetry".into())
+    .tip(
+        "Send anonymous crash reports and app starts; every payload is logged below",
+        t,
+    )
     .on_click(cx.listener(|this, _, _, cx| {
         this.state
             .update(cx, |s, cx| s.set_telemetry(!s.privacy.on, cx))
@@ -45,6 +50,7 @@ fn buttons(s: &AppState, t: Tokens, cx: &Context<Root>) -> impl IntoElement {
         t,
     )
     .debug_selector(|| "pb-telemetry-clear".into())
+    .tip("Delete the local log of what was sent", t)
     .when(!empty, |el| {
         el.on_click(
             cx.listener(|this, _, _, cx| this.state.update(cx, |s, cx| s.clear_sent_log(cx))),
@@ -57,6 +63,7 @@ fn buttons(s: &AppState, t: Tokens, cx: &Context<Root>) -> impl IntoElement {
         true,
         t,
     )
+    .tip("Open the privacy policy in the browser", t)
     .on_click(|_, _, cx| cx.open_url(PRIVACY_URL));
     div().flex().gap_2().child(open).child(clear).child(policy)
 }
@@ -71,6 +78,7 @@ fn open_log(s: &AppState, t: Tokens) -> impl IntoElement {
         has_log,
         t,
     )
+    .tip("Open the log of every payload sent, as plain JSON lines", t)
     .when_some(path.filter(|_| has_log), |el, p| {
         el.on_click(move |_, _, cx| cx.open_with_system(&p))
     })

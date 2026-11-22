@@ -2,6 +2,7 @@
 
 use gpui::{div, prelude::*, Action, AnyElement, Context};
 
+use super::super::widgets::Tipped as _;
 use super::super::{motion, widgets};
 use crate::actions::{Open, ToggleTheme};
 use crate::app::Root;
@@ -69,6 +70,7 @@ fn row(ix: usize, cmd: Command, t: Tokens, cx: &Context<Root>) -> AnyElement {
     };
     widgets::row(("pb-cmd", ix), false, t)
         .debug_selector(move || format!("cmd-{ix}"))
+        .tip("Run this command (Enter)", t)
         .on_click(cx.listener(move |this, _, window, cx| {
             this.state.update(cx, |s, cx| {
                 s.palette = false;

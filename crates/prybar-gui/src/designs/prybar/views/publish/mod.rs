@@ -7,6 +7,7 @@ mod steam;
 
 use gpui::{div, prelude::*, px, AnyElement, Context, Entity};
 
+use super::super::widgets::Tipped as _;
 use super::super::widgets::{self, Kind};
 use crate::app::{Forms, Root};
 use crate::designs::input::TextInput;
@@ -53,6 +54,14 @@ fn picked(
     let choose = |n: usize, text: &'static str, dirs: bool| {
         let target = input.clone();
         widgets::button((id, n), text, Kind::Secondary, true, t)
+            .tip(
+                if dirs {
+                    "Pick the addon folder"
+                } else {
+                    "Pick a file"
+                },
+                t,
+            )
             .on_click(cx.listener(move |this, _, _, cx| this.pick_into(target.clone(), dirs, cx)))
     };
     div()
@@ -71,6 +80,14 @@ fn buttons(s: &AppState, f: &Forms, t: Tokens, cx: &Context<Root>) -> impl IntoE
     let go = |id: &'static str, label: &'static str, kind, dry: bool| {
         widgets::button(id, label, kind, ready, t)
             .debug_selector(move || id.into())
+            .tip(
+                if dry {
+                    "Check everything without uploading"
+                } else {
+                    "Upload to the Steam Workshop"
+                },
+                t,
+            )
             .when(ready, |el| {
                 el.on_click(cx.listener(move |this, _, _, cx| {
                     let form = this.forms.publish.form(cx);

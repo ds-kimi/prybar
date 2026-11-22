@@ -2,6 +2,7 @@
 
 use gpui::{div, prelude::*, px, AnyElement, Context};
 
+use super::super::widgets::Tipped as _;
 use super::super::widgets::{self, Kind};
 use crate::app::{Forms, Root};
 use crate::state::AppState;
@@ -43,6 +44,10 @@ pub fn view(s: &AppState, f: &Forms, t: Tokens, cx: &Context<Root>) -> AnyElemen
 fn run(s: &AppState, has_target: bool, t: Tokens, cx: &Context<Root>) -> AnyElement {
     let split = widgets::switch("pb-split", "One .qci file per QC section", s.split_qc, t)
         .debug_selector(|| "pb-split".into())
+        .tip(
+            "Write each QC section to its own .qci file, included from the main QC",
+            t,
+        )
         .on_click(cx.listener(|this, _, _, cx| {
             this.state.update(cx, |s, cx| {
                 s.split_qc = !s.split_qc;
@@ -54,6 +59,10 @@ fn run(s: &AppState, has_target: bool, t: Tokens, cx: &Context<Root>) -> AnyElem
     let label = if busy { "Decompiling…" } else { "Decompile" };
     let go = widgets::button("pb-decompile", label, Kind::Primary, ready, t)
         .debug_selector(|| "pb-decompile".into())
+        .tip(
+            "Write the QC, SMD and animation files to the output folder",
+            t,
+        )
         .when(ready, |el| {
             el.on_click(cx.listener(|this, _, _, cx| {
                 let out = this.forms.out.read(cx).text().trim().into();

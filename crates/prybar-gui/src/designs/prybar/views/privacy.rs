@@ -4,6 +4,7 @@
 
 use gpui::{div, prelude::*, px, AnyElement, Context};
 
+use super::super::widgets::Tipped as _;
 use super::widgets::{self, Kind};
 use crate::app::Root;
 use crate::state::AppState;
@@ -60,6 +61,14 @@ fn answers(t: Tokens, cx: &Context<Root>) -> impl IntoElement {
     let answer = |id: &'static str, label: &'static str, keep: bool| {
         widgets::button(id, label, Kind::Secondary, true, t)
             .debug_selector(move || id.into())
+            .tip(
+                if keep {
+                    "Send anonymous crash reports and app starts, nothing else"
+                } else {
+                    "Send nothing; you can change this in Settings"
+                },
+                t,
+            )
             .on_click(cx.listener(move |this, _, _, cx| {
                 this.state.update(cx, |s, cx| s.answer_notice(keep, cx))
             }))
@@ -71,6 +80,7 @@ fn answers(t: Tokens, cx: &Context<Root>) -> impl IntoElement {
         true,
         t,
     )
+    .tip("Open the privacy policy in the browser", t)
     .on_click(|_, _, cx| cx.open_url(PRIVACY_URL));
     div()
         .flex()

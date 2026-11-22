@@ -2,6 +2,7 @@ mod ime;
 mod input;
 mod publish;
 mod shell;
+mod tips;
 mod tools;
 mod views;
 

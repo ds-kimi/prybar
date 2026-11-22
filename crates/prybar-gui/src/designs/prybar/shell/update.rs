@@ -3,8 +3,7 @@
 
 use gpui::{div, prelude::*, AnyElement, Context, FontWeight, SharedString};
 
-use super::super::widgets::ring;
-use super::brand::Tip;
+use super::super::widgets::{ring, Tipped};
 use crate::app::Root;
 use crate::state::{AppState, Screen};
 use crate::theme::prybar::Tokens;
@@ -33,7 +32,7 @@ pub fn button(s: &AppState, t: Tokens, cx: &Context<Root>) -> Option<AnyElement>
         .cursor_pointer()
         .hover(|st| st.opacity(0.88))
         .active(|st| st.opacity(0.74))
-        .tooltip(move |_, cx| cx.new(|_| Tip(tip.clone(), t)).into())
+        .tip(tip, t)
         .on_click(cx.listener(|this, _, _, cx| this.state.update(cx, click)))
         .child(label);
     Some(ring(el, t).into_any_element())

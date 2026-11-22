@@ -1,6 +1,7 @@
 //! The texture screen: the open model's materials, where each base
 //! texture was found or looked for, and a zoomable preview of one of them.
 
+mod about;
 mod canvas;
 mod facts;
 mod input;
