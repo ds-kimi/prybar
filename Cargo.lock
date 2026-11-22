@@ -4452,6 +4452,10 @@ version = "0.1.0"
 dependencies = [
  "gpui",
  "gpui_platform",
+ "prybar-mdl",
+ "prybar-service",
+ "prybar-vpk",
+ "tempfile",
 ]
 
 [[package]]
