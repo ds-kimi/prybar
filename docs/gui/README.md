@@ -86,3 +86,10 @@ with Dry run; real uploads need a build with the Steamworks SDK:
 `cargo run -p prybar-gui --features workshop`, Steam running and logged in.
 Without them the screen says which one is missing.
 
+
+## Updates and privacy
+
+The app checks for updates at launch and installs them on restart (Settings >
+Updates; `PRYBAR_NO_UPDATE_CHECK=1` turns the check off). Anonymous launch and
+crash analytics are on by default with a first-launch opt-out; everything sent
+is listed in Settings > Privacy. See [PRIVACY.md](../../PRIVACY.md).

@@ -73,6 +73,7 @@ Analytics (GUI only) are sent only when the build sets
 `PRYBAR_TELEMETRY_URL`; local builds leave it empty, so nothing leaves the
 machine. The collector lives in `services/telemetry-collector`
 (`cargo test -p telemetry-collector`; deploy: `docs/privacy/collector.md`).
+What is sent is documented in `PRIVACY.md`: change both together.
 
 ## Checks (run all before every commit)
 

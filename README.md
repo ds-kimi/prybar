@@ -11,6 +11,7 @@
 
 <p align="center">
   <a href="https://github.com/ds-kimi/prybar/releases"><img src="https://img.shields.io/github/v/release/ds-kimi/prybar?sort=semver&amp;style=for-the-badge&amp;logo=github&amp;label=release" alt="GitHub release"></a>
+  <a href="https://github.com/ds-kimi/prybar/releases"><img src="https://img.shields.io/github/downloads/ds-kimi/prybar/total?style=for-the-badge&amp;logo=github" alt="Downloads"></a>
   <a href="https://github.com/ds-kimi/prybar"><img src="https://img.shields.io/github/stars/ds-kimi/prybar?style=for-the-badge&amp;logo=github" alt="GitHub stars"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT%20%2B%20Commons%20Clause-orange?style=for-the-badge" alt="MIT + Commons Clause"></a>
   <img src="https://img.shields.io/badge/Windows%20%7C%20Linux-0078D6?style=for-the-badge&amp;logo=rust&amp;logoColor=white" alt="Windows and Linux">
@@ -83,6 +84,16 @@ code --add-mcp '{"name":"prybar","command":"prybar-mcp"}'
 - Skill source: [plugins/prybar/skills/prybar/SKILL.md](plugins/prybar/skills/prybar/SKILL.md)
 - Error reference, recipes, troubleshooting: [docs/agents/](docs/agents/)
 
+## Updates
+
+- Desktop app: checks at launch, downloads and verifies the new version in the background, then shows "Restart to update". Switch it off in Settings > Updates.
+- CLI and MCP server: at most once a day, one line on stderr says a newer version exists; `prybar self-update` installs it. Output on stdout never changes.
+- Everywhere: `PRYBAR_NO_UPDATE_CHECK=1` turns the check off (it is also off in CI).
+
+## Privacy
+
+Only the desktop app sends anonymous analytics (launch and crash events, no IDs, no paths), on by default with a first-launch opt-out, and every payload sent is listed in Settings > Privacy. `PRYBAR_TELEMETRY=0` or `DO_NOT_TRACK=1` turns it off. The CLI and MCP server send none. Details: [PRIVACY.md](PRIVACY.md).
+
 ## Documentation
 
 | Doc | Content |
@@ -91,6 +102,8 @@ code --add-mcp '{"name":"prybar","command":"prybar-mcp"}'
 | [docs/mcp/README.md](docs/mcp/README.md) | MCP tools and safety rules |
 | [docs/formats.md](docs/formats.md) | public sources behind each format (clean-room provenance) |
 | [docs/roundtrip-report.md](docs/roundtrip-report.md) | decompile, recompile and compare results on real models |
+| [PRIVACY.md](PRIVACY.md) | what the app sends, what it never collects, how to turn it off |
+| [docs/gui/README.md](docs/gui/README.md) | desktop app: run, keys, 3D preview |
 | [CONTRIBUTING.md](CONTRIBUTING.md) | build, test, fuzz, bench |
 
 ## License
