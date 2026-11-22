@@ -61,6 +61,8 @@ fn keys_switch_design_and_back(cx: &mut TestAppContext) {
         Some(String::new())
     );
     cx.simulate_keystrokes("escape");
+    assert_eq!(state.read_with(&cx, |s, _| s.search.clone()), None);
+    cx.simulate_keystrokes("escape");
     assert_eq!(state.read_with(&cx, |s, _| s.design), None);
     cx.simulate_keystrokes(&format!("{MOD}-2 {MOD}-0"));
     assert_eq!(state.read_with(&cx, |s, _| s.design), None);

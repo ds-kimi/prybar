@@ -1,9 +1,10 @@
-//! Design views. Until each design lot lands, all three share this stub:
-//! the same screens and data, in that design's palette.
+//! Design views. Workbench has its own; the others share this stub
+//! (same screens and data, in their palette) until their lots land.
 
 mod content;
 mod placeholder;
 mod side;
+mod workbench;
 
 use gpui::{div, prelude::*, AnyElement, Context, Entity};
 
@@ -12,6 +13,13 @@ use crate::state::{AppState, DesignKind, Screen};
 use crate::theme::{self, Palette};
 
 pub fn render(kind: DesignKind, state: Entity<AppState>, cx: &mut Context<Root>) -> AnyElement {
+    match kind {
+        DesignKind::Workbench => workbench::render(state, cx),
+        _ => stub(kind, state, cx),
+    }
+}
+
+fn stub(kind: DesignKind, state: Entity<AppState>, cx: &mut Context<Root>) -> AnyElement {
     let p = theme::for_design(kind);
     let state = state.read(cx);
     let current = state.screen;

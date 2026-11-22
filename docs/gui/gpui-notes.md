@@ -130,3 +130,8 @@ Tailwind-like builders on `div()` (`zed/crates/gpui/src/styled.rs`):
 - `screencapture -l <id>` from a background process fails without the Screen
   Recording permission for the terminal; the window still opens.
 - GPUI is pre-1.0: bumping the pinned rev can break APIs. Bump deliberately.
+- `cx.listener` takes `&self`, so a design can hold `state.read(cx)` while
+  building listeners; pass `&Context<Root>` to view helpers, not `&mut`.
+- `debug_bounds` wants a `&'static str`; tests `leak()` formatted names.
+- Window ids for `screencapture -l` come from `CGWindowListCopyWindowInfo`
+  (a one-line `swift -e` script); it works once Screen Recording is allowed.

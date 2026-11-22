@@ -37,6 +37,14 @@ pub struct AppState {
     /// `Some` while the search field is open.
     pub search: Option<String>,
     pub last_decompile: Option<DecompileReport>,
+    /// The command palette is open.
+    pub palette: bool,
+    /// Light variant of the design's theme.
+    pub light: bool,
+    /// Decompile option: one `.qci` per QC section.
+    pub split_qc: bool,
+    /// Index into the compile screen's game list.
+    pub game: usize,
     next_id: u64,
 }
 
@@ -54,8 +62,15 @@ impl AppState {
         }
     }
 
-    /// Back walks screen history first, then leaves the design for the chooser.
+    /// Back closes the palette or search first, then walks screen
+    /// history, then leaves the design for the chooser.
     pub fn back(&mut self, cx: &mut Context<Self>) {
+        if self.palette || self.search.is_some() {
+            self.palette = false;
+            self.search = None;
+            cx.notify();
+            return;
+        }
         match self.history.pop() {
             Some(screen) => self.screen = screen,
             None => self.design = None,

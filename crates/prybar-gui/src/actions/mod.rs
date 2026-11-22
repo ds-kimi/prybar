@@ -12,6 +12,10 @@ actions!(
         ShowWorkbench,
         ShowCanvas,
         ShowConsole,
+        TogglePalette,
+        ToggleTheme,
+        FocusNext,
+        FocusPrev,
         Quit
     ]
 );
@@ -45,6 +49,11 @@ pub fn bindings() -> Vec<KeyBinding> {
         KeyBinding::new(key!("1"), ShowWorkbench, None),
         KeyBinding::new(key!("2"), ShowCanvas, None),
         KeyBinding::new(key!("3"), ShowConsole, None),
+        KeyBinding::new(key!("k"), TogglePalette, None),
+        KeyBinding::new(key!("shift-p"), TogglePalette, None),
+        KeyBinding::new(key!("shift-l"), ToggleTheme, None),
+        KeyBinding::new("tab", FocusNext, None),
+        KeyBinding::new("shift-tab", FocusPrev, None),
         KeyBinding::new(key!("q"), Quit, None),
     ]
 }

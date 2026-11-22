@@ -38,11 +38,7 @@ impl Root {
 
 impl Render for Root {
     fn render(&mut self, _window: &mut Window, cx: &mut Context<Self>) -> impl IntoElement {
-        let palette = self
-            .state
-            .read(cx)
-            .design
-            .map_or_else(theme::chooser, theme::for_design);
+        let palette = theme::current(self.state.read(cx));
         let root = div()
             .id("root")
             .track_focus(&self.focus)
@@ -55,7 +51,7 @@ impl Render for Root {
             .drag_over::<ExternalPaths>(move |s, _, _, _| {
                 s.border_2().border_color(palette.accent)
             });
-        let root = Self::navigation_actions(root, cx);
+        let root = Self::ui_actions(Self::navigation_actions(root, cx), cx);
         Self::design_actions(root, cx).child(self.body(cx))
     }
 }

@@ -4,6 +4,7 @@ mod handlers;
 mod root;
 #[cfg(test)]
 mod tests;
+mod ui;
 
 pub use root::Root;
 
