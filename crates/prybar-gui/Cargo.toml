@@ -1,0 +1,25 @@
+[package]
+name = "prybar-gui"
+version.workspace = true
+edition.workspace = true
+license-file.workspace = true
+publish.workspace = true
+description = "Desktop interface for prybar"
+
+[[bin]]
+name = "prybar-gui"
+path = "src/main.rs"
+
+# GPUI is pinned to one Zed commit: the crates.io release lags the platform
+# split (gpui_platform is not published), and the notes in docs/gui match it.
+# runtime_shaders compiles Metal shaders at launch, so building does not need
+# the separate Xcode Metal Toolchain download.
+[dependencies]
+gpui = { git = "https://github.com/zed-industries/zed", rev = "d31d1074a07b7bbaa43a52fef7847a00dd491baf" }
+gpui_platform = { git = "https://github.com/zed-industries/zed", rev = "d31d1074a07b7bbaa43a52fef7847a00dd491baf", features = ["font-kit", "wayland", "x11", "runtime_shaders"] }
+
+[dev-dependencies]
+gpui = { git = "https://github.com/zed-industries/zed", rev = "d31d1074a07b7bbaa43a52fef7847a00dd491baf", features = ["test-support"] }
+
+[lints]
+workspace = true
