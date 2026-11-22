@@ -81,6 +81,6 @@ fn main_click_paths(cx: &mut TestAppContext) {
     assert!(cx.debug_bounds("pb-result").is_some());
     state.update(&mut cx, |s, cx| s.navigate(Screen::Compile, cx));
     cx.run_until_parked();
-    click(&mut cx, "pb-game-2");
-    assert_eq!(state.read_with(&cx, |s, _| s.game), 2);
+    click(&mut cx, "pb-game-1");
+    assert_eq!(state.read_with(&cx, |s, _| s.tools.game), 1);
 }

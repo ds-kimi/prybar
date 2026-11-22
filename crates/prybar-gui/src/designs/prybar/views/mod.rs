@@ -58,8 +58,8 @@ fn content(s: &AppState, f: &Forms, t: Tokens, cx: &Context<Root>) -> AnyElement
         },
         Screen::Decompile => decompile::view(s, f, t, cx),
         Screen::Compile => compile::view(s, f, t, cx),
-        Screen::Publish => publish::view(f, t),
-        Screen::Settings => settings::view(s, f, t),
+        Screen::Publish => publish::view(s, f, t, cx),
+        Screen::Settings => settings::view(s, f, t, cx),
         Screen::ModelPreview | Screen::TexturePreview => {
             preview::view(s.screen, pick(s, true), f, t)
         }

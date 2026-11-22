@@ -10,13 +10,15 @@ pub mod prefs;
 mod run;
 mod screen;
 #[cfg(test)]
-mod tests;
+pub(crate) mod tests;
+pub mod tools;
 
 use std::path::PathBuf;
 
 pub use document::Document;
 pub use job::{Job, JobStatus, Toast, ToastKind};
-pub use screen::{Placeholder, Screen};
+pub use screen::Screen;
+pub use tools::Tools;
 
 use gpui::Context;
 use prybar_service::model::DecompileReport;
@@ -45,8 +47,8 @@ pub struct AppState {
     pub light: bool,
     /// Decompile option: one `.qci` per QC section.
     pub split_qc: bool,
-    /// Index into the compile screen's game list.
-    pub game: usize,
+    /// Games config, compile and publish runs.
+    pub tools: Tools,
     /// Where the theme choice is saved; `None` keeps it in memory.
     pub prefs: Option<PathBuf>,
     next_id: u64,
@@ -54,6 +56,9 @@ pub struct AppState {
 
 impl AppState {
     pub fn navigate(&mut self, screen: Screen, cx: &mut Context<Self>) {
+        if matches!(screen, Screen::Compile | Screen::Settings) {
+            self.ensure_games(cx);
+        }
         if screen != self.screen {
             self.history.push(self.screen);
             self.screen = screen;

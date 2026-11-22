@@ -1,8 +1,9 @@
 //! Every text field of the app, made once so typing survives redraws
 //! and screen changes.
 
-use gpui::{App, AppContext as _, Entity};
+use gpui::{App, AppContext as _, Entity, ScrollHandle};
 
+use super::publish_inputs::PublishInputs;
 use crate::designs::input::{any, Spec, TextInput};
 use crate::state::checks;
 use crate::state::AppState;
@@ -14,18 +15,20 @@ pub struct Forms {
     pub search: Entity<TextInput>,
     pub out: Entity<TextInput>,
     pub qc: Entity<TextInput>,
-    pub title: Entity<TextInput>,
-    pub description: Entity<TextInput>,
-    pub tags: Entity<TextInput>,
-    pub visibility: Entity<TextInput>,
-    pub config: Entity<TextInput>,
+    /// The Workshop form.
+    pub publish: PublishInputs,
+    /// Settings: the edited game's folder and its studiomdl.
+    pub game_dir: Entity<TextInput>,
+    pub studiomdl: Entity<TextInput>,
+    /// The compile log, so the view can keep its tail in sight.
+    pub compile_log: ScrollHandle,
     /// The 3D preview, kept so its GPU thread and camera survive tabs.
     pub viewport: Entity<Viewport>,
     /// The texture screen, kept so its decoded image and pan survive tabs.
     pub textures: Entity<TextureView>,
 }
 
-type Check = fn(&str) -> Option<&'static str>;
+pub(super) type Check = fn(&str) -> Option<&'static str>;
 
 impl Forms {
     pub fn new(cx: &mut App) -> Forms {
@@ -34,24 +37,20 @@ impl Forms {
             .join("decompile")
             .display()
             .to_string();
-        let config = prybar_tools::config::config_path()
-            .map(|p| p.display().to_string())
-            .unwrap_or_default();
         Forms {
             search: field(cx, "Filter files", "", false, any),
             out: field(cx, "/path/to/output", &out, false, checks::out_dir),
             qc: field(cx, "/path/to/model.qc", "", false, checks::qc),
-            title: field(cx, "Addon name", "", false, checks::title),
-            description: field(
+            publish: PublishInputs::new(cx),
+            game_dir: field(cx, "/path/to/garrysmod", "", false, checks::game_dir),
+            studiomdl: field(
                 cx,
-                "What it is and how to use it",
+                "/path/to/bin/studiomdl.exe",
                 "",
-                true,
-                checks::description,
+                false,
+                checks::existing,
             ),
-            tags: field(cx, "model, prop", "model", false, checks::tags),
-            visibility: field(cx, "Private", "Private", false, checks::visibility),
-            config: field(cx, "/path/to/games.toml", &config, false, checks::required),
+            compile_log: ScrollHandle::new(),
             viewport: cx.new(|_| Viewport::default()),
             textures: cx.new(|_| TextureView::default()),
         }
@@ -74,7 +73,7 @@ impl Forms {
     }
 }
 
-fn field(
+pub(super) fn field(
     cx: &mut App,
     placeholder: &'static str,
     text: &str,

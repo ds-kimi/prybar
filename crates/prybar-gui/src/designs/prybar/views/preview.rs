@@ -1,5 +1,4 @@
-//! 3D and texture previews, and the calm region every later-work part
-//! uses: a labeled frame, no fake art, no motion.
+//! 3D and texture previews of the open model.
 
 use std::path::PathBuf;
 
@@ -7,12 +6,11 @@ use gpui::{div, prelude::*, AnyElement};
 
 use super::super::widgets;
 use crate::app::Forms;
-use crate::state::{AppState, Document, Placeholder, Screen};
+use crate::state::{AppState, Document, Screen};
 use crate::theme::prybar::Tokens;
 
 pub fn view(screen: Screen, doc: Option<&Document>, f: &Forms, t: Tokens) -> AnyElement {
     let name = doc.map_or_else(|| "No model open".into(), |d| d.title());
-    let ph = screen.placeholder().unwrap_or(Placeholder::ModelViewport);
     div()
         .size_full()
         .flex()
@@ -29,7 +27,7 @@ pub fn view(screen: Screen, doc: Option<&Document>, f: &Forms, t: Tokens) -> Any
         .child(match (screen, doc) {
             (Screen::ModelPreview, Some(_)) => f.viewport.clone().into_any_element(),
             (Screen::TexturePreview, Some(_)) => f.textures.clone().into_any_element(),
-            _ => region(ph, t),
+            _ => no_model(screen, t),
         })
         .into_any_element()
 }
@@ -52,27 +50,24 @@ pub fn wanted_textures(s: &AppState) -> Option<PathBuf> {
         .map(|d| d.path().to_owned())
 }
 
-/// Says what will live here and that it is not built yet.
-pub fn region(ph: Placeholder, t: Tokens) -> AnyElement {
+/// Nothing to draw until a model is open; says how to get one.
+fn no_model(screen: Screen, t: Tokens) -> AnyElement {
+    let what = match screen {
+        Screen::TexturePreview => "its materials",
+        _ => "it in 3D",
+    };
     div()
-        .debug_selector(|| "pb-placeholder".into())
+        .debug_selector(|| "pb-no-model".into())
         .flex_1()
         .min_h_48()
         .flex()
-        .flex_col()
         .items_center()
         .justify_center()
-        .gap_1()
         .rounded_lg()
         .border_1()
         .border_color(t.border)
         .bg(t.surface)
-        .child(ph.label())
-        .child(
-            div()
-                .text_xs()
-                .text_color(t.muted)
-                .child("Coming in a later release"),
-        )
+        .text_color(t.muted)
+        .child(format!("Open a .mdl to see {what} here."))
         .into_any_element()
 }

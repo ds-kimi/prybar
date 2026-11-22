@@ -20,6 +20,8 @@ gpui_platform = { git = "https://github.com/zed-industries/zed", rev = "d31d1074
 prybar-service = { path = "../prybar-service" }
 prybar-mdl = { path = "../prybar-mdl" }
 prybar-vtf = { path = "../prybar-vtf" }
+# Item spec and progress types the publish form fills and shows.
+prybar-workshop = { path = "../prybar-workshop" }
 # Only for the config folder, where the theme choice is saved too.
 prybar-tools = { path = "../prybar-tools" }
 # Only to pack the synthetic sample package shown by `--sample`.
@@ -31,6 +33,11 @@ pollster = "0.4"
 async-channel = "2"
 # Frame type GPUI images are built from; same major as GPUI's.
 image = { version = "0.25", default-features = false }
+
+[features]
+# Real Workshop uploads need the Steamworks SDK; without it the publish
+# screen still validates (dry run) and says how to get uploads.
+workshop = ["prybar-service/workshop"]
 
 [dev-dependencies]
 gpui = { git = "https://github.com/zed-industries/zed", rev = "d31d1074a07b7bbaa43a52fef7847a00dd491baf", features = ["test-support"] }

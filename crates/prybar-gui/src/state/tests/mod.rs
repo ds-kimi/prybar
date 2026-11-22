@@ -2,7 +2,10 @@ use std::path::PathBuf;
 
 use gpui::{AppContext as _, Entity, TestAppContext};
 
+pub(crate) mod fake;
 mod ops;
+mod publish;
+mod tools;
 
 use super::{AppState, Screen};
 
@@ -17,7 +20,13 @@ pub(super) fn open(cx: &mut TestAppContext, path: PathBuf) -> Entity<AppState> {
 
 #[gpui::test]
 fn navigate_and_back(cx: &mut TestAppContext) {
-    let state = cx.new(|_| AppState::default());
+    let state = cx.new(|_| AppState {
+        tools: super::Tools {
+            backend: fake::backend(),
+            ..Default::default()
+        },
+        ..AppState::default()
+    });
     state.update(cx, |s, cx| {
         s.navigate(Screen::Settings, cx);
         s.navigate(Screen::Compile, cx);

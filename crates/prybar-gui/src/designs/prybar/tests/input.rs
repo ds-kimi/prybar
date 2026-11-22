@@ -21,7 +21,8 @@ fn title_edits(cx: &mut TestAppContext) {
     focus_field(&mut cx, "pb-pub-title");
     cx.simulate_input("Crate pack");
     let f = forms(&mut cx);
-    let text = |cx: &mut VisualTestContext| f.title.read_with(cx, |i, _| i.text().to_owned());
+    let text =
+        |cx: &mut VisualTestContext| f.publish.title.read_with(cx, |i, _| i.text().to_owned());
     assert_eq!(text(&mut cx), "Crate pack");
     cx.simulate_keystrokes("shift-left shift-left shift-left shift-left");
     cx.write_to_clipboard(ClipboardItem::new_string("box\nset".into()));
@@ -35,7 +36,7 @@ fn title_edits(cx: &mut TestAppContext) {
     assert_eq!(text(&mut cx), "Crate pack");
     cx.simulate_keystrokes(&format!("{MOD}-a backspace"));
     assert_eq!(
-        f.title.read_with(&cx, |i, _| i.error()),
+        f.publish.title.read_with(&cx, |i, _| i.error()),
         Some("Give the addon a title.")
     );
 }
@@ -64,22 +65,22 @@ fn enter_submits_or_breaks(cx: &mut TestAppContext) {
     let (state, mut cx) = window(cx, false);
     state.update(&mut cx, |s, cx| s.navigate(Screen::Publish, cx));
     cx.run_until_parked();
-    let f = forms(&mut cx);
+    let p = forms(&mut cx).publish;
     let submitted = std::rc::Rc::new(std::cell::Cell::new(false));
     let seen = submitted.clone();
     let _sub = cx.update(|_, cx| {
-        cx.subscribe(&f.title, move |_, ev, _| {
+        cx.subscribe(&p.title, move |_, ev, _| {
             seen.set(matches!(ev, crate::designs::input::InputEvent::Submit))
         })
     });
     focus_field(&mut cx, "pb-pub-title");
     cx.simulate_keystrokes("a enter");
     assert!(submitted.get());
-    f.description.update(&mut cx, |i, cx| i.set_text("one", cx));
-    cx.update(|window, cx| f.description.read(cx).focus_handle(cx).focus(window, cx));
+    p.description.update(&mut cx, |i, cx| i.set_text("one", cx));
+    cx.update(|window, cx| p.description.read(cx).focus_handle(cx).focus(window, cx));
     cx.simulate_keystrokes("enter t w o");
     assert_eq!(
-        f.description.read_with(&cx, |i, _| i.text().to_owned()),
+        p.description.read_with(&cx, |i, _| i.text().to_owned()),
         "one\ntwo"
     );
 }

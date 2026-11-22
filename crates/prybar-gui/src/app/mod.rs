@@ -3,6 +3,8 @@
 mod assets;
 mod forms;
 mod handlers;
+mod pick;
+mod publish_inputs;
 mod root;
 #[cfg(test)]
 mod tests;

@@ -1,5 +1,6 @@
 mod input;
 mod shell;
+mod tools;
 mod views;
 
 use gpui::{AppContext as _, Entity, Modifiers, TestAppContext, VisualTestContext};
@@ -17,6 +18,7 @@ pub(super) fn window(
             let state = cx.new(|_| {
                 let mut s = AppState::default();
                 s.light = light;
+                s.tools.backend = crate::state::tests::fake::backend();
                 s
             });
             cx.new(|cx| Root::new(state, window, cx))

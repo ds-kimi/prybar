@@ -1,7 +1,9 @@
 //! Rules for form text, with messages that say what to type instead.
 
+mod paths;
 mod publish;
 
+pub use paths::{existing, game_dir, item_id, preview};
 pub use publish::{description, tags, title, visibility};
 
 use std::path::Path;
@@ -24,8 +26,4 @@ pub fn qc(text: &str) -> Option<&'static str> {
         return Some("A QC file name ends in .qc.");
     }
     (!Path::new(text).is_file()).then_some("No file at this path.")
-}
-
-pub fn required(text: &str) -> Option<&'static str> {
-    text.trim().is_empty().then_some("This can't be empty.")
 }

@@ -1,4 +1,4 @@
-//! Screens every design offers, and the regions that are later work.
+//! Screens the app offers.
 
 /// One navigable screen. Designs lay them out differently, but all of
 /// them exist in every design so the comparison is about design only.
@@ -14,16 +14,6 @@ pub enum Screen {
     Settings,
     ModelPreview,
     TexturePreview,
-}
-
-/// A feature that is not built yet; designs draw it as a styled,
-/// animated region carrying this label.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum Placeholder {
-    ModelViewport,
-    TextureView,
-    CompileLog,
-    PublishProgress,
 }
 
 impl Screen {
@@ -50,27 +40,6 @@ impl Screen {
             Self::Settings => "Settings",
             Self::ModelPreview => "3D preview",
             Self::TexturePreview => "Textures",
-        }
-    }
-
-    pub fn placeholder(self) -> Option<Placeholder> {
-        match self {
-            Self::Compile => Some(Placeholder::CompileLog),
-            Self::Publish => Some(Placeholder::PublishProgress),
-            Self::ModelPreview => Some(Placeholder::ModelViewport),
-            Self::TexturePreview => Some(Placeholder::TextureView),
-            _ => None,
-        }
-    }
-}
-
-impl Placeholder {
-    pub fn label(self) -> &'static str {
-        match self {
-            Self::ModelViewport => "3D preview here",
-            Self::TextureView => "Texture preview here",
-            Self::CompileLog => "Compile log stream here",
-            Self::PublishProgress => "Workshop upload progress here",
         }
     }
 }

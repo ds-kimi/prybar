@@ -7,7 +7,7 @@ mod publish;
 mod spec;
 mod view;
 
-pub use compile::compile;
+pub use compile::{compile, compile_streamed};
 pub use config::{config_get, config_remove, config_set, ConfigReport};
 pub use games::{games, GamesReport};
 pub use prybar_tools::config::{Game, Packer};
