@@ -7,12 +7,14 @@ mod home;
 mod model;
 mod package;
 mod preview;
+mod privacy;
 mod publish;
 mod settings;
 
 use gpui::{div, prelude::*, AnyElement, Context};
 
 pub use preview::{wanted, wanted_textures};
+pub use privacy::notice;
 
 use super::motion;
 use super::widgets::{self, Kind};

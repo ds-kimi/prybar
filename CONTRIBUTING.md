@@ -69,6 +69,11 @@ and Linux) opens, cmd-shift-l switches theme, escape goes back.
 
 The first build fetches the Zed repository and takes a few minutes.
 
+Analytics (GUI only) are sent only when the build sets
+`PRYBAR_TELEMETRY_URL`; local builds leave it empty, so nothing leaves the
+machine. The collector lives in `services/telemetry-collector`
+(`cargo test -p telemetry-collector`; deploy: `docs/privacy/collector.md`).
+
 ## Checks (run all before every commit)
 
 ```sh

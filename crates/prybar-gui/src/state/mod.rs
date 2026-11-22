@@ -51,6 +51,8 @@ pub struct AppState {
     pub tools: Tools,
     /// Release check, download and restart.
     pub updates: crate::update::Updates,
+    /// Analytics choice, outbox and the log of what was sent.
+    pub privacy: crate::telemetry::Privacy,
     /// Where the theme choice is saved; `None` keeps it in memory.
     pub prefs: Option<PathBuf>,
     next_id: u64,

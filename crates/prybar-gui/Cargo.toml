@@ -22,6 +22,8 @@ prybar-mdl = { path = "../prybar-mdl" }
 prybar-vtf = { path = "../prybar-vtf" }
 # Release check, verified download and install for the update button.
 prybar-update = { path = "../prybar-update" }
+# Anonymous app_start and crash events, the outbox and the sent log.
+prybar-telemetry = { path = "../prybar-telemetry" }
 # Item spec and progress types the publish form fills and shows.
 prybar-workshop = { path = "../prybar-workshop" }
 # Only for the config folder, where the theme choice is saved too.

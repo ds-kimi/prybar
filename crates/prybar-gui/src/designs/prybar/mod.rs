@@ -29,6 +29,7 @@ pub fn render(state: Entity<AppState>, f: &Forms, cx: &mut Context<Root>) -> Any
         .text_color(t.text)
         .text_sm()
         .child(shell::bar(s, t, cx))
+        .children(views::notice(s, t, cx))
         .child(views::screen(s, f, t, cx))
         .child(shell::toasts::stack(s, t))
         .children(s.palette.then(|| shell::palette::overlay(t, cx)))

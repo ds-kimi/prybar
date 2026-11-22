@@ -67,7 +67,10 @@ fn initial_state(launch: Launch, cx: &mut gpui::Context<AppState>) -> AppState {
     if let Some(p) = state.prefs.as_deref().map(crate::state::prefs::load) {
         state.light = p.light;
         state.updates.auto = p.auto_update;
+        state.privacy.on = p.telemetry;
+        state.privacy.notice_seen = p.notice_seen;
     }
+    crate::telemetry::launch(&mut state, cx);
     if !prybar_update::checks_disabled() {
         state.check_updates(false, cx);
     }

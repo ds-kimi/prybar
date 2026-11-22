@@ -44,6 +44,16 @@ impl Event {
         }
     }
 
+    /// The exact bytes sent, or a readable form of them for the log view.
+    pub fn json(&self, pretty: bool) -> String {
+        let out = if pretty {
+            serde_json::to_string_pretty(self)
+        } else {
+            serde_json::to_string(self)
+        };
+        out.unwrap_or_default()
+    }
+
     /// Shape checks the collector runs before storing anything, so a
     /// forged request cannot smuggle free text past the limits.
     pub fn valid(&self) -> bool {

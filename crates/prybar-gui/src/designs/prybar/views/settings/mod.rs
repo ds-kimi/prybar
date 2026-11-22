@@ -1,7 +1,9 @@
-//! Settings: appearance, updates, and the games config (detect, edit,
+//! Settings: appearance, updates, privacy, and the games config (detect, edit,
 //! save).
 
 mod games;
+mod privacy;
+mod sent;
 mod status;
 mod updates;
 
@@ -16,18 +18,6 @@ use crate::theme::prybar::Tokens;
 pub fn view(s: &AppState, f: &Forms, t: Tokens, cx: &Context<Root>) -> AnyElement {
     let path = prybar_tools::config::config_path()
         .map_or_else(|e| e.to_string(), |p| p.display().to_string());
-    let busy = s.is_running("Detect games");
-    let detect = widgets::button(
-        "pb-detect",
-        if busy { "Detecting…" } else { "Detect games" },
-        Kind::Secondary,
-        !busy,
-        t,
-    )
-    .debug_selector(|| "pb-detect".into())
-    .when(!busy, |el| {
-        el.on_click(cx.listener(|this, _, _, cx| this.state.update(cx, |s, cx| s.detect_games(cx))))
-    });
     div()
         .max_w(px(520.))
         .flex()
@@ -36,9 +26,10 @@ pub fn view(s: &AppState, f: &Forms, t: Tokens, cx: &Context<Root>) -> AnyElemen
         .child(widgets::heading("Settings"))
         .child(appearance(s, t))
         .child(updates::section(s, t, cx))
+        .child(privacy::section(s, t, cx))
         .child(widgets::section("Games", t))
         .child(widgets::readonly("Games config", path, t))
-        .child(div().flex().child(detect))
+        .child(div().flex().child(detect(s, t, cx)))
         .child(games::list(s, f, t, cx))
         .child(games::editor(s, f, t, cx))
         .into_any_element()
@@ -56,4 +47,19 @@ fn appearance(s: &AppState, t: Tokens) -> impl IntoElement {
         .child(widgets::section("Appearance", t))
         .child(theme)
         .child(div().text_xs().text_color(t.muted).child(hint))
+}
+
+fn detect(s: &AppState, t: Tokens, cx: &Context<Root>) -> impl IntoElement {
+    let busy = s.is_running("Detect games");
+    widgets::button(
+        "pb-detect",
+        if busy { "Detecting…" } else { "Detect games" },
+        Kind::Secondary,
+        !busy,
+        t,
+    )
+    .debug_selector(|| "pb-detect".into())
+    .when(!busy, |el| {
+        el.on_click(cx.listener(|this, _, _, cx| this.state.update(cx, |s, cx| s.detect_games(cx))))
+    })
 }
