@@ -44,6 +44,27 @@ line). Tools, path rules and client setup: `docs/mcp/README.md`. Tests:
 `cargo test -p prybar-mcp` (in-process rmcp client for every tool, plus
 the same handshake against the real binary).
 
+## Running the GUI
+
+`crates/prybar-gui` is a desktop app built with GPUI, pinned to one Zed
+commit (API notes: `docs/gui/gpui-notes.md`).
+
+- macOS: install Xcode and launch it once. Shaders compile at launch
+  (`runtime_shaders`), so the separate Metal Toolchain is not needed.
+- Linux (Debian/Ubuntu):
+  ```sh
+  sudo apt-get install libfontconfig-dev libfreetype-dev libwayland-dev \
+    libx11-xcb-dev libxkbcommon-x11-dev libvulkan1
+  ```
+- Windows: nothing beyond the MSVC toolchain.
+
+```sh
+cargo run -p prybar-gui
+cargo test -p prybar-gui     # GPUI test harness, no window or display needed
+```
+
+The first build fetches the Zed repository and takes a few minutes.
+
 ## Checks (run all before every commit)
 
 ```sh
