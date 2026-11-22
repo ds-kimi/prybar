@@ -59,6 +59,7 @@ commit (API notes: `docs/gui/gpui-notes.md`).
 - Windows: nothing beyond the MSVC toolchain.
 
 ```sh
+cargo run -p prybar-gui --release -- --sample        # chooser; see docs/gui/choose.md
 cargo run -p prybar-gui                              # design chooser
 cargo run -p prybar-gui -- --design canvas --sample  # one design, synthetic files
 cargo test -p prybar-gui     # GPUI test harness, no window or display needed
