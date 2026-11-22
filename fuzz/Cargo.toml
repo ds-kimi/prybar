@@ -1,0 +1,113 @@
+[package]
+name = "prybar-fuzz"
+version = "0.0.0"
+publish = false
+edition = "2021"
+
+[package.metadata]
+cargo-fuzz = true
+
+# Kept out of the main workspace: libFuzzer needs nightly and sanitizer
+# flags that would leak into every normal build.
+[workspace]
+
+[dependencies]
+libfuzzer-sys = "0.4"
+prybar-vpk = { path = "../crates/prybar-vpk" }
+prybar-gma = { path = "../crates/prybar-gma" }
+prybar-apk = { path = "../crates/prybar-apk" }
+prybar-hfs = { path = "../crates/prybar-hfs" }
+prybar-mdl = { path = "../crates/prybar-mdl" }
+prybar-tools = { path = "../crates/prybar-tools" }
+prybar-export = { path = "../crates/prybar-export" }
+
+[profile.release]
+debug = 1
+
+[[bin]]
+name = "vpk"
+path = "fuzz_targets/vpk.rs"
+test = false
+doc = false
+bench = false
+
+[[bin]]
+name = "gma"
+path = "fuzz_targets/gma.rs"
+test = false
+doc = false
+bench = false
+
+[[bin]]
+name = "apk"
+path = "fuzz_targets/apk.rs"
+test = false
+doc = false
+bench = false
+
+[[bin]]
+name = "hfs"
+path = "fuzz_targets/hfs.rs"
+test = false
+doc = false
+bench = false
+
+[[bin]]
+name = "mdl"
+path = "fuzz_targets/mdl.rs"
+test = false
+doc = false
+bench = false
+
+[[bin]]
+name = "vvd"
+path = "fuzz_targets/vvd.rs"
+test = false
+doc = false
+bench = false
+
+[[bin]]
+name = "vtx"
+path = "fuzz_targets/vtx.rs"
+test = false
+doc = false
+bench = false
+
+[[bin]]
+name = "vdf"
+path = "fuzz_targets/vdf.rs"
+test = false
+doc = false
+bench = false
+
+[[bin]]
+name = "mdl_ani"
+path = "fuzz_targets/mdl_ani.rs"
+test = false
+doc = false
+bench = false
+
+[[bin]]
+name = "phy"
+path = "fuzz_targets/phy.rs"
+test = false
+doc = false
+bench = false
+
+[dev-dependencies]
+prybar-io = { path = "../crates/prybar-io" }
+tempfile = "3"
+
+[[bin]]
+name = "mdl_qc"
+path = "fuzz_targets/mdl_qc.rs"
+test = false
+doc = false
+bench = false
+
+[[bin]]
+name = "studiomdl_log"
+path = "fuzz_targets/studiomdl_log.rs"
+test = false
+doc = false
+bench = false

@@ -1,0 +1,8 @@
+---
+source: crates/prybar-export/tests/qc/main.rs
+expression: "files[0].text"
+---
+$include "test_model.qci"
+$include "test_bones.qci"
+$include "test_animations.qci"
+$include "test_collision.qci"

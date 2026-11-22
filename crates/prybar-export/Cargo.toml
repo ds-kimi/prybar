@@ -1,0 +1,23 @@
+[package]
+name = "prybar-export"
+version.workspace = true
+edition.workspace = true
+license-file.workspace = true
+publish.workspace = true
+
+[dependencies]
+prybar-mdl = { path = "../prybar-mdl" }
+
+[dev-dependencies]
+prybar-testkit = { path = "../prybar-testkit" }
+prybar-vpk = { path = "../prybar-vpk" }
+insta = "1"
+proptest.workspace = true
+criterion.workspace = true
+
+[[bench]]
+name = "qc"
+harness = false
+
+[lints]
+workspace = true

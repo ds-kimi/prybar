@@ -1,0 +1,4 @@
+Processing tri.qc
+WARNING: x
+ERROR: c:/a.qc(3): - bad
+Completed "tri.qc"

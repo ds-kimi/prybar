@@ -1,0 +1,33 @@
+[package]
+name = "prybar-mdl"
+version.workspace = true
+edition.workspace = true
+license-file.workspace = true
+publish.workspace = true
+
+[dependencies]
+prybar-io.workspace = true
+thiserror.workspace = true
+serde.workspace = true
+
+[dev-dependencies]
+prybar-testkit = { path = "../prybar-testkit" }
+prybar-vpk = { path = "../prybar-vpk" }
+serde_json.workspace = true
+proptest.workspace = true
+criterion.workspace = true
+
+[[bench]]
+name = "mdl"
+harness = false
+
+[[bench]]
+name = "mdl_legacy"
+harness = false
+
+[[bench]]
+name = "mdl_goldsrc"
+harness = false
+
+[lints]
+workspace = true

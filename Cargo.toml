@@ -1,0 +1,23 @@
+[workspace]
+resolver = "2"
+members = ["crates/*", "tests/roundtrip"]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+license-file = "LICENSE"
+publish = false
+
+[workspace.dependencies]
+thiserror = "2"
+prybar-io = { path = "crates/prybar-io" }
+crc32fast = "1"
+walkdir = "2"
+tempfile = "3"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+proptest = "1"
+criterion = "0.5"
+
+[workspace.lints.rust]
+unsafe_code = "forbid"

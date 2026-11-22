@@ -1,0 +1,35 @@
+use super::LogLine;
+
+/// Lines starting like this are diagnostics; studiomdl has no other
+/// structured channel.
+const ERROR: &str = "ERROR";
+const WARNING: &str = "WARNING";
+
+/// Splits a studiomdl log into (errors, warnings). Matching is on the
+/// line start, case-insensitive: studiomdl writes `ERROR:`, `Error:` and
+/// `WARNING:`, while words like "errors" mid-line are plain verbose text.
+pub fn parse_log(log: &str) -> (Vec<LogLine>, Vec<LogLine>) {
+    let mut errors = Vec::new();
+    let mut warnings = Vec::new();
+    for (i, raw) in log.lines().enumerate() {
+        let text = raw.trim();
+        let entry = || LogLine {
+            line: i + 1,
+            text: text.to_string(),
+        };
+        if starts_with(text, ERROR) {
+            errors.push(entry());
+        } else if starts_with(text, WARNING) {
+            warnings.push(entry());
+        }
+    }
+    (errors, warnings)
+}
+
+fn starts_with(text: &str, word: &str) -> bool {
+    text.get(..word.len())
+        .is_some_and(|head| head.eq_ignore_ascii_case(word))
+        && text
+            .get(word.len()..)
+            .is_some_and(|rest| rest.is_empty() || rest.starts_with([':', ' ', '!']))
+}

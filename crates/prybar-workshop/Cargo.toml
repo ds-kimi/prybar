@@ -1,0 +1,27 @@
+[package]
+name = "prybar-workshop"
+version.workspace = true
+edition.workspace = true
+license-file.workspace = true
+publish.workspace = true
+
+[dependencies]
+prybar-io.workspace = true
+serde.workspace = true
+thiserror.workspace = true
+tempfile.workspace = true
+steamworks = { version = "0.13", optional = true }
+
+[features]
+workshop = ["dep:steamworks"]
+
+[dev-dependencies]
+tempfile.workspace = true
+proptest.workspace = true
+
+[lints]
+workspace = true
+
+[[test]]
+name = "dry_run"
+path = "tests/dry_run/main.rs"

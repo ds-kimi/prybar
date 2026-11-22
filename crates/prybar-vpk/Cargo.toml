@@ -1,0 +1,25 @@
+[package]
+name = "prybar-vpk"
+version.workspace = true
+edition.workspace = true
+license-file.workspace = true
+publish.workspace = true
+
+[dependencies]
+prybar-io.workspace = true
+thiserror.workspace = true
+crc32fast.workspace = true
+walkdir.workspace = true
+
+[dev-dependencies]
+prybar-testkit = { path = "../prybar-testkit" }
+tempfile.workspace = true
+proptest.workspace = true
+criterion.workspace = true
+
+[[bench]]
+name = "vpk"
+harness = false
+
+[lints]
+workspace = true

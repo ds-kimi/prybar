@@ -1,0 +1,36 @@
+[package]
+name = "prybar-service"
+version.workspace = true
+edition.workspace = true
+license-file.workspace = true
+publish.workspace = true
+description = "Operations shared by the prybar CLI and MCP server"
+
+[dependencies]
+prybar-io.workspace = true
+prybar-vpk = { path = "../prybar-vpk" }
+prybar-gma = { path = "../prybar-gma" }
+prybar-apk = { path = "../prybar-apk" }
+prybar-hfs = { path = "../prybar-hfs" }
+prybar-mdl = { path = "../prybar-mdl" }
+prybar-export = { path = "../prybar-export" }
+prybar-tools = { path = "../prybar-tools" }
+prybar-workshop = { path = "../prybar-workshop" }
+serde.workspace = true
+serde_json.workspace = true
+thiserror.workspace = true
+walkdir.workspace = true
+rayon = "1"
+
+[features]
+workshop = ["prybar-workshop/workshop"]
+
+[dev-dependencies]
+tempfile.workspace = true
+
+[lints]
+workspace = true
+
+[[test]]
+name = "source"
+path = "tests/source/main.rs"

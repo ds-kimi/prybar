@@ -1,0 +1,49 @@
+name: fuzz
+
+on:
+  pull_request:
+    paths:
+      - "crates/prybar-io/**"
+      - "crates/prybar-vpk/**"
+      - "crates/prybar-gma/**"
+      - "crates/prybar-apk/**"
+      - "crates/prybar-hfs/**"
+      - "crates/prybar-mdl/**"
+      - "crates/prybar-tools/**"
+      - "crates/prybar-export/**"
+      - "fuzz/**"
+  schedule:
+    - cron: "17 3 * * *"
+  workflow_dispatch:
+
+concurrency:
+  group: fuzz-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  fuzz:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        target: [vpk, gma, apk, hfs, mdl, mdl_ani, vvd, vtx, vdf, phy, mdl_qc, studiomdl_log]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@nightly
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: fuzz
+      - run: cargo install cargo-fuzz --locked
+      # 60 s smoke on PRs, 30 min per target nightly.
+      - name: run
+        working-directory: fuzz
+        run: |
+          secs=60
+          if [ "${{ github.event_name }}" != "pull_request" ]; then secs=1800; fi
+          mkdir -p work/${{ matrix.target }}
+          cargo +nightly fuzz run -O ${{ matrix.target }} work/${{ matrix.target }} corpus/${{ matrix.target }} -- -max_total_time=$secs -rss_limit_mb=2048
+      - if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: fuzz-${{ matrix.target }}-artifacts
+          path: fuzz/artifacts
