@@ -12,8 +12,6 @@
 
 use gpui::{rgb, Rgba};
 
-use super::Palette;
-
 #[derive(Clone, Copy)]
 pub struct Tokens {
     pub bg: Rgba,
@@ -73,21 +71,5 @@ pub fn tokens(light_theme: bool) -> Tokens {
         light()
     } else {
         dark()
-    }
-}
-
-/// The shared palette shape, for the window frame and the chooser preview.
-pub fn palette(light_theme: bool) -> Palette {
-    let t = tokens(light_theme);
-    Palette {
-        bg: t.bg,
-        surface: t.surface,
-        hover: t.hover,
-        active: t.active,
-        border: t.border,
-        text: t.text,
-        muted: t.muted,
-        accent: t.rust,
-        danger: t.danger,
     }
 }

@@ -1,14 +1,13 @@
-//! The window's root view: picks the chooser or a design and owns the
-//! handlers every design shares.
+//! The window's root view: draws the design and owns the window-wide
+//! handlers.
 
 use gpui::{
     div, prelude::*, App, Context, Entity, ExternalPaths, FocusHandle, Focusable, Subscription,
     Window,
 };
 
-use crate::actions::CONSOLE;
-use crate::state::{AppState, DesignKind};
-use crate::theme;
+use crate::state::AppState;
+use crate::theme::prybar::tokens;
 
 pub struct Root {
     pub state: Entity<AppState>,
@@ -34,35 +33,23 @@ impl Root {
             _refocus,
         }
     }
-
-    fn body(&self, cx: &mut Context<Self>) -> gpui::AnyElement {
-        match self.state.read(cx).design {
-            None => crate::chooser::render(cx).into_any_element(),
-            Some(kind) => crate::designs::render(kind, self.state.clone(), cx),
-        }
-    }
 }
 
 impl Render for Root {
     fn render(&mut self, _window: &mut Window, cx: &mut Context<Self>) -> impl IntoElement {
-        let palette = theme::current(self.state.read(cx));
-        let console = self.state.read(cx).design == Some(DesignKind::Console);
+        let t = tokens(self.state.read(cx).light);
         let root = div()
             .id("root")
-            .when(console, |el| el.key_context(CONSOLE))
             .track_focus(&self.focus)
             .size_full()
-            .bg(palette.bg)
-            .text_color(palette.text)
+            .bg(t.bg)
+            .text_color(t.text)
             .on_drop(cx.listener(|this, paths: &ExternalPaths, _, cx| {
                 this.open_paths(paths.paths().to_vec(), cx)
             }))
-            .drag_over::<ExternalPaths>(move |s, _, _, _| {
-                s.border_2().border_color(palette.accent)
-            });
-        let root = Self::ui_actions(Self::navigation_actions(root, cx), cx);
-        let root = Self::console_actions(root, cx);
-        Self::design_actions(root, cx).child(self.body(cx))
+            .drag_over::<ExternalPaths>(move |s, _, _, _| s.border_2().border_color(t.rust));
+        Self::ui_actions(Self::navigation_actions(root, cx), cx)
+            .child(crate::designs::render(self.state.clone(), cx))
     }
 }
 

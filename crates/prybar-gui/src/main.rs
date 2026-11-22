@@ -2,7 +2,6 @@
 
 mod actions;
 mod app;
-mod chooser;
 mod cli;
 mod designs;
 mod sample;

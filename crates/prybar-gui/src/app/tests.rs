@@ -5,7 +5,7 @@ use gpui::{
 
 use super::Root;
 use crate::actions::MOD;
-use crate::state::{AppState, DesignKind, Screen};
+use crate::state::{AppState, Screen};
 
 fn window(cx: &mut TestAppContext) -> (Entity<AppState>, VisualTestContext) {
     cx.update(|cx| cx.bind_keys(crate::actions::bindings()));
@@ -23,19 +23,11 @@ fn window(cx: &mut TestAppContext) -> (Entity<AppState>, VisualTestContext) {
     (state, vcx)
 }
 
+/// The app opens straight on its home screen, with the top bar live.
 #[gpui::test]
-fn card_click_opens_design(cx: &mut TestAppContext) {
+fn opens_on_home(cx: &mut TestAppContext) {
     let (state, mut cx) = window(cx);
-    for name in ["card-workbench", "card-canvas", "card-console"] {
-        assert!(cx.debug_bounds(name).is_some(), "{name} drawn");
-    }
-    let card = cx.debug_bounds("card-canvas").expect("canvas card");
-    cx.simulate_click(card.center(), Modifiers::none());
-    assert_eq!(
-        state.read_with(&cx, |s, _| s.design),
-        Some(DesignKind::Canvas)
-    );
-    cx.run_until_parked();
+    assert_eq!(state.read_with(&cx, |s, _| s.screen), Screen::Home);
     let nav = cx.debug_bounds("nav-settings").expect("nav drawn");
     cx.simulate_click(nav.center(), Modifiers::none());
     cx.run_until_parked();
@@ -43,18 +35,8 @@ fn card_click_opens_design(cx: &mut TestAppContext) {
 }
 
 #[gpui::test]
-fn keys_switch_design_and_back(cx: &mut TestAppContext) {
+fn search_and_back_keys(cx: &mut TestAppContext) {
     let (state, mut cx) = window(cx);
-    cx.simulate_keystrokes(&format!("{MOD}-3"));
-    assert_eq!(
-        state.read_with(&cx, |s, _| s.design),
-        Some(DesignKind::Console)
-    );
-    cx.simulate_keystrokes(&format!("{MOD}-1"));
-    assert_eq!(
-        state.read_with(&cx, |s, _| s.design),
-        Some(DesignKind::Workbench)
-    );
     cx.simulate_keystrokes(&format!("{MOD}-f"));
     assert_eq!(
         state.read_with(&cx, |s, _| s.search.clone()),
@@ -62,10 +44,9 @@ fn keys_switch_design_and_back(cx: &mut TestAppContext) {
     );
     cx.simulate_keystrokes("escape");
     assert_eq!(state.read_with(&cx, |s, _| s.search.clone()), None);
-    cx.simulate_keystrokes("escape");
-    assert_eq!(state.read_with(&cx, |s, _| s.design), None);
-    cx.simulate_keystrokes(&format!("{MOD}-2 {MOD}-0"));
-    assert_eq!(state.read_with(&cx, |s, _| s.design), None);
+    // Old design switch keys are gone and do nothing.
+    cx.simulate_keystrokes(&format!("{MOD}-1 escape"));
+    assert_eq!(state.read_with(&cx, |s, _| s.screen), Screen::Home);
 }
 
 #[gpui::test]
@@ -74,7 +55,7 @@ fn dropped_file_opens(cx: &mut TestAppContext) {
     let tmp = tempfile::tempdir().expect("tempdir");
     let sample = crate::sample::write(tmp.path()).expect("sample written");
     let (state, mut cx) = window(cx);
-    let at = cx.debug_bounds("card-console").expect("card").center();
+    let at = cx.debug_bounds("pb-view").expect("view").center();
     let paths = ExternalPaths(vec![sample.model].into());
     cx.simulate_event(FileDropEvent::Entered {
         position: at,

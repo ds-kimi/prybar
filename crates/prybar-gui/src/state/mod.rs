@@ -1,7 +1,6 @@
-//! App state shared by every design: what is open, where the user is,
+//! App state: what is open, where the user is,
 //! and what runs in the background.
 
-mod design;
 mod document;
 mod job;
 mod ops;
@@ -13,7 +12,6 @@ mod tests;
 
 use std::path::PathBuf;
 
-pub use design::DesignKind;
 pub use document::Document;
 pub use job::{Job, JobStatus, Toast, ToastKind};
 pub use screen::{Placeholder, Screen};
@@ -26,8 +24,6 @@ const MAX_TOASTS: usize = 5;
 
 #[derive(Default)]
 pub struct AppState {
-    /// `None` shows the chooser.
-    pub design: Option<DesignKind>,
     pub screen: Screen,
     pub history: Vec<Screen>,
     pub documents: Vec<Document>,
@@ -40,12 +36,10 @@ pub struct AppState {
     pub last_decompile: Option<DecompileReport>,
     /// The command palette is open.
     pub palette: bool,
-    /// Light variant of the design's theme.
+    /// Light theme instead of the dark default.
     pub light: bool,
     /// Decompile option: one `.qci` per QC section.
     pub split_qc: bool,
-    /// Highlighted row of the console's command list.
-    pub cursor: usize,
     /// Index into the compile screen's game list.
     pub game: usize,
     /// Where the theme choice is saved; `None` keeps it in memory.
@@ -54,11 +48,6 @@ pub struct AppState {
 }
 
 impl AppState {
-    pub fn set_design(&mut self, design: Option<DesignKind>, cx: &mut Context<Self>) {
-        self.design = design;
-        cx.notify();
-    }
-
     pub fn navigate(&mut self, screen: Screen, cx: &mut Context<Self>) {
         if screen != self.screen {
             self.history.push(self.screen);
@@ -68,7 +57,7 @@ impl AppState {
     }
 
     /// Back closes the palette or search first, then walks screen
-    /// history, then leaves the design for the chooser.
+    /// history; on the first screen it does nothing.
     pub fn back(&mut self, cx: &mut Context<Self>) {
         if self.palette || self.search.is_some() {
             self.palette = false;
@@ -76,11 +65,10 @@ impl AppState {
             cx.notify();
             return;
         }
-        match self.history.pop() {
-            Some(screen) => self.screen = screen,
-            None => self.design = None,
+        if let Some(screen) = self.history.pop() {
+            self.screen = screen;
+            cx.notify();
         }
-        cx.notify();
     }
 
     pub fn toast(&mut self, kind: ToastKind, text: String, cx: &mut Context<Self>) {

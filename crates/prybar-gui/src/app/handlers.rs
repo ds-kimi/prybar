@@ -1,14 +1,11 @@
-//! Action handlers shared by the chooser and every design.
+//! Action handlers for opening files, going back and search.
 
 use std::path::PathBuf;
 
 use gpui::{Context, Div, InteractiveElement as _, PathPromptOptions, Stateful};
 
 use super::root::Root;
-use crate::actions::{
-    Back, Open, Search, ShowCanvas, ShowChooser, ShowConsole, ShowPrybar, ShowWorkbench,
-};
-use crate::state::DesignKind;
+use crate::actions::{Back, Open, Search};
 
 impl Root {
     pub fn open_paths(&mut self, paths: Vec<PathBuf>, cx: &mut Context<Self>) {
@@ -52,25 +49,5 @@ impl Root {
                     cx.notify();
                 })
             }))
-    }
-
-    pub(super) fn design_actions(el: Stateful<Div>, cx: &mut Context<Self>) -> Stateful<Div> {
-        let set = |design: Option<DesignKind>| {
-            move |this: &mut Root, cx: &mut Context<Root>| {
-                this.state.update(cx, |s, cx| s.set_design(design, cx))
-            }
-        };
-        let (chooser, bench, canvas, console, merged) = (
-            set(None),
-            set(Some(DesignKind::Workbench)),
-            set(Some(DesignKind::Canvas)),
-            set(Some(DesignKind::Console)),
-            set(Some(DesignKind::Prybar)),
-        );
-        el.on_action(cx.listener(move |this, _: &ShowChooser, _, cx| chooser(this, cx)))
-            .on_action(cx.listener(move |this, _: &ShowWorkbench, _, cx| bench(this, cx)))
-            .on_action(cx.listener(move |this, _: &ShowCanvas, _, cx| canvas(this, cx)))
-            .on_action(cx.listener(move |this, _: &ShowConsole, _, cx| console(this, cx)))
-            .on_action(cx.listener(move |this, _: &ShowPrybar, _, cx| merged(this, cx)))
     }
 }

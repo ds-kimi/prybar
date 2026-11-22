@@ -4,7 +4,7 @@ mod views;
 use gpui::{AppContext as _, Entity, Modifiers, TestAppContext, VisualTestContext};
 
 use crate::app::Root;
-use crate::state::{AppState, DesignKind};
+use crate::state::AppState;
 
 pub(super) fn window(
     cx: &mut TestAppContext,
@@ -15,7 +15,6 @@ pub(super) fn window(
         cx.open_window(Default::default(), |window, cx| {
             let state = cx.new(|_| {
                 let mut s = AppState::default();
-                s.design = Some(DesignKind::Prybar);
                 s.light = light;
                 s
             });

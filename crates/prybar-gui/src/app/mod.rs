@@ -34,10 +34,9 @@ pub fn run(launch: Launch) {
     });
 }
 
-/// Applies the command line: design, files to open, and the sample.
+/// Applies the command line: files to open, and the sample.
 fn initial_state(launch: Launch, cx: &mut gpui::Context<AppState>) -> AppState {
     let mut state = AppState::default();
-    state.design = launch.design;
     state.prefs = crate::state::prefs::default_path();
     state.light = state
         .prefs

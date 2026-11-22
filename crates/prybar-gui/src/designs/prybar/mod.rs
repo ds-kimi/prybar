@@ -1,6 +1,5 @@
-//! The merged design: Workbench's calm hierarchy under a horizontal top
-//! bar, dark by default with a designed light theme, rust as the only
-//! accent.
+//! The app's design: a calm hierarchy under a horizontal top bar, dark
+//! by default with a designed light theme, rust as the only accent.
 
 mod motion;
 mod shell;

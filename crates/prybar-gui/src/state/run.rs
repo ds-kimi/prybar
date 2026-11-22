@@ -5,16 +5,6 @@ use gpui::Context;
 use super::{AppState, Job, JobStatus, ToastKind};
 
 impl AppState {
-    pub fn select(&mut self, index: usize, cx: &mut Context<Self>) {
-        if index < self.documents.len() {
-            self.selected = Some(index);
-            cx.notify();
-        }
-    }
-
-    /// Starts `work` on the background executor and tracks it as a job.
-    /// `done` applies the result on the UI thread; its return value is
-    /// the success message. Errors become a failed job and an error toast.
     /// A job with this label is still running, so its button waits.
     pub fn is_running(&self, label: &str) -> bool {
         self.jobs
@@ -22,6 +12,9 @@ impl AppState {
             .any(|j| j.label == label && j.status == JobStatus::Running)
     }
 
+    /// Starts `work` on the background executor and tracks it as a job.
+    /// `done` applies the result on the UI thread; its return value is
+    /// the success message. Errors become a failed job and an error toast.
     pub fn run_job<R: Send + 'static>(
         &mut self,
         label: String,
