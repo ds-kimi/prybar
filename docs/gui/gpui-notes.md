@@ -71,7 +71,9 @@ Tailwind-like builders on `div()` (`zed/crates/gpui/src/styled.rs`):
 - `actions!(prybar, [Open, Back, Search]);`
 - `cx.bind_keys([KeyBinding::new("cmd-o", Open, Some("Context"))])`;
   the element sets `.key_context("Context")` and `.on_action(cx.listener(Self::open))`.
-  Example `examples/testing.rs`. `secondary-` prefix = cmd on macOS, ctrl elsewhere.
+  Example `examples/testing.rs`. `KeyBinding::new` panics on `secondary-`;
+  that alias only works through `KeyBinding::load`. We pick `cmd`/`ctrl` with
+  `cfg!` in `crates/prybar-gui/src/actions/mod.rs`.
 
 ## Lists, scroll, images
 
@@ -112,9 +114,15 @@ Tailwind-like builders on `div()` (`zed/crates/gpui/src/styled.rs`):
   `cx.debug_bounds("name")` — only in debug builds (returns `None` in release).
 - `cx.run_until_parked()` runs pending tasks. Real I/O in a test needs
   `cx.executor().allow_parking()`.
-- Our sample: `crates/prybar-gui/src/hello/tests.rs`.
+- Ours: `crates/prybar-gui/src/app/tests.rs` (clicks, keys, file drop) and
+  `src/state/tests/` (real prybar-service calls on the synthetic sample).
 
 ## Pitfalls found
+
+- A view must not read its own entity during its render (`cx.entity().read(cx)`
+  panics "already being updated"); pass child entities down instead.
+- Bound actions need a focused element in the dispatch path: the root view
+  focuses its own handle on creation.
 
 - Missing Metal Toolchain breaks the build with "cannot execute tool 'metal'";
   fixed by the `runtime_shaders` feature.
