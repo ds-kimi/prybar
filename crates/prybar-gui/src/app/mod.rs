@@ -24,7 +24,9 @@ pub fn run(launch: Launch) {
             ..Default::default()
         };
         let opened = cx.open_window(options, |window, cx| {
+            let screen = launch.screen;
             let state = cx.new(|cx| initial_state(launch, cx));
+            start_on(&state, screen, cx);
             cx.new(|cx| Root::new(state, window, cx))
         });
         // A window that fails to open leaves nothing to show, so quit cleanly.
@@ -32,6 +34,21 @@ pub fn run(launch: Launch) {
             cx.quit();
         }
     });
+}
+
+/// Files load in the background and move to their own screen when done,
+/// so the asked screen waits until loading has settled.
+fn start_on(state: &gpui::Entity<AppState>, screen: Option<crate::state::Screen>, cx: &mut App) {
+    let Some(screen) = screen else { return };
+    let state = state.downgrade();
+    let timer = cx
+        .background_executor()
+        .timer(std::time::Duration::from_secs(1));
+    cx.spawn(async move |cx| {
+        timer.await;
+        let _ = state.update(cx, |s, cx| s.navigate(screen, cx));
+    })
+    .detach();
 }
 
 /// Applies the command line: files to open, and the sample.

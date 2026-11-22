@@ -22,6 +22,9 @@ use prybar_service::model::DecompileReport;
 /// Oldest toasts drop off past this, so errors never pile up forever.
 const MAX_TOASTS: usize = 5;
 
+/// How long a confirmation toast stays on screen.
+const TOAST_LIFE: std::time::Duration = std::time::Duration::from_secs(4);
+
 #[derive(Default)]
 pub struct AppState {
     pub screen: Screen,
@@ -80,6 +83,19 @@ impl AppState {
         });
         if self.toasts.len() > MAX_TOASTS {
             self.toasts.remove(0);
+        }
+        // Confirmations fade on their own; errors stay until pushed out.
+        if kind == ToastKind::Info {
+            let id = self.next_id;
+            let timer = cx.background_executor().timer(TOAST_LIFE);
+            cx.spawn(async move |this, cx| {
+                timer.await;
+                let _ = this.update(cx, |s, cx| {
+                    s.toasts.retain(|t| t.id != id);
+                    cx.notify();
+                });
+            })
+            .detach();
         }
         cx.notify();
     }

@@ -59,16 +59,13 @@ commit (API notes: `docs/gui/gpui-notes.md`).
 - Windows: nothing beyond the MSVC toolchain.
 
 ```sh
-cargo run -p prybar-gui --release -- --sample        # chooser; see docs/gui/choose.md
-cargo run -p prybar-gui                              # design chooser
-cargo run -p prybar-gui -- --design canvas --sample  # one design, synthetic files
+cargo run -p prybar-gui --release -- --sample   # synthetic files; see docs/gui/README.md
 cargo test -p prybar-gui     # GPUI test harness, no window or display needed
 ```
 
-`--design` takes `workbench`, `canvas` or `console`; `--sample` writes a
-generated model and VPK to the temp folder and opens them; other arguments
-are files to open. In the app, cmd-1/2/3 (ctrl on Windows and Linux)
-switches design, cmd-0 returns to the chooser, cmd-o opens, escape goes back.
+`--sample` writes a generated model and VPK to the temp folder and opens
+them; other arguments are files to open. In the app, cmd-o (ctrl on Windows
+and Linux) opens, cmd-shift-l switches theme, escape goes back.
 
 The first build fetches the Zed repository and takes a few minutes.
 

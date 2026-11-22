@@ -43,8 +43,10 @@ fn header(r: &ListReport, t: Tokens, cx: &Context<Root>) -> impl IntoElement {
             this.state.update(cx, |s, cx| s.extract_selected(out, cx))
         }));
     let facts = format!(
-        "{:?} package, {} files, {} bytes",
-        r.format, r.total, r.total_bytes
+        "{} package, {} files, {} bytes",
+        format!("{:?}", r.format).to_uppercase(),
+        r.total,
+        r.total_bytes
     );
     div()
         .flex()
