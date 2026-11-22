@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=Prybar
+Comment=Decompile and package Source engine content
+Exec=prybar-gui %F
+Icon=prybar
+Terminal=false
+Categories=Utility;Development;

@@ -53,6 +53,17 @@ jobs:
           ext=""
           if [[ "$TARGET" == *windows* ]]; then ext=".exe"; fi
           cp "target/$TARGET/release/prybar$ext" "target/$TARGET/release/prybar-mcp$ext" README.md "$name"/
+          # Desktop entry and hicolor icons for the Linux archive, so a
+          # package maintainer or the user can install them as they are.
+          if [[ "$TARGET" == *linux* ]]; then
+            mkdir -p "$name/share/icons/hicolor" "$name/share/applications"
+            for f in assets/icon/hicolor/prybar-*.png; do
+              s="${f##*-}"; s="${s%.png}"
+              mkdir -p "$name/share/icons/hicolor/${s}x${s}/apps"
+              cp "$f" "$name/share/icons/hicolor/${s}x${s}/apps/prybar.png"
+            done
+            cp assets/icon/prybar.desktop "$name/share/applications/"
+          fi
           echo "DIST_NAME=$name" >> "$GITHUB_ENV"
       - name: build app bundle
         if: runner.os == 'macOS'

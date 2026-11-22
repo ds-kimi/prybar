@@ -33,3 +33,6 @@ prybar-gma = { path = "../prybar-gma" }
 [[test]]
 name = "mcp"
 path = "tests/mcp/main.rs"
+
+[target.'cfg(windows)'.build-dependencies]
+winresource = "0.1"

@@ -8,6 +8,7 @@ app="$out/Prybar.app"
 rm -rf "$app"
 mkdir -p "$app/Contents/MacOS" "$app/Contents/Resources"
 cp "$bin" "$app/Contents/MacOS/prybar-gui"
+cp "$here/assets/icon/Prybar.icns" "$app/Contents/Resources/Prybar.icns"
 # Apple wants up to three dot-separated integers; anything else (rc tags,
 # slashes) would break the plist or the sed below, so refuse it.
 number="${version#v}"
