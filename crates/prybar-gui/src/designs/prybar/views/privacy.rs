@@ -57,18 +57,14 @@ fn text(s: &AppState, t: Tokens) -> impl IntoElement {
     })
 }
 
+const KEEP: &str = "Send anonymous crash reports and app starts, nothing else";
+const OFF: &str = "Send nothing; you can change this in Settings";
+
 fn answers(t: Tokens, cx: &Context<Root>) -> impl IntoElement {
     let answer = |id: &'static str, label: &'static str, keep: bool| {
         widgets::button(id, label, Kind::Secondary, true, t)
             .debug_selector(move || id.into())
-            .tip(
-                if keep {
-                    "Send anonymous crash reports and app starts, nothing else"
-                } else {
-                    "Send nothing; you can change this in Settings"
-                },
-                t,
-            )
+            .tip(if keep { KEEP } else { OFF }, t)
             .on_click(cx.listener(move |this, _, _, cx| {
                 this.state.update(cx, |s, cx| s.answer_notice(keep, cx))
             }))

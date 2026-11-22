@@ -60,8 +60,7 @@ pub(super) fn chip(
     act: impl Fn(&mut Viewport, &mut Context<Viewport>) + 'static,
 ) -> impl IntoElement {
     let (hover, active, id) = (t.hover, t.active, id.into());
-    let selector = id.to_string();
-    let tip = about::about(&selector);
+    let (selector, tip) = (id.to_string(), about::about(&id.to_string()));
     div()
         .id(id)
         .debug_selector(move || selector.clone())
@@ -77,9 +76,6 @@ pub(super) fn chip(
         .hover(move |s| s.bg(hover))
         .active(move |s| s.bg(active))
         .on_mouse_down(gpui::MouseButton::Left, |_, _, cx| cx.stop_propagation())
-        .on_click(cx.listener(move |v, _, _, cx| {
-            act(v, cx);
-            cx.notify()
-        }))
+        .on_click(cx.listener(move |v, _, _, cx| (act(v, cx), cx.notify()).1))
         .child(label.into())
 }

@@ -9,7 +9,7 @@ use prybar_service::ServiceError;
 use prybar_tools::compile::CompileReport;
 use prybar_workshop::addon::AddonCheck;
 use prybar_workshop::spec::ItemSpec;
-use prybar_workshop::{ListedItem, Progress, PublishReport, SteamStatus};
+use prybar_workshop::{Avatar, ListedItem, Progress, PublishReport, SteamStatus};
 
 pub type CompileFn =
     fn(&Game, &Path, &mut dyn FnMut(&str), &AtomicBool) -> Result<CompileReport, String>;
@@ -21,6 +21,7 @@ pub type SaveFn = fn(Game) -> Result<Vec<Game>, String>;
 pub type StatusFn = fn(u32) -> SteamStatus;
 pub type ItemsFn = fn(u32) -> Result<Vec<ListedItem>, String>;
 pub type AddonFn = fn(&Path) -> Result<AddonCheck, String>;
+pub type AvatarFn = fn(u32) -> Option<Avatar>;
 
 #[derive(Clone, Copy)]
 pub struct Backend {
@@ -31,6 +32,7 @@ pub struct Backend {
     pub status: StatusFn,
     pub items: ItemsFn,
     pub addon: AddonFn,
+    pub avatar: AvatarFn,
 }
 
 impl Default for Backend {
@@ -48,6 +50,7 @@ impl Default for Backend {
             status: tools::steam_status,
             items: |app| tools::workshop_list(app).map_err(|e| explain(&e)),
             addon: |dir| tools::addon_check(dir).map_err(|e| e.to_string()),
+            avatar: tools::steam_avatar,
         }
     }
 }

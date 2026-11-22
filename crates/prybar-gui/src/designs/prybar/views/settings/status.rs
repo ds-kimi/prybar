@@ -11,6 +11,9 @@ use crate::state::AppState;
 use crate::theme::prybar::Tokens;
 use crate::update::{Phase, Updates};
 
+// Tooltip texts, kept here so the element trees stay readable.
+const TIP_1: &str = "Download updates in the background and install them on restart";
+
 /// One line that says where things stand and when it was last asked.
 pub fn status(u: &Updates) -> String {
     let latest = u.release.as_ref().map(|r| format!("v{}", r.version));
@@ -43,10 +46,7 @@ pub fn auto_switch(s: &AppState, t: Tokens, cx: &Context<Root>) -> impl IntoElem
         t,
     )
     .debug_selector(|| "pb-auto-update".into())
-    .tip(
-        "Download updates in the background and install them on restart",
-        t,
-    )
+    .tip(TIP_1, t)
     .on_click(cx.listener(|this, _, _, cx| {
         this.state
             .update(cx, |s, cx| s.set_auto_update(!s.updates.auto, cx))

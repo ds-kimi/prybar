@@ -83,8 +83,13 @@ Compile runs the picked game's studiomdl (through Wine or `PRYBAR_WINE` off
 Windows) with the log streamed line by line, cancel and copy. Settings
 detects games and edits a game's folder and studiomdl.
 
-Publish shows Steam's state (not running, not logged in, game not owned,
-ready) with Retry, lists your Garry's Mod items (a click fills the id and
+The Steam badge at the right of the top bar shows your Steam picture and
+name with a green dot when publishing works and a red one when it does not;
+its tooltip says why (not running, not logged in, game not owned, no Steam
+support in this build) and a click checks again. Every button, toggle and
+control explains itself in a tooltip after a short pause.
+
+Publish repeats what blocks Steam, if anything, with Retry, lists your Garry's Mod items (a click fills the id and
 title to update one), takes an addon folder (its `addon.json` type and tags
 and every file the game refuses are listed as you type) or a `.gma`, and
 fits a png/jpg preview to 512x512 under 1 MB (a GIF goes as is and must be
@@ -101,11 +106,11 @@ Tests only use a mocked Steam. One real upload checks the whole path:
 
 1. Start Steam, log in with the account that owns Garry's Mod.
 2. Build and run with Steam support (see above); open Publish. The line
-   must say "Steam is ready, logged in as <you>" and list your items.
+   The badge must show your name with a green dot; Publish lists your items.
 3. Make a test folder: `addon.json` with
    `{"title": "prybar test", "type": "tool", "tags": ["fun"]}` and
    `lua/autorun/prybar_test.lua` with `print("prybar")`.
-4. Item id empty, title `prybar test`, visibility `Private`, content the
+4. Item id empty, title `prybar test`, visibility `Hidden`, content the
    folder, a preview png of any size. Dry run, then Publish.
 5. Expect the stages, then "Published item <id>" and Open in Steam. On the
    page: private, preview 512x512, tags Addon / tool / fun.

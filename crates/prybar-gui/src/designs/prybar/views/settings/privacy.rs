@@ -10,6 +10,9 @@ use crate::state::AppState;
 use crate::telemetry::PRIVACY_URL;
 use crate::theme::prybar::Tokens;
 
+// Tooltip texts, kept here so the element trees stay readable.
+const TIP_1: &str = "Send anonymous crash reports and app starts; every payload is logged below";
+
 pub fn section(s: &AppState, t: Tokens, cx: &Context<Root>) -> AnyElement {
     let p = &s.privacy;
     let switch = widgets::switch(
@@ -19,10 +22,7 @@ pub fn section(s: &AppState, t: Tokens, cx: &Context<Root>) -> AnyElement {
         t,
     )
     .debug_selector(|| "pb-telemetry".into())
-    .tip(
-        "Send anonymous crash reports and app starts; every payload is logged below",
-        t,
-    )
+    .tip(TIP_1, t)
     .on_click(cx.listener(|this, _, _, cx| {
         this.state
             .update(cx, |s, cx| s.set_telemetry(!s.privacy.on, cx))

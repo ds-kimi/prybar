@@ -34,6 +34,7 @@ pub(crate) fn backend() -> Backend {
         },
         items: |_| Ok(vec![item()]),
         addon: |dir| prybar_workshop::addon::check_addon(dir).map_err(|e| e.to_string()),
+        avatar: |_| prybar_workshop::Avatar::new(2, 2, vec![200; 16]),
     }
 }
 

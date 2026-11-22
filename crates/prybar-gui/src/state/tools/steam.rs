@@ -2,10 +2,10 @@
 //! the user already published, and the check of the chosen addon folder.
 
 use std::path::PathBuf;
+use std::sync::Arc;
 
-use gpui::Context;
+use gpui::{Context, RenderImage};
 use prybar_workshop::addon::AddonCheck;
-use prybar_workshop::spec::GMOD_APP_ID;
 use prybar_workshop::{ListedItem, SteamStatus};
 
 use crate::state::AppState;
@@ -19,6 +19,36 @@ pub struct SteamView {
     pub items_error: Option<String>,
     /// The folder the check is about, and what it found.
     pub addon: Option<(PathBuf, Result<AddonCheck, String>)>,
+    /// The account picture, read once and kept: it rarely changes and
+    /// each read wakes the Steam API.
+    pub avatar: Option<Arc<RenderImage>>,
+}
+
+impl SteamView {
+    /// What the state means for the user, what to do about it, and
+    /// whether it is good news. `None` while the check runs.
+    pub fn sentence(&self) -> (String, Option<bool>) {
+        let bad = |text: &str| (text.to_owned(), Some(false));
+        match &self.status {
+            None => ("Checking Steam…".to_owned(), None),
+            Some(SteamStatus::Ready { user }) => (
+                format!("Steam is ready, logged in as {user}. Publishing works."),
+                Some(true),
+            ),
+            Some(SteamStatus::NotRunning) => {
+                bad("Steam is not running. Start Steam, then click to check again.")
+            }
+            Some(SteamStatus::NotLoggedIn) => {
+                bad("Steam is open but no one is logged in. Log in, then click to check again.")
+            }
+            Some(SteamStatus::NotOwned) => {
+                bad("This Steam account does not own Garry's Mod, so it cannot publish for it.")
+            }
+            Some(SteamStatus::Disabled) => {
+                bad("This build has no Steam Workshop support. Dry run still checks everything.")
+            }
+        }
+    }
 }
 
 impl AppState {
@@ -29,20 +59,17 @@ impl AppState {
         }
         self.tools.steam_started = true;
         self.tools.steam.status = None;
-        let (status, items) = (self.tools.backend.status, self.tools.backend.items);
-        let work = cx.background_executor().spawn(async move {
-            let s = status(GMOD_APP_ID);
-            let list = match s {
-                SteamStatus::Ready { .. } => items(GMOD_APP_ID),
-                _ => Ok(Vec::new()),
-            };
-            (s, list)
-        });
+        let b = self.tools.backend;
+        let want_avatar = self.tools.steam.avatar.is_none();
+        let work = cx
+            .background_executor()
+            .spawn(async move { super::ask::ask(b, want_avatar) });
         cx.spawn(async move |this, cx| {
-            let (s, list) = work.await;
+            let (s, list, face) = work.await;
             let _ = this.update(cx, |st, cx| {
                 st.tools.steam.status = Some(s);
                 let steam = &mut st.tools.steam;
+                steam.avatar = steam.avatar.take().or(face);
                 (steam.items, steam.items_error) = match list {
                     Ok(items) => (items, None),
                     Err(why) => (Vec::new(), Some(why)),

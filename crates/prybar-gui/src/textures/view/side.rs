@@ -28,11 +28,10 @@ pub fn list(v: &TextureView, t: &Tokens, cx: &mut Context<TextureView>) -> impl 
 /// Name on top, base texture under it; missing ones say so in words and
 /// color, not color alone.
 fn row(i: usize, s: &Slot, on: bool, t: &Tokens, cx: &mut Context<TextureView>) -> AnyElement {
-    let id = format!("pb-tex-{i}");
     let (hover, active) = (t.hover, t.active);
     let (found, under) = (s.info.is_some(), s.summary());
     div()
-        .id(id)
+        .id(("pb-tex", i))
         .debug_selector(move || format!("pb-tex-{i}"))
         .tip("Show this texture", *t)
         .px_2()

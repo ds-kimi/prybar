@@ -31,7 +31,7 @@ pub fn view(s: &AppState, f: &Forms, t: Tokens, cx: &Context<Root>) -> AnyElemen
         .child(widgets::field("Title", &f.publish.title, t).debug_selector(|| "pb-pub-title".into()))
         .child(widgets::field("Description", &f.publish.description, t))
         .child(widgets::field("Tags", &f.publish.tags, t))
-        .child(widgets::field("Visibility", &f.publish.visibility, t))
+        .child(visibility(f, t))
         .child(picked("Addon folder or .gma", "pb-pub-content", &f.publish.content, true, t, cx))
         .child(addon::view(s, t))
         .child(picked("Preview image", "pb-pub-preview", &f.publish.preview, false, t, cx))
@@ -100,4 +100,13 @@ fn buttons(s: &AppState, f: &Forms, t: Tokens, cx: &Context<Root>) -> impl IntoE
         .gap_2()
         .child(go("pb-pub-dry", "Dry run", Kind::Secondary, true))
         .child(go("pb-pub-go", "Publish", Kind::Primary, false))
+}
+
+fn visibility(f: &Forms, t: Tokens) -> impl IntoElement {
+    div()
+        .flex()
+        .flex_col()
+        .gap_1()
+        .child(div().text_xs().text_color(t.muted).child("Visibility"))
+        .child(f.publish.visibility.clone())
 }

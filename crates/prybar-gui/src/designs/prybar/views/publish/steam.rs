@@ -1,8 +1,8 @@
-//! Steam's state in one line with what to do about it, then the items
+//! What blocks Steam, if anything, with what to do about it, then the items
 //! the user already published, each one click away from an update.
 
 use gpui::{div, prelude::*, AnyElement, Context};
-use prybar_workshop::{ListedItem, SteamStatus};
+use prybar_workshop::ListedItem;
 
 use super::super::super::widgets::Tipped as _;
 use super::super::super::widgets::{self, Kind};
@@ -16,7 +16,10 @@ pub fn view(s: &AppState, t: Tokens, cx: &Context<Root>) -> AnyElement {
         .flex()
         .flex_col()
         .gap_1()
-        .child(line(s, t, cx))
+        // Good news lives in the top bar badge; here only what blocks.
+        .when(s.tools.steam.sentence().1 == Some(false), |el| {
+            el.child(line(s, t, cx))
+        })
         .when_some(steam.items_error.clone(), |el, why| {
             el.child(div().text_color(t.danger).child(why))
         })
@@ -26,30 +29,9 @@ pub fn view(s: &AppState, t: Tokens, cx: &Context<Root>) -> AnyElement {
         .into_any_element()
 }
 
-/// The sentence for each state and whether it is good news.
-fn status_text(status: Option<&SteamStatus>) -> (String, bool) {
-    let bad = |text: &str| (text.to_owned(), false);
-    match status {
-        None => ("Checking Steam…".to_owned(), true),
-        Some(SteamStatus::Ready { user }) => {
-            (format!("Steam is ready, logged in as {user}."), true)
-        }
-        Some(SteamStatus::NotRunning) => bad("Steam is not running. Start Steam, then retry."),
-        Some(SteamStatus::NotLoggedIn) => {
-            bad("Steam is open but no one is logged in. Log in, then retry.")
-        }
-        Some(SteamStatus::NotOwned) => {
-            bad("This Steam account does not own Garry's Mod, so it cannot publish for it.")
-        }
-        Some(SteamStatus::Disabled) => {
-            bad("This build has no Steam support. Dry run still checks everything.")
-        }
-    }
-}
-
 fn line(s: &AppState, t: Tokens, cx: &Context<Root>) -> impl IntoElement {
     let status = s.tools.steam.status.as_ref();
-    let (text, ok) = status_text(status);
+    let (text, ok) = s.tools.steam.sentence();
     let retry = widgets::button(
         "pb-pub-retry",
         "Retry",
@@ -68,7 +50,7 @@ fn line(s: &AppState, t: Tokens, cx: &Context<Root>) -> impl IntoElement {
         .child(
             div()
                 .flex_1()
-                .text_color(if ok { t.muted } else { t.danger })
+                .text_color(if ok == Some(false) { t.danger } else { t.muted })
                 .child(text),
         )
         .child(retry)

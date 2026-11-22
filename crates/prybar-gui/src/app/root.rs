@@ -8,6 +8,7 @@ use gpui::{
 
 use super::Forms;
 use crate::designs::input::InputEvent;
+use crate::designs::modal::Modal;
 use crate::state::{AppState, Screen};
 use crate::theme::prybar::{tokens, Light};
 use crate::viewport::view::Full;
@@ -16,6 +17,8 @@ pub struct Root {
     pub state: Entity<AppState>,
     pub forms: Forms,
     pub(super) focus: FocusHandle,
+    /// The open popup and the subscription that drops it when closed.
+    pub(super) modal: Option<(Entity<Modal>, Subscription)>,
     _subs: [Subscription; 5],
 }
 
@@ -42,10 +45,13 @@ impl Root {
         });
         let _full = full_view(&forms, cx);
         let _content = forms.publish.watch(&state, cx);
+        // The bar's account badge needs Steam's answer on every screen.
+        state.update(cx, |s, cx| s.refresh_steam(cx));
         Root {
             state,
             forms,
             focus,
+            modal: None,
             _subs: [_observe, _refocus, _search, _full, _content],
         }
     }
@@ -60,17 +66,20 @@ impl Render for Root {
             .id("root")
             .track_focus(&self.focus)
             .size_full()
+            .relative()
             .bg(t.bg)
             .text_color(t.text)
             .on_drop(cx.listener(|this, paths: &ExternalPaths, _, cx| {
                 this.open_paths(paths.paths().to_vec(), cx)
             }))
             .drag_over::<ExternalPaths>(move |s, _, _, _| s.border_2().border_color(t.rust));
-        Self::ui_actions(Self::navigation_actions(root, cx), cx).child(crate::designs::render(
-            self.state.clone(),
-            &self.forms.clone(),
-            cx,
-        ))
+        Self::ui_actions(Self::navigation_actions(root, cx), cx)
+            .child(crate::designs::render(
+                self.state.clone(),
+                &self.forms.clone(),
+                cx,
+            ))
+            .children(self.modal.as_ref().map(|m| m.0.clone()))
     }
 }
 

@@ -4,7 +4,7 @@ mod paths;
 mod publish;
 
 pub use paths::{existing, game_dir, item_id, preview};
-pub use publish::{description, tags, title, visibility};
+pub use publish::{description, tags, title};
 
 use std::path::Path;
 

@@ -4,7 +4,9 @@
 mod button;
 mod field;
 pub mod input;
+pub mod modal;
 mod nav;
+pub mod select;
 pub mod tip;
 
 pub use button::{button, Kind};

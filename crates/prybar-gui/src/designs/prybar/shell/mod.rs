@@ -2,6 +2,7 @@
 //! job status, the update button, the theme toggle and settings; toasts and the command
 //! palette float above.
 
+mod account;
 mod brand;
 pub mod palette;
 mod status;
@@ -47,6 +48,7 @@ pub fn bar(s: &AppState, t: Tokens, cx: &Context<Root>) -> AnyElement {
         .child(div().flex_1())
         .children(status::job(s, t))
         .children(update::button(s, t, cx))
+        .child(account::badge(s, t, cx))
         .child(brand::theme_toggle(s.light, t, cx))
         .child(nav(Screen::Settings, s, t, cx))
         .children(status::sweep(s, t))

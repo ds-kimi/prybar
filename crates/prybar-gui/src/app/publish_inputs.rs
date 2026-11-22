@@ -4,8 +4,10 @@
 use gpui::{App, Context, Entity, Subscription};
 
 use super::forms::field;
+use super::visibility::{visibility, VALUES};
 use super::Root;
 use crate::designs::input::TextInput;
+use crate::designs::select::Select;
 use crate::state::tools::PublishForm;
 use crate::state::{checks, AppState};
 
@@ -15,7 +17,7 @@ pub struct PublishInputs {
     pub title: Entity<TextInput>,
     pub description: Entity<TextInput>,
     pub tags: Entity<TextInput>,
-    pub visibility: Entity<TextInput>,
+    pub visibility: Entity<Select>,
     pub content: Entity<TextInput>,
     pub preview: Entity<TextInput>,
     pub change_note: Entity<TextInput>,
@@ -29,20 +31,19 @@ impl PublishInputs {
             title: field(cx, "Addon name", "", false, checks::title),
             description: field(cx, about, "", true, checks::description),
             tags: field(cx, "Empty: from addon.json", "", false, checks::tags),
-            visibility: field(cx, "Private", "Private", false, checks::visibility),
+            visibility: visibility(cx),
             content: field(cx, "Addon folder or .gma", "", false, checks::existing),
             preview: field(cx, "/path/to/preview.jpg", "", false, checks::preview),
             change_note: field(cx, "What changed", "", true, checks::description),
         }
     }
 
-    pub fn all(&self) -> [&Entity<TextInput>; 8] {
+    pub fn all(&self) -> [&Entity<TextInput>; 7] {
         [
             &self.item_id,
             &self.title,
             &self.description,
             &self.tags,
-            &self.visibility,
             &self.content,
             &self.preview,
             &self.change_note,
@@ -57,7 +58,10 @@ impl PublishInputs {
             title: text(&self.title),
             description: text(&self.description),
             tags: text(&self.tags),
-            visibility: text(&self.visibility),
+            visibility: VALUES
+                .get(self.visibility.read(cx).current())
+                .map_or("private", |v| v)
+                .into(),
             preview: text(&self.preview),
             content: text(&self.content),
             change_note: text(&self.change_note),

@@ -21,6 +21,9 @@ pub fn view(s: &AppState, f: &Forms, t: Tokens, cx: &Context<Root>) -> AnyElemen
         .into_any_element()
 }
 
+const INTRO: &str = "Build a QC with the game's studiomdl.";
+const NO_GAME: &str = "No game is set up yet. Detect games in Settings.";
+
 fn form(s: &AppState, f: &Forms, t: Tokens, cx: &Context<Root>) -> impl IntoElement {
     let choose = widgets::button("pb-qc-pick", "Choose…", Kind::Secondary, true, t)
         .tip("Pick the .qc file to compile", t)
@@ -31,11 +34,7 @@ fn form(s: &AppState, f: &Forms, t: Tokens, cx: &Context<Root>) -> impl IntoElem
         .flex_col()
         .gap_3()
         .child(widgets::heading("Compile"))
-        .child(
-            div()
-                .text_color(t.muted)
-                .child("Build a QC with the game's studiomdl."),
-        )
+        .child(div().text_color(t.muted).child(INTRO))
         .child(
             div()
                 .flex()
@@ -62,9 +61,7 @@ fn games(s: &AppState, t: Tokens, cx: &Context<Root>) -> AnyElement {
                 this.state
                     .update(cx, |s, cx| s.navigate(Screen::Settings, cx))
             }));
-        let why = div()
-            .text_color(t.muted)
-            .child("No game is set up yet. Detect games in Settings.");
+        let why = div().text_color(t.muted).child(NO_GAME);
         return div()
             .flex()
             .items_center()

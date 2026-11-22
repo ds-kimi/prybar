@@ -23,9 +23,3 @@ pub fn tags(text: &str) -> Option<&'static str> {
     (!text.trim().is_empty() && empty)
         .then_some("Separate tags with single commas, like model, prop.")
 }
-
-pub fn visibility(text: &str) -> Option<&'static str> {
-    let ok = ["public", "friends", "unlisted", "private"];
-    (!ok.contains(&text.trim().to_ascii_lowercase().as_str()))
-        .then_some("Use Public, Friends, Unlisted or Private.")
-}

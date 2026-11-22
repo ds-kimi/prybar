@@ -9,6 +9,7 @@ mod root;
 #[cfg(test)]
 mod tests;
 mod ui;
+mod visibility;
 
 pub use forms::Forms;
 pub use root::Root;

@@ -2,6 +2,7 @@
 //! external tools. Each call goes through [`Backend`] so tests swap in
 //! fakes and never start studiomdl or talk to Steam.
 
+mod ask;
 mod backend;
 mod compile;
 mod games;

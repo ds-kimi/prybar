@@ -19,13 +19,9 @@ pub fn list(s: &AppState, f: &Forms, t: Tokens, cx: &Context<Root>) -> AnyElemen
             .into_any_element();
     }
     let rows = s.tools.games.iter().enumerate().map(|(ix, g)| {
-        let (dir, tool) = (
-            g.game_dir.display().to_string(),
-            g.studiomdl
-                .as_ref()
-                .map(|p| p.display().to_string())
-                .unwrap_or_default(),
-        );
+        let dir = g.game_dir.display().to_string();
+        let tool = g.studiomdl.as_ref().map(|p| p.display().to_string());
+        let tool = tool.unwrap_or_default();
         let (dir_in, tool_in) = (f.game_dir.clone(), f.studiomdl.clone());
         widgets::row(("pb-set-game", ix), s.tools.editing == Some(ix), t)
             .debug_selector(move || format!("pb-set-game-{ix}"))

@@ -3,20 +3,24 @@ use gpui::{Modifiers, TestAppContext};
 use super::{forms, window};
 use crate::state::Screen;
 
-/// Opening the screen asks Steam once; a listed item fills the form.
+/// Steam is asked at start; a listed item fills the form and the bar
+/// badge checks again.
 #[gpui::test]
 fn steam_line_and_items_fill_the_form(cx: &mut TestAppContext) {
     let (state, mut cx) = window(cx, false);
     state.update(&mut cx, |s, cx| s.navigate(Screen::Publish, cx));
     cx.run_until_parked();
-    assert!(cx.debug_bounds("pb-pub-steam").is_some());
+    assert!(
+        cx.debug_bounds("pb-pub-steam").is_none(),
+        "good news stays in the badge"
+    );
     let b = cx.debug_bounds("pb-pub-item-0").expect("item row drawn");
     cx.simulate_click(b.center(), Modifiers::none());
     cx.run_until_parked();
     let f = forms(&mut cx);
     let id = f.publish.item_id.read_with(&cx, |i, _| i.text().to_owned());
     assert_eq!(id, "7");
-    let b = cx.debug_bounds("pb-pub-retry").expect("retry drawn");
+    let b = cx.debug_bounds("pb-steam").expect("badge drawn");
     cx.simulate_click(b.center(), Modifiers::none());
     cx.run_until_parked();
     state.read_with(&cx, |s, _| assert!(s.tools.steam.status.is_some()));
