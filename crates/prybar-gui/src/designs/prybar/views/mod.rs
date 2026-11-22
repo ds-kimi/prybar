@@ -12,6 +12,8 @@ mod settings;
 
 use gpui::{div, prelude::*, AnyElement, Context};
 
+pub use preview::wanted;
+
 use super::motion;
 use super::widgets::{self, Kind};
 use crate::app::{Forms, Root};
@@ -58,7 +60,9 @@ fn content(s: &AppState, f: &Forms, t: Tokens, cx: &Context<Root>) -> AnyElement
         Screen::Compile => compile::view(s, f, t, cx),
         Screen::Publish => publish::view(f, t),
         Screen::Settings => settings::view(s, f, t),
-        Screen::ModelPreview | Screen::TexturePreview => preview::view(s.screen, pick(s, true), t),
+        Screen::ModelPreview | Screen::TexturePreview => {
+            preview::view(s.screen, pick(s, true), f, t)
+        }
     }
 }
 

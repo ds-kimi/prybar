@@ -24,7 +24,14 @@ impl Root {
     pub fn new(state: Entity<AppState>, window: &mut Window, cx: &mut Context<Self>) -> Self {
         let focus = cx.focus_handle();
         focus.focus(window, cx);
-        let _observe = cx.observe(&state, |_, _, cx| cx.notify());
+        let _observe = cx.observe(&state, |this: &mut Self, state, cx| {
+            if let Some(path) = crate::designs::wanted(state.read(cx)) {
+                this.forms
+                    .viewport
+                    .update(cx, |v, cx| v.show(Some(path), cx));
+            }
+            cx.notify()
+        });
         // A clicked row that a screen change removes takes focus with it;
         // without this, keys would reach nothing until the next click.
         let _refocus = cx.on_focus_lost(window, |this, window, cx| this.focus.focus(window, cx));

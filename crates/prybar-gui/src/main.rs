@@ -7,6 +7,7 @@ mod designs;
 mod sample;
 mod state;
 mod theme;
+mod viewport;
 
 fn main() {
     match cli::parse(std::env::args().skip(1)) {

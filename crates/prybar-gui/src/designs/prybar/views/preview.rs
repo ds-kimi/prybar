@@ -1,13 +1,16 @@
 //! 3D and texture previews, and the calm region every later-work part
 //! uses: a labeled frame, no fake art, no motion.
 
+use std::path::PathBuf;
+
 use gpui::{div, prelude::*, AnyElement};
 
 use super::super::widgets;
-use crate::state::{Document, Placeholder, Screen};
+use crate::app::Forms;
+use crate::state::{AppState, Document, Placeholder, Screen};
 use crate::theme::prybar::Tokens;
 
-pub fn view(screen: Screen, doc: Option<&Document>, t: Tokens) -> AnyElement {
+pub fn view(screen: Screen, doc: Option<&Document>, f: &Forms, t: Tokens) -> AnyElement {
     let name = doc.map_or_else(|| "No model open".into(), |d| d.title());
     let ph = screen.placeholder().unwrap_or(Placeholder::ModelViewport);
     div()
@@ -23,8 +26,20 @@ pub fn view(screen: Screen, doc: Option<&Document>, t: Tokens) -> AnyElement {
                 .child(widgets::heading(screen.label()))
                 .child(div().text_color(t.muted).child(name)),
         )
-        .child(region(ph, t))
+        .child(match (screen, doc) {
+            (Screen::ModelPreview, Some(_)) => f.viewport.clone().into_any_element(),
+            _ => region(ph, t),
+        })
         .into_any_element()
+}
+
+/// The model the 3D preview should show, once its screen is open: the
+/// GPU only starts for people who look at a model.
+pub fn wanted(s: &AppState) -> Option<PathBuf> {
+    (s.screen == Screen::ModelPreview)
+        .then(|| super::pick(s, true))
+        .flatten()
+        .map(|d| d.path().to_owned())
 }
 
 /// Says what will live here and that it is not built yet.

@@ -8,6 +8,7 @@ mod tests;
 mod views;
 mod widgets;
 
+pub use views::wanted;
 pub use widgets::input;
 
 use gpui::{div, prelude::*, AnyElement, Context, Entity};

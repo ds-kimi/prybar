@@ -5,6 +5,7 @@ use gpui::{App, AppContext as _, Entity};
 
 use crate::designs::input::{any, Spec, TextInput};
 use crate::state::checks;
+use crate::viewport::view::Viewport;
 
 #[derive(Clone)]
 pub struct Forms {
@@ -16,6 +17,8 @@ pub struct Forms {
     pub tags: Entity<TextInput>,
     pub visibility: Entity<TextInput>,
     pub config: Entity<TextInput>,
+    /// The 3D preview, kept so its GPU thread and camera survive tabs.
+    pub viewport: Entity<Viewport>,
 }
 
 type Check = fn(&str) -> Option<&'static str>;
@@ -45,6 +48,7 @@ impl Forms {
             tags: field(cx, "model, prop", "model", false, checks::tags),
             visibility: field(cx, "Private", "Private", false, checks::visibility),
             config: field(cx, "/path/to/games.toml", &config, false, checks::required),
+            viewport: cx.new(|_| Viewport::default()),
         }
     }
 }

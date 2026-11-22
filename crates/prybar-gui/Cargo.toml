@@ -23,6 +23,13 @@ prybar-mdl = { path = "../prybar-mdl" }
 prybar-tools = { path = "../prybar-tools" }
 # Only to pack the synthetic sample package shown by `--sample`.
 prybar-vpk = { path = "../prybar-vpk" }
+# 3D viewport: same wgpu commit GPUI builds on Linux, so one copy compiles.
+wgpu = { git = "https://github.com/gfx-rs/wgpu", rev = "cddb2f5d80dc0009b2ef6767635140cacf90a007" }
+glam = "0.30"
+pollster = "0.4"
+async-channel = "2"
+# Frame type GPUI images are built from; same major as GPUI's.
+image = { version = "0.25", default-features = false }
 
 [dev-dependencies]
 gpui = { git = "https://github.com/zed-industries/zed", rev = "d31d1074a07b7bbaa43a52fef7847a00dd491baf", features = ["test-support"] }
