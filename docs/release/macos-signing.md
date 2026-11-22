@@ -19,7 +19,8 @@ job. Notarization gives up after 30 minutes and prints Apple's log when a
 submission is rejected.
 
 Tags must look like `v1.2.3`: the app bundle version only allows numbers, so
-a tag such as `v1.2.0-rc.1` fails the macOS build.
+a tag such as `v1.2.0-rc.1` fails the release at its first step, on every
+platform.
 
 ## What gets signed
 
