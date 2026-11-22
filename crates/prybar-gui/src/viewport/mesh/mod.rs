@@ -1,5 +1,5 @@
-//! Turns a parsed model into flat GPU-ready buffers: LOD 0 of the chosen
-//! body group models, materials remapped by the chosen skin.
+//! Turns a parsed model into flat GPU-ready buffers: the chosen LOD of the
+//! chosen body group models, materials remapped by the chosen skin.
 
 mod bones;
 mod bounds;
@@ -13,6 +13,7 @@ use prybar_mdl::ir::ModelIr;
 
 pub use bones::bones;
 pub use bounds::Bounds;
+pub use model::lods;
 
 /// Floats per vertex: position, normal, uv.
 pub const STRIDE: usize = 8;
@@ -36,6 +37,18 @@ pub struct Scene {
     pub bounds: Bounds,
     /// Bone segments (parent, child) in bind pose.
     pub bones: Vec<[[f32; 3]; 2]>,
+    /// Up to three `(bone, weight)` per vertex, for posing on the CPU.
+    pub weights: Vec<[(u8, f32); 3]>,
+}
+
+/// Which variant of the model to show.
+#[derive(Debug, Clone, Default, PartialEq)]
+pub struct Pick {
+    /// `body[i]` is the sub-model of body part `i` (0 when missing).
+    pub body: Vec<usize>,
+    pub skin: usize,
+    /// Falls back to LOD 0 when a sub-model has fewer levels.
+    pub lod: usize,
 }
 
 impl Scene {
@@ -44,13 +57,12 @@ impl Scene {
     }
 }
 
-/// `body[i]` picks the sub-model of body part `i` (0 when missing).
-pub fn build(ir: &ModelIr, body: &[usize], skin: usize) -> Result<Scene, String> {
+pub fn build(ir: &ModelIr, pick: &Pick) -> Result<Scene, String> {
     let mut scene = Scene::default();
     for (pi, part) in ir.body_parts.iter().enumerate() {
-        let pick = body.get(pi).copied().unwrap_or(0);
-        if let Some(model) = part.models.get(pick).or(part.models.first()) {
-            model::add(&mut scene, ir, model, skin);
+        let at = pick.body.get(pi).copied().unwrap_or(0);
+        if let Some(model) = part.models.get(at).or(part.models.first()) {
+            model::add(&mut scene, ir, model, pick);
         }
     }
     if scene.indices.is_empty() {

@@ -9,6 +9,8 @@ mod input;
 mod load;
 mod overlay;
 mod paint;
+mod pick;
+mod play;
 #[cfg(test)]
 mod tests;
 
@@ -17,7 +19,11 @@ use std::sync::Arc;
 
 use gpui::{Bounds, Context, EventEmitter, FocusHandle, Pixels, RenderImage, Task};
 
+use prybar_mdl::ir::ModelIr;
+
 use super::camera::{Inertia, Orbit};
+use super::mesh::{Pick, Scene};
+use super::pose::Play;
 use super::render::{Flags, Output, Request, Worker};
 
 #[derive(Debug, Clone, Default, PartialEq)]
@@ -64,6 +70,15 @@ pub struct Viewport {
     /// Neutral grey behind the model instead of the theme surface, to
     /// judge silhouettes.
     pub backdrop: bool,
+    /// The open model, kept to rebuild other body groups, skins and LODs
+    /// and to build clips.
+    pub ir: Option<Arc<ModelIr>>,
+    /// The built mesh in bind pose; playback poses a copy of it.
+    bind: Option<Arc<Scene>>,
+    pub pick: Pick,
+    pub play: Play,
+    /// Only the newest variant build matters.
+    rebuild: Option<Task<()>>,
 }
 
 /// Asks the host to switch between the side-by-side and full-size view.
@@ -94,6 +109,8 @@ impl Viewport {
         self.drag = None;
         self.last = None;
         self.drops.extend(self.image.take());
+        (self.ir, self.bind, self.rebuild) = (None, None, None);
+        (self.pick, self.play) = (Pick::default(), Play::default());
         self.status = if path.is_some() {
             Status::Loading
         } else {

@@ -10,7 +10,7 @@ use gpui::{
 
 use super::drag::{Drag, Mode};
 use super::{Full, Viewport};
-use crate::actions::{FrameModel, ResetView, ToggleBones, ToggleFullView, ToggleWire};
+use crate::actions::{FrameModel, ResetView, ToggleBones, ToggleFullView, TogglePlay, ToggleWire};
 
 pub fn attach(el: Div, cx: &mut Context<Viewport>) -> Div {
     let down =
@@ -49,6 +49,10 @@ pub fn keys(el: Div, cx: &mut Context<Viewport>) -> Div {
         }))
         .on_action(cx.listener(|v, _: &ToggleBones, _, cx| {
             v.flags.bones = !v.flags.bones;
+            cx.notify()
+        }))
+        .on_action(cx.listener(|v, _: &TogglePlay, _, cx| {
+            v.play.toggle();
             cx.notify()
         }))
 }

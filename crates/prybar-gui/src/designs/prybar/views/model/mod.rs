@@ -2,6 +2,7 @@
 //! material lists, so opening a model shows it at once.
 
 mod facts;
+mod sequences;
 
 use gpui::{div, prelude::*, AnyElement, Context};
 
@@ -10,6 +11,7 @@ use crate::app::{Forms, Root};
 use crate::state::{Document, Screen};
 use crate::theme::prybar::Tokens;
 use facts::{companions, facts, list};
+use sequences::sequences;
 
 pub fn view(doc: &Document, f: &Forms, t: Tokens, cx: &Context<Root>) -> AnyElement {
     let Document::Model { summary: m, .. } = doc else {
@@ -25,13 +27,19 @@ pub fn view(doc: &Document, f: &Forms, t: Tokens, cx: &Context<Root>) -> AnyElem
         .gap_3()
         .child(head(doc, t, cx))
         .child(
-            row.child(details(doc, m, t))
+            row.child(details(doc, m, f, t, cx))
                 .child(view.child(f.viewport.clone())),
         )
         .into_any_element()
 }
 
-fn details(doc: &Document, m: &prybar_mdl::Summary, t: Tokens) -> impl IntoElement {
+fn details(
+    doc: &Document,
+    m: &prybar_mdl::Summary,
+    f: &Forms,
+    t: Tokens,
+    cx: &Context<Root>,
+) -> impl IntoElement {
     div()
         .flex()
         .flex_col()
@@ -39,6 +47,8 @@ fn details(doc: &Document, m: &prybar_mdl::Summary, t: Tokens) -> impl IntoEleme
         .w(gpui::px(380.0))
         .flex_none()
         .child(facts(m, t))
+        .child(widgets::section("Sequences", t))
+        .child(sequences(f, t, cx))
         .child(widgets::section("Companion files", t))
         .child(companions(doc, t))
         .child(widgets::section("Materials", t))

@@ -10,7 +10,7 @@ use crate::viewport::mesh;
 fn bench() {
     let path = std::env::var("PRYBAR_BENCH_MDL").expect("PRYBAR_BENCH_MDL");
     let ir = prybar_service::model::open(&path).unwrap();
-    let scene = mesh::build(&ir, &[], 0).unwrap();
+    let scene = mesh::build(&ir, &mesh::Pick::default()).unwrap();
     let mut r = Renderer::new().unwrap();
     r.set_scene(&scene);
     let mut req = request(&scene, 2400, 1500);

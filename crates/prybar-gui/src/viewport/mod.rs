@@ -3,6 +3,7 @@
 
 pub mod camera;
 pub mod mesh;
+pub mod pose;
 pub mod render;
 mod shaders;
 pub mod view;

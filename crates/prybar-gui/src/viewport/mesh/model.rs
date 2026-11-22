@@ -1,10 +1,10 @@
 use prybar_mdl::ir::{ModelIr, SubModel};
 
-use super::{Part, Scene, MAX_TRIANGLES};
+use super::{Part, Pick, Scene, MAX_TRIANGLES};
 
-/// Appends LOD 0 of one sub-model, one part per mesh.
-pub fn add(scene: &mut Scene, ir: &ModelIr, model: &SubModel, skin: usize) {
-    let Some(lod) = model.lods.first() else {
+/// Appends the picked LOD of one sub-model, one part per mesh.
+pub fn add(scene: &mut Scene, ir: &ModelIr, model: &SubModel, pick: &Pick) {
+    let Some(lod) = model.lods.get(pick.lod).or(model.lods.first()) else {
         return;
     };
     let base = push_vertices(scene, model);
@@ -18,7 +18,7 @@ pub fn add(scene: &mut Scene, ir: &ModelIr, model: &SubModel, skin: usize) {
         }
         let count = scene.indices.len() as u32 - first;
         if count > 0 {
-            let material = material(ir, model, mi, skin);
+            let material = material(ir, model, mi, pick.skin);
             scene.parts.push(Part {
                 first,
                 count,
@@ -34,8 +34,19 @@ fn push_vertices(scene: &mut Scene, model: &SubModel) -> u32 {
     for v in &model.vertices {
         scene.vertices.extend(v.position.iter().chain(&v.normal));
         scene.vertices.extend(v.uv);
+        let mut w = [(0, 0.0); 3];
+        for (slot, &bw) in w.iter_mut().zip(&v.weights) {
+            *slot = bw;
+        }
+        scene.weights.push(w);
     }
     base
+}
+
+/// Most LOD levels of any shown sub-model, at least one.
+pub fn lods(ir: &ModelIr) -> usize {
+    let each = ir.body_parts.iter().flat_map(|p| &p.models);
+    each.map(|m| m.lods.len()).max().unwrap_or(0).max(1)
 }
 
 /// The mesh's material slot, remapped by the skin family when it has one.

@@ -5,7 +5,7 @@ pub(super) fn sample_scene() -> Scene {
     let dir = tempfile::tempdir().unwrap();
     let sample = crate::sample::write(dir.path()).unwrap();
     let ir = prybar_service::model::open(&sample.model.to_string_lossy()).unwrap();
-    mesh::build(&ir, &[], 0).unwrap()
+    mesh::build(&ir, &mesh::Pick::default()).unwrap()
 }
 
 pub(super) fn request(scene: &Scene, width: u32, height: u32) -> Request {

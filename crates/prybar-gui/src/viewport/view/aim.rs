@@ -58,5 +58,6 @@ impl Viewport {
         if moving {
             window.request_animation_frame();
         }
+        self.advance(window);
     }
 }

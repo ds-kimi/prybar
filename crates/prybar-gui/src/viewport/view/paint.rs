@@ -12,6 +12,7 @@ impl Render for Viewport {
         let surface = surface(self, cx.entity(), colors);
         let focus = self.focus.get_or_insert_with(|| cx.focus_handle()).clone();
         let el = input::keys(input::attach(div(), cx), cx);
+        let ready = self.status == Status::Ready;
         el.track_focus(&focus)
             .debug_selector(|| "pb-viewport".into())
             .relative()
@@ -24,7 +25,9 @@ impl Render for Viewport {
             .overflow_hidden()
             .child(surface.absolute().size_full())
             .child(label(self, &t))
-            .children((self.status == Status::Ready).then(|| overlay::controls(self, &t, cx)))
+            .children(ready.then(|| overlay::controls(self, &t, cx)))
+            .children(ready.then(|| overlay::variants(self, &t, cx)))
+            .children(ready.then(|| overlay::timeline(self, &t, cx)).flatten())
     }
 }
 

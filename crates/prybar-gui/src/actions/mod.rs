@@ -17,7 +17,8 @@ actions!(
         ResetView,
         ToggleFullView,
         ToggleWire,
-        ToggleBones
+        ToggleBones,
+        TogglePlay
     ]
 );
 
@@ -59,5 +60,6 @@ pub fn bindings() -> Vec<KeyBinding> {
         KeyBinding::new("shift-f", ToggleFullView, Some("Viewport")),
         KeyBinding::new("w", ToggleWire, Some("Viewport")),
         KeyBinding::new("b", ToggleBones, Some("Viewport")),
+        KeyBinding::new("space", TogglePlay, Some("Viewport")),
     ]
 }

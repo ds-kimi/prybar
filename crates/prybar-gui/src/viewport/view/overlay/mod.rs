@@ -3,10 +3,16 @@
 
 use gpui::{div, prelude::*, Context, SharedString};
 
+mod timeline;
+mod variants;
+
 use super::{Full, Viewport};
 use crate::theme::prybar::Tokens;
 
 type Act = fn(&mut Viewport, &mut Context<Viewport>);
+
+pub use timeline::timeline;
+pub use variants::variants;
 
 pub fn controls(v: &Viewport, t: &Tokens, cx: &mut Context<Viewport>) -> impl IntoElement {
     let f = v.flags;
@@ -36,18 +42,19 @@ pub fn controls(v: &Viewport, t: &Tokens, cx: &mut Context<Viewport>) -> impl In
 
 /// A toggle with hover, press and on states; clicks never reach the
 /// viewport so they do not start a drag.
-fn chip(
-    id: &'static str,
-    label: &'static str,
+pub(super) fn chip(
+    id: impl Into<gpui::ElementId>,
+    label: impl Into<SharedString>,
     on: bool,
     t: &Tokens,
     cx: &mut Context<Viewport>,
     act: impl Fn(&mut Viewport, &mut Context<Viewport>) + 'static,
 ) -> impl IntoElement {
-    let (hover, active) = (t.hover, t.active);
+    let (hover, active, id) = (t.hover, t.active, id.into());
+    let selector = id.to_string();
     div()
         .id(id)
-        .debug_selector(move || id.into())
+        .debug_selector(move || selector.clone())
         .px_2()
         .py_0p5()
         .rounded_md()
@@ -63,5 +70,5 @@ fn chip(
             act(v, cx);
             cx.notify()
         }))
-        .child(SharedString::from(label))
+        .child(label.into())
 }
