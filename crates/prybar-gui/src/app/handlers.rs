@@ -5,7 +5,9 @@ use std::path::PathBuf;
 use gpui::{Context, Div, InteractiveElement as _, PathPromptOptions, Stateful};
 
 use super::root::Root;
-use crate::actions::{Back, Open, Search, ShowCanvas, ShowChooser, ShowConsole, ShowWorkbench};
+use crate::actions::{
+    Back, Open, Search, ShowCanvas, ShowChooser, ShowConsole, ShowPrybar, ShowWorkbench,
+};
 use crate::state::DesignKind;
 
 impl Root {
@@ -58,15 +60,17 @@ impl Root {
                 this.state.update(cx, |s, cx| s.set_design(design, cx))
             }
         };
-        let (chooser, bench, canvas, console) = (
+        let (chooser, bench, canvas, console, merged) = (
             set(None),
             set(Some(DesignKind::Workbench)),
             set(Some(DesignKind::Canvas)),
             set(Some(DesignKind::Console)),
+            set(Some(DesignKind::Prybar)),
         );
         el.on_action(cx.listener(move |this, _: &ShowChooser, _, cx| chooser(this, cx)))
             .on_action(cx.listener(move |this, _: &ShowWorkbench, _, cx| bench(this, cx)))
             .on_action(cx.listener(move |this, _: &ShowCanvas, _, cx| canvas(this, cx)))
             .on_action(cx.listener(move |this, _: &ShowConsole, _, cx| console(this, cx)))
+            .on_action(cx.listener(move |this, _: &ShowPrybar, _, cx| merged(this, cx)))
     }
 }

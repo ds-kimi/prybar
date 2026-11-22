@@ -19,7 +19,7 @@ pub fn preview(kind: DesignKind) -> AnyElement {
         .flex()
         .gap_1();
     let inner = match kind {
-        DesignKind::Workbench => workbench(p.accent.into(), p.surface.into()),
+        DesignKind::Workbench | DesignKind::Prybar => workbench(p.accent.into(), p.surface.into()),
         DesignKind::Canvas => canvas(p.accent.into(), p.surface.into()),
         DesignKind::Console => console(p.accent.into()),
     };

@@ -25,7 +25,7 @@ pub fn render(cx: &mut Context<Root>) -> Div {
         .gap_8()
         .child(div().text_2xl().child("Pick a direction"))
         .child(div().text_sm().text_color(palette.muted).child(format!(
-            "Click a card or press {MOD}-1, {MOD}-2, {MOD}-3. {MOD}-0 comes back here."
+            "Click a card or press {MOD}-1 to {MOD}-4. {MOD}-0 comes back here."
         )))
         .child(div().flex().gap_6().children(cards))
 }

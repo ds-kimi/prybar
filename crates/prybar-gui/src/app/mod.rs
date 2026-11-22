@@ -38,6 +38,11 @@ pub fn run(launch: Launch) {
 fn initial_state(launch: Launch, cx: &mut gpui::Context<AppState>) -> AppState {
     let mut state = AppState::default();
     state.design = launch.design;
+    state.prefs = crate::state::prefs::default_path();
+    state.light = state
+        .prefs
+        .as_deref()
+        .is_some_and(crate::state::prefs::load_light);
     let mut files = launch.files;
     if launch.sample {
         match crate::sample::write(&crate::sample::default_dir()) {

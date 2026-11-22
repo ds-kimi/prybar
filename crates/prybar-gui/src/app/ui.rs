@@ -25,10 +25,7 @@ impl Root {
             })
         }))
         .on_action(cx.listener(|this, _: &ToggleTheme, _, cx| {
-            this.state.update(cx, |s, cx| {
-                s.light = !s.light;
-                cx.notify();
-            })
+            this.state.update(cx, |s, cx| s.toggle_theme(cx))
         }))
         .on_action(cx.listener(|_, _: &FocusNext, window, cx| window.focus_next(cx)))
         .on_action(cx.listener(|_, _: &FocusPrev, window, cx| window.focus_prev(cx)))
