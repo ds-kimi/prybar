@@ -1,4 +1,5 @@
-//! Buttons: primary in the strong neutral, secondary outlined.
+//! Buttons: primary in the strong neutral, secondary outlined, and
+//! square glyph buttons for toolbars and close.
 
 use gpui::{div, prelude::*, Div, ElementId, FontWeight, SharedString, Stateful};
 
@@ -46,5 +47,26 @@ fn live(el: Stateful<Div>, kind: Kind, t: Tokens) -> Stateful<Div> {
         return el.hover(|s| s.opacity(0.88)).active(|s| s.opacity(0.74));
     }
     el.hover(move |s| s.bg(t.hover))
+        .active(move |s| s.bg(t.active))
+}
+
+/// A square button holding one glyph. The focus ring is its own border,
+/// so it is drawn inside its bounds and never touches what is around.
+pub fn icon_button(
+    id: impl Into<ElementId>,
+    glyph: impl Into<SharedString>,
+    t: Tokens,
+) -> Stateful<Div> {
+    ring(div().id(id), t)
+        .size_7()
+        .flex_none()
+        .flex()
+        .items_center()
+        .justify_center()
+        .rounded_md()
+        .text_color(t.muted)
+        .cursor_pointer()
+        .child(glyph.into())
+        .hover(move |s| s.bg(t.hover).text_color(t.text))
         .active(move |s| s.bg(t.active))
 }

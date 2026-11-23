@@ -8,7 +8,7 @@ use gpui::{
 };
 
 use super::super::tip::Tipped as _;
-use super::super::{button, Kind};
+use super::super::{button, icon_button, Kind};
 use super::Modal;
 use crate::theme::prybar::{tokens, Light, Tokens};
 
@@ -79,7 +79,7 @@ impl Modal {
     }
 
     fn header(&self, t: Tokens, cx: &mut Context<Self>) -> impl IntoElement {
-        let close = button("pb-modal-close", "Close", Kind::Secondary, true, t)
+        let close = icon_button("pb-modal-close", "✕", t)
             .debug_selector(|| "pb-modal-close".into())
             .tip("Close this popup (Escape)", t)
             .on_click(cx.listener(|this, _, _, cx| this.request_close(cx)));

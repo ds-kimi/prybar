@@ -7,6 +7,7 @@
 use gpui::{div, prelude::*, AnyElement, Context, Div, FontWeight, Stateful};
 
 use super::super::motion;
+use super::super::widgets::icon_button;
 use super::super::widgets::Tipped as _;
 use crate::app::Root;
 use crate::state::{AppState, Toast, ToastKind};
@@ -74,10 +75,7 @@ fn card(toast: &Toast, t: Tokens, cx: &Context<Root>) -> Stateful<Div> {
 
 /// A visible way out; the click itself lands on the card.
 fn close(id: u64, t: Tokens) -> impl IntoElement {
-    div()
-        .id(("pb-toast-close", id as usize))
-        .text_color(t.muted)
-        .hover(move |s| s.text_color(t.text))
-        .child("×")
+    icon_button(("pb-toast-close", id as usize), "✕", t)
+        .size_6()
         .tip("Dismiss", t)
 }
