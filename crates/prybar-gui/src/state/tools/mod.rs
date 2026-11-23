@@ -4,6 +4,7 @@
 
 mod ask;
 mod backend;
+mod catalog;
 mod compile;
 mod games;
 mod publish;
@@ -11,6 +12,7 @@ mod result;
 mod steam;
 
 pub use backend::Backend;
+pub use catalog::{default_thumb, prefs_lines, Catalog, ItemPrefs, Thumb};
 #[cfg(test)]
 pub use compile::LineKind;
 pub use compile::{CompileOutcome, CompileRun};

@@ -2,21 +2,22 @@
 //! the item's link.
 
 mod addon;
+mod fields;
+mod items;
 mod result;
 mod steam;
 
-use gpui::{div, prelude::*, px, AnyElement, Context, Entity};
+use gpui::{div, prelude::*, px, AnyElement, Context};
 
 use super::super::widgets::Tipped as _;
 use super::super::widgets::{self, Kind};
 use crate::app::{Forms, Root};
-use crate::designs::input::TextInput;
 use crate::state::AppState;
 use crate::theme::prybar::Tokens;
 
 pub fn view(s: &AppState, f: &Forms, t: Tokens, cx: &Context<Root>) -> AnyElement {
     div()
-        .max_w(px(520.))
+        .max_w(px(880.))
         .flex()
         .flex_col()
         .gap_3()
@@ -27,50 +28,30 @@ pub fn view(s: &AppState, f: &Forms, t: Tokens, cx: &Context<Root>) -> AnyElemen
                 .child("Upload a Garry's Mod addon folder or .gma to the Steam Workshop. Dry run checks it without uploading."),
         )
         .child(steam::view(s, t, cx))
-        .child(widgets::field("Item id", &f.publish.item_id, t))
-        .child(widgets::field("Title", &f.publish.title, t).debug_selector(|| "pb-pub-title".into()))
-        .child(widgets::field("Description", &f.publish.description, t))
-        .child(widgets::field("Tags", &f.publish.tags, t))
-        .child(visibility(f, t))
-        .child(picked("Addon folder or .gma", "pb-pub-content", &f.publish.content, true, t, cx))
-        .child(addon::view(s, t))
-        .child(picked("Preview image", "pb-pub-preview", &f.publish.preview, false, t, cx))
-        .child(widgets::field("Change note", &f.publish.change_note, t))
-        .child(buttons(s, f, t, cx))
-        .child(result::view(s, t, cx))
+        .child(items::view(s, f, t, cx))
+        .child(form(s, f, t, cx))
         .into_any_element()
 }
 
-/// A path field with a Choose… button that fills it; `folder` adds a
-/// second button for picking a folder.
-fn picked(
-    label: &'static str,
-    id: &'static str,
-    input: &Entity<TextInput>,
-    folder: bool,
-    t: Tokens,
-    cx: &Context<Root>,
-) -> impl IntoElement {
-    let choose = |n: usize, text: &'static str, dirs: bool| {
-        let target = input.clone();
-        widgets::button((id, n), text, Kind::Secondary, true, t)
-            .tip(
-                if dirs {
-                    "Pick the addon folder"
-                } else {
-                    "Pick a file"
-                },
-                t,
-            )
-            .on_click(cx.listener(move |this, _, _, cx| this.pick_into(target.clone(), dirs, cx)))
-    };
+/// The fields, kept to reading width under the wider item grid.
+fn form(s: &AppState, f: &Forms, t: Tokens, cx: &Context<Root>) -> impl IntoElement {
     div()
+        .max_w(px(520.))
         .flex()
-        .items_end()
-        .gap_2()
-        .child(widgets::field(label, input, t).flex_1())
-        .when(folder, |el| el.child(choose(0, "Folder…", true)))
-        .child(choose(1, "File…", false))
+        .flex_col()
+        .gap_3()
+        .child(widgets::section("Item", t))
+        .child(widgets::field("Item id", &f.publish.item_id, t))
+        .child(
+            widgets::field("Title", &f.publish.title, t).debug_selector(|| "pb-pub-title".into()),
+        )
+        .child(widgets::field("Description", &f.publish.description, t))
+        .child(widgets::field("Tags", &f.publish.tags, t))
+        .child(fields::visibility(f, t))
+        .child(fields::files(s, f, t, cx))
+        .child(widgets::field("Change note", &f.publish.change_note, t))
+        .child(buttons(s, f, t, cx))
+        .child(result::view(s, t, cx))
 }
 
 /// Both wait for a clean form and for the run in flight.
@@ -100,13 +81,4 @@ fn buttons(s: &AppState, f: &Forms, t: Tokens, cx: &Context<Root>) -> impl IntoE
         .gap_2()
         .child(go("pb-pub-dry", "Dry run", Kind::Secondary, true))
         .child(go("pb-pub-go", "Publish", Kind::Primary, false))
-}
-
-fn visibility(f: &Forms, t: Tokens) -> impl IntoElement {
-    div()
-        .flex()
-        .flex_col()
-        .gap_1()
-        .child(div().text_xs().text_color(t.muted).child("Visibility"))
-        .child(f.publish.visibility.clone())
 }

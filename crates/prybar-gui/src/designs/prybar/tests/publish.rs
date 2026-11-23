@@ -14,7 +14,7 @@ fn steam_line_and_items_fill_the_form(cx: &mut TestAppContext) {
         cx.debug_bounds("pb-pub-steam").is_none(),
         "good news stays in the badge"
     );
-    let b = cx.debug_bounds("pb-pub-item-0").expect("item row drawn");
+    let b = cx.debug_bounds("pb-item-0").expect("item row drawn");
     cx.simulate_click(b.center(), Modifiers::none());
     cx.run_until_parked();
     let f = forms(&mut cx);
@@ -53,6 +53,35 @@ fn addon_folder_is_checked_as_typed(cx: &mut TestAppContext) {
         .update(&mut cx, |i, cx| i.set_text("", cx));
     cx.run_until_parked();
     state.read_with(&cx, |s, _| assert!(s.tools.steam.addon.is_none()));
+}
+
+/// Search narrows the grid as typed, the empty result says what to do,
+/// the list toggle sticks and New item empties the form.
+#[gpui::test]
+fn items_search_layout_and_new(cx: &mut TestAppContext) {
+    let (state, mut cx) = window(cx, false);
+    state.update(&mut cx, |s, cx| s.navigate(Screen::Publish, cx));
+    cx.run_until_parked();
+    assert!(cx.debug_bounds("pb-item-0").is_some(), "card drawn");
+    let f = forms(&mut cx);
+    let search = f.publish.items.search.clone();
+    search.update(&mut cx, |i, cx| i.set_text("no such item", cx));
+    cx.run_until_parked();
+    assert!(cx.debug_bounds("pb-item-0").is_none(), "filtered out");
+    assert!(cx.debug_bounds("pb-items-state").is_some(), "says why");
+    search.update(&mut cx, |i, cx| i.set_text("CRATE", cx));
+    cx.run_until_parked();
+    let b = cx.debug_bounds("pb-items-list").expect("toggle drawn");
+    cx.simulate_click(b.center(), Modifiers::none());
+    cx.run_until_parked();
+    state.read_with(&cx, |s, _| assert!(!s.tools.steam.catalog.grid));
+    let b = cx.debug_bounds("pb-item-0").expect("row drawn");
+    cx.simulate_click(b.center(), Modifiers::none());
+    let b = cx.debug_bounds("pb-items-new").expect("new drawn");
+    cx.simulate_click(b.center(), Modifiers::none());
+    cx.run_until_parked();
+    let id = f.publish.item_id.read_with(&cx, |i, _| i.text().to_owned());
+    assert_eq!(id, "", "new item has no id");
 }
 
 /// A tool addon with one Lua file and one file the game refuses.

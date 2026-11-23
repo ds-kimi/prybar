@@ -2,6 +2,7 @@ use std::path::PathBuf;
 
 use gpui::{AppContext as _, Entity, TestAppContext};
 
+mod catalog;
 pub(crate) mod fake;
 mod ops;
 mod publish;

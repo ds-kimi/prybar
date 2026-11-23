@@ -22,6 +22,8 @@ pub type StatusFn = fn(u32) -> SteamStatus;
 pub type ItemsFn = fn(u32) -> Result<Vec<ListedItem>, String>;
 pub type AddonFn = fn(&Path) -> Result<AddonCheck, String>;
 pub type AvatarFn = fn(u32) -> Option<Avatar>;
+/// A preview URL to a cached image file.
+pub type ThumbFn = fn(&str) -> Result<std::path::PathBuf, String>;
 
 #[derive(Clone, Copy)]
 pub struct Backend {
@@ -33,6 +35,7 @@ pub struct Backend {
     pub items: ItemsFn,
     pub addon: AddonFn,
     pub avatar: AvatarFn,
+    pub thumb: ThumbFn,
 }
 
 impl Default for Backend {
@@ -51,6 +54,7 @@ impl Default for Backend {
             items: |app| tools::workshop_list(app).map_err(|e| explain(&e)),
             addon: |dir| tools::addon_check(dir).map_err(|e| e.to_string()),
             avatar: tools::steam_avatar,
+            thumb: super::default_thumb,
         }
     }
 }

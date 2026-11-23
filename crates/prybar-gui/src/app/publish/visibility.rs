@@ -5,7 +5,7 @@ use gpui::{App, Entity};
 use crate::designs::select::{Choice, Select};
 
 /// The words the spec parser reads, in the order of [`visibility`]'s choices.
-pub const VALUES: [&str; 4] = ["public", "friends", "private", "unlisted"];
+pub(super) const VALUES: [&str; 4] = ["public", "friends", "private", "unlisted"];
 
 /// Steam's four visibilities in its own words; new items start hidden
 /// so nothing goes public by accident.

@@ -3,13 +3,19 @@
 
 use gpui::{App, Context, Entity, Subscription};
 
+mod fill;
+mod items;
+mod visibility;
+
+pub use items::ItemsInputs;
+
 use super::forms::field;
-use super::visibility::{visibility, VALUES};
 use super::Root;
 use crate::designs::input::TextInput;
 use crate::designs::select::Select;
 use crate::state::tools::PublishForm;
 use crate::state::{checks, AppState};
+use visibility::{visibility, VALUES};
 
 #[derive(Clone)]
 pub struct PublishInputs {
@@ -21,6 +27,8 @@ pub struct PublishInputs {
     pub content: Entity<TextInput>,
     pub preview: Entity<TextInput>,
     pub change_note: Entity<TextInput>,
+    /// The toolbar above the user's items.
+    pub items: ItemsInputs,
 }
 
 impl PublishInputs {
@@ -35,6 +43,7 @@ impl PublishInputs {
             content: field(cx, "Addon folder or .gma", "", false, checks::existing),
             preview: field(cx, "/path/to/preview.jpg", "", false, checks::preview),
             change_note: field(cx, "What changed", "", true, checks::description),
+            items: ItemsInputs::new(cx),
         }
     }
 
@@ -70,11 +79,13 @@ impl PublishInputs {
 
     /// Typing or picking a content path re-checks it when it is an
     /// addon folder, so rejected files show before any upload.
-    pub fn watch(&self, state: &Entity<AppState>, cx: &mut Context<Root>) -> Subscription {
+    pub fn watch(&self, state: &Entity<AppState>, cx: &mut Context<Root>) -> Vec<Subscription> {
+        let mut subs = self.items.watch(state, cx);
         let state = state.clone();
-        cx.observe(&self.content, move |_, input, cx| {
+        subs.push(cx.observe(&self.content, move |_, input, cx| {
             let path = input.read(cx).text().to_owned();
             state.update(cx, |s, cx| s.check_content(&path, cx));
-        })
+        }));
+        subs
     }
 }

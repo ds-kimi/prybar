@@ -1,4 +1,5 @@
-//! Choices remembered between runs: theme, auto-update, analytics.
+//! Choices remembered between runs: theme, auto-update, analytics and
+//! how the Workshop item list is sorted and laid out.
 
 use std::path::{Path, PathBuf};
 
@@ -18,6 +19,7 @@ pub struct Prefs {
     pub auto_update: bool,
     pub telemetry: bool,
     pub notice_seen: bool,
+    pub items: super::tools::ItemPrefs,
 }
 
 /// A missing, unreadable or foreign file means the defaults: dark theme,
@@ -31,6 +33,7 @@ pub fn load(path: &Path) -> Prefs {
         auto_update: !has("auto_update=off"),
         telemetry: !has("telemetry=off"),
         notice_seen: has("telemetry_notice=seen"),
+        items: super::tools::ItemPrefs::parse(&text),
     }
 }
 
@@ -49,8 +52,9 @@ impl AppState {
         } else {
             "new"
         };
+        let items = super::tools::prefs_lines(self.tools.steam.catalog.prefs());
         let text = format!(
-            "theme={theme}\nauto_update={auto}\ntelemetry={tele}\ntelemetry_notice={seen}\n"
+            "theme={theme}\nauto_update={auto}\ntelemetry={tele}\ntelemetry_notice={seen}\n{items}"
         );
         let written = path
             .parent()

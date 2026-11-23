@@ -56,6 +56,8 @@ fn publish_dry_run_from_the_form(cx: &mut TestAppContext) {
     let tmp = tempfile::tempdir().expect("tempdir");
     let gma = tmp.path().join("a.gma");
     std::fs::write(&gma, b"GMAD").expect("gma written");
+    // Tall enough that the form under the item grid needs no scrolling.
+    cx.simulate_resize(gpui::size(gpui::px(1280.), gpui::px(1600.)));
     state.update(&mut cx, |s, cx| s.navigate(Screen::Publish, cx));
     cx.run_until_parked();
     click(&mut cx, "pb-pub-dry");

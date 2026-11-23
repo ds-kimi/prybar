@@ -22,6 +22,7 @@ pub struct SteamView {
     /// The account picture, read once and kept: it rarely changes and
     /// each read wakes the Steam API.
     pub avatar: Option<Arc<RenderImage>>,
+    pub catalog: super::Catalog,
 }
 
 impl SteamView {

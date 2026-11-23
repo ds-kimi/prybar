@@ -3,7 +3,7 @@
 
 use gpui::{App, AppContext as _, Entity, ScrollHandle};
 
-use super::publish_inputs::PublishInputs;
+use super::publish::PublishInputs;
 use crate::designs::input::{any, Spec, TextInput};
 use crate::state::checks;
 use crate::state::AppState;

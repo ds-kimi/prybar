@@ -4,12 +4,11 @@ mod assets;
 mod forms;
 mod handlers;
 mod pick;
-mod publish_inputs;
+mod publish;
 mod root;
 #[cfg(test)]
 mod tests;
 mod ui;
-mod visibility;
 
 pub use forms::Forms;
 pub use root::Root;
@@ -70,6 +69,7 @@ fn initial_state(launch: Launch, cx: &mut gpui::Context<AppState>) -> AppState {
         state.updates.auto = p.auto_update;
         state.privacy.on = p.telemetry;
         state.privacy.notice_seen = p.notice_seen;
+        state.tools.steam.catalog.set_prefs(p.items);
     }
     crate::telemetry::launch(&mut state, cx);
     if !prybar_update::checks_disabled() {

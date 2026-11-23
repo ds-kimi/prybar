@@ -19,7 +19,7 @@ pub struct Root {
     pub(super) focus: FocusHandle,
     /// The open popup and the subscription that drops it when closed.
     pub(super) modal: Option<(Entity<Modal>, Subscription)>,
-    _subs: [Subscription; 5],
+    _subs: Vec<Subscription>,
 }
 
 impl Root {
@@ -43,8 +43,8 @@ impl Root {
                 cx.notify();
             })
         });
-        let _full = full_view(&forms, cx);
-        let _content = forms.publish.watch(&state, cx);
+        let mut _subs = forms.publish.watch(&state, cx);
+        _subs.extend([_observe, _refocus, _search, full_view(&forms, cx)]);
         // The bar's account badge needs Steam's answer on every screen.
         state.update(cx, |s, cx| s.refresh_steam(cx));
         Root {
@@ -52,7 +52,7 @@ impl Root {
             forms,
             focus,
             modal: None,
-            _subs: [_observe, _refocus, _search, _full, _content],
+            _subs,
         }
     }
 }
