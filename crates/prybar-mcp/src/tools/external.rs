@@ -10,7 +10,7 @@ use rmcp::{tool, tool_router};
 #[tool_router(router = external_router, vis = "pub(crate)")]
 impl Prybar {
     #[tool(
-        description = "Compile a QC file with the configured game's studiomdl. A compile that runs but fails still returns a result with `success: false`, the error lines and the full log, so the QC can be fixed and compiled again.",
+        description = "Compile a QC file with the configured game's studiomdl. A compile that runs but fails still returns a result with `success: false`, the error lines and the full log, so the QC can be fixed and compiled again. `outputs` lists the files studiomdl wrote (.mdl, .vvd, .vtx, .phy, .ani, .cvvd).",
         annotations(
             destructive_hint = true,
             idempotent_hint = true,

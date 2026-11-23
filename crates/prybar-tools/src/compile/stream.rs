@@ -116,6 +116,7 @@ fn finish(
         exit_code: status.code(),
         errors,
         warnings,
+        outputs: super::written_files(&log),
         log,
     })
 }

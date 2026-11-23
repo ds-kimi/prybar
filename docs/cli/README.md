@@ -11,7 +11,7 @@ prybar [--json] [--quiet] <command> [args]
 | `list <package> [--filter <wildcard>] [--limit <n>]` | Entries of a VPK, GMA, APK or HFS |
 | `unpack <package> -o <dir>` | Extract every entry |
 | `pack <dir> -o <out.vpk\|out.gma> [--vpk-version 1\|2] [--chunk-size <bytes>]` | Build a VPK or GMA |
-| `compile <qc> -g <game>` | studiomdl of the configured game |
+| `compile <qc> -g <game>` | studiomdl of the configured game; JSON `outputs` lists the files written (.mdl, .vvd, .vtx, .phy, .ani, .cvvd) |
 | `view <mdl> -g <game>` | hlmv of the configured game, detached |
 | `publish <spec.json> [--dry-run] [--game <game>]` / `publish --list <game>` / `publish --status <game>` / `publish --games` | Steam Workshop create/update (needs `--features workshop`). `<game>` is `garrysmod`, `tf2` or the app id; `--games` lists supported games, the installed ones and why others are unsupported ([workshop-games](../workshop-games.md)) |
 | `workshop items <game> [-s <text>] [--sort <key>] [--reverse] [--visibility <v>] [--tag <t>]` | Your items, searched and sorted like the app's list; sort keys `subscribed`, `rated`, `favorited`, `updated` (default), `newest`, `title`; visibility `public`, `friendsonly`, `private`, `unlisted` |

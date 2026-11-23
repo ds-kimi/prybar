@@ -76,6 +76,7 @@ fn compile(
         exit_code: Some(0),
         errors: vec![],
         warnings: vec![],
+        outputs: vec!["/g/models/x.mdl".into()],
         log: log.join("\n"),
     })
 }

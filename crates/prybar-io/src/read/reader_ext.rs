@@ -26,6 +26,9 @@ impl<'a> Reader<'a> {
             .checked_mul(T::SIZE)
             .ok_or(Error::CountTooLarge { count, cap })?;
         let raw = self.bytes(offset, len)?;
-        Ok(raw.chunks_exact(T::SIZE).map(T::from_le).collect())
+        Ok(raw
+            .chunks_exact(T::SIZE)
+            .map(|b| super::endian::decode(b, self.big))
+            .collect())
     }
 }

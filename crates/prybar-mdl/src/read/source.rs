@@ -17,9 +17,14 @@ pub struct Source<'a> {
 
 impl<'a> Source<'a> {
     pub fn new(data: &'a [u8]) -> Self {
-        let budget = data.len().saturating_mul(4).saturating_add(BUDGET_FLOOR);
+        Self::with_reader(Reader::new(data))
+    }
+
+    /// For files whose byte order is decided by a header probe.
+    pub fn with_reader(reader: Reader<'a>) -> Self {
+        let budget = reader.len().saturating_mul(4).saturating_add(BUDGET_FLOOR);
         Self {
-            reader: Reader::new(data),
+            reader,
             budget: Cell::new(budget),
         }
     }

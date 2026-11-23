@@ -37,7 +37,7 @@ fn starts_with(text: &str, word: &str) -> bool {
 /// Files studiomdl says it wrote (`writing <path>:` lines in verbose
 /// mode), so a caller can point at the compiled model.
 pub fn written_files(log: &str) -> Vec<String> {
-    const EXTS: [&str; 5] = [".mdl", ".vvd", ".vtx", ".phy", ".ani"];
+    const EXTS: [&str; 6] = [".mdl", ".vvd", ".vtx", ".phy", ".ani", ".cvvd"];
     log.lines()
         .filter_map(|l| {
             let l = l.trim();

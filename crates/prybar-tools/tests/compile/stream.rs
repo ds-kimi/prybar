@@ -5,7 +5,7 @@
 use std::path::{Path, PathBuf};
 use std::sync::atomic::{AtomicBool, Ordering};
 
-use prybar_tools::compile::{compile_streamed, written_files};
+use prybar_tools::compile::compile_streamed;
 use prybar_tools::runner::Runner;
 
 fn fake(dir: &Path, body: &str) -> PathBuf {
@@ -36,7 +36,7 @@ fn lines_arrive_in_order_and_errors_fail_the_report() {
     assert!(seen.contains(&"ERROR: bad".to_owned()));
     assert!(!report.success);
     assert_eq!((report.errors.len(), report.warnings.len()), (1, 1));
-    assert_eq!(written_files(&report.log), ["/g/models/x.mdl"]);
+    assert_eq!(report.outputs, ["/g/models/x.mdl"]);
 }
 
 #[test]

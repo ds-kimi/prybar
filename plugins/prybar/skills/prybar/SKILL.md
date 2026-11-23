@@ -36,7 +36,7 @@ Recipes with exact calls: `docs/agents/usecases.md`. GUI/CLI/MCP feature table: 
 - Package inner paths: `pak_dir.vpk:models/props/crate.mdl`; folders and wildcards work too.
 - Multi-archive VPK: use the `_dir.vpk`.
 - A bad model in a batch lands in `failures`; the batch continues.
-- `compile_model` failing is `success: false` with the log, not a tool error.
+- `compile_model` failing is `success: false` with the log, not a tool error. On success `outputs` lists the written files.
 - MCP `config_set` cannot set `studiomdl` or `hlmv` paths on purpose; use `games --detect --save` or edit the config file.
 - Descriptions are Steam BBCode, at most 7999 characters; run `check_bbcode` first. Visibility: `public`, `friendsonly`, `private`, `unlisted`.
 - Writes need `confirm: true` in MCP (`publish_workshop` without `dry_run`, `privacy` changes): ask the user first.

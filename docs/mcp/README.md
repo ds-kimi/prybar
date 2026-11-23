@@ -18,7 +18,7 @@ shared `prybar-service` crate.
 | `list_package` | sorted entries; `filter`, `limit` (default 200, max 5000); `total` counts all |
 | `unpack_package` | extract a whole package; returns the file count |
 | `pack_package` | folder to `.vpk` (v1/v2, chunks) or `.gma` (needs `addon.json`) |
-| `compile_model` | studiomdl on a QC; a failed compile is a result with `success: false` |
+| `compile_model` | studiomdl on a QC; a failed compile is a result with `success: false`; `outputs` lists the files written |
 | `view_model` | start hlmv, returns its pid |
 | `publish_workshop` | spec file publish/update (`dry_run`, `confirm`, `game` overrides the spec's app id), `game` alone lists your items for that game, `list_games` lists supported and installed games ([workshop-games](../workshop-games.md)) |
 | `games_list` | configured games, `detect` Steam installs, `save` |

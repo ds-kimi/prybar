@@ -34,7 +34,8 @@ pub fn solid(r: &Source, at: usize) -> Result<(PhysSolid, usize)> {
 }
 
 fn surface_start(r: &Source, body: usize) -> Result<usize> {
-    if r.bytes(body, 4)? != b"VPHY" {
+    // The magic is an int, so big-endian files store it reversed.
+    if !matches!(r.bytes(body, 4)?, b"VPHY" | b"YHPV") {
         return Ok(body);
     }
     let kind: i16 = r.read(body + 6)?;

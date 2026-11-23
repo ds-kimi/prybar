@@ -25,7 +25,7 @@ Read the returned log. Frequent causes:
 
 ## Decompile output looks wrong
 
-`notes` in the report lists companions that were missing or broken (`.vvd`, `.vtx`, `.phy`, `.ani`). Put all companions next to the `.mdl`, or reference the package folder (`pak_dir.vpk:models/props`). Known small differences: `docs/roundtrip-report.md`.
+`notes` in the report lists companions that were missing or broken (`.vvd`, `.vtx`, `.phy`, `.ani`). Put all companions next to the `.mdl`, or reference the package folder (`pak_dir.vpk:models/props`). Big-endian `.phy` files from console ports (Postal III, Xbox 360, PS3) are detected and read automatically; big-endian `.mdl` (`TSDI` magic) is not supported. Known small differences: `docs/roundtrip-report.md`.
 
 ## Limits
 

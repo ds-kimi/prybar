@@ -4,7 +4,7 @@ use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::Arc;
 
 use gpui::Context;
-use prybar_tools::compile::{written_files, CompileReport};
+use prybar_tools::compile::CompileReport;
 
 use super::{CompileOutcome, CompileRun};
 use crate::state::{AppState, ToastKind};
@@ -48,7 +48,7 @@ fn outcome(result: Result<CompileReport, String>, cancelled: bool) -> CompileOut
         _ if cancelled => CompileOutcome::Cancelled,
         Err(why) => CompileOutcome::Blocked(why),
         Ok(r) if r.success => CompileOutcome::Built {
-            outputs: written_files(&r.log),
+            outputs: r.outputs,
             warnings: r.warnings.len(),
         },
         Ok(r) => CompileOutcome::Failed {
