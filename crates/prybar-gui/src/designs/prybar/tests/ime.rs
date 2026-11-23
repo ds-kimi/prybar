@@ -2,13 +2,11 @@ use gpui::{EntityInputHandler as _, Focusable as _, TestAppContext, VisualTestCo
 
 use super::{forms, window};
 use crate::designs::input::TextInput;
-use crate::state::Screen;
 
 fn title(cx: &mut TestAppContext) -> (gpui::Entity<TextInput>, VisualTestContext) {
     let (state, mut cx) = window(cx, false);
     let cx = &mut cx;
-    state.update(cx, |s, cx| s.navigate(Screen::Publish, cx));
-    cx.run_until_parked();
+    super::details::new_popup(&state, cx);
     let t = forms(cx).publish.title;
     cx.update(|window, cx| t.read(cx).focus_handle(cx).focus(window, cx));
     cx.run_until_parked();

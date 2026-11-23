@@ -13,14 +13,18 @@ pub fn card(
     i: usize,
     it: &ListedItem,
     thumb: Option<&Thumb>,
-    grid: bool,
+    (grid, on): (bool, bool),
     root: &Entity<Root>,
     t: Tokens,
 ) -> AnyElement {
-    let (root, picked) = (root.clone(), it.clone());
+    let (root, id) = (root.clone(), it.item_id);
     frame(i, grid, t)
+        .when(on, |el| el.border_color(t.rust))
         .tip(details(it), t)
-        .on_click(move |_, _, cx| root.update(cx, |this, cx| this.edit_item(&picked, cx)))
+        .on_click(move |_, _, cx| {
+            let state = root.read(cx).state.clone();
+            state.update(cx, |s, cx| s.select_item(id, cx))
+        })
         .child(picture(thumb, grid, t))
         .child(words(it, t))
         .into_any_element()

@@ -1,23 +1,12 @@
 //! A Workshop upload: the form as typed, its progress, its result.
 
 use gpui::Context;
-use prybar_workshop::spec::{ItemSpec, Visibility, GMOD_APP_ID};
+use std::path::PathBuf;
+
 use prybar_workshop::{Progress, PublishReport};
 
+use super::PublishForm;
 use crate::state::{AppState, ToastKind};
-
-/// The publish fields as text, straight from the inputs.
-#[derive(Debug, Clone, Default)]
-pub struct PublishForm {
-    pub item_id: String,
-    pub title: String,
-    pub description: String,
-    pub tags: String,
-    pub visibility: String,
-    pub preview: String,
-    pub content: String,
-    pub change_note: String,
-}
 
 #[derive(Default)]
 pub struct PublishRun {
@@ -25,38 +14,8 @@ pub struct PublishRun {
     pub dry_run: bool,
     pub progress: Option<Progress>,
     pub outcome: Option<Result<PublishReport, String>>,
-}
-
-impl PublishForm {
-    /// Empty fields stay unset, so an update only changes what was typed.
-    pub fn spec(&self) -> Result<ItemSpec, String> {
-        let some = |s: &str| Some(s.trim().to_owned()).filter(|s| !s.is_empty());
-        let item_id = match some(&self.item_id) {
-            None => None,
-            Some(id) => Some(
-                id.parse()
-                    .map_err(|_| "The item id is the number in the item's Workshop link.")?,
-            ),
-        };
-        let visibility = match self.visibility.trim().to_ascii_lowercase().as_str() {
-            "public" => Visibility::Public,
-            "friends" => Visibility::FriendsOnly,
-            "unlisted" => Visibility::Unlisted,
-            _ => Visibility::Private,
-        };
-        let tags = self.tags.split(',').filter_map(some).collect();
-        Ok(ItemSpec {
-            app_id: GMOD_APP_ID,
-            item_id,
-            title: some(&self.title),
-            description: some(&self.description),
-            tags,
-            visibility: Some(visibility),
-            preview: some(&self.preview).map(Into::into),
-            content: some(&self.content).map(Into::into),
-            change_note: some(&self.change_note),
-        })
-    }
+    /// The addon folder sent, linked to the item once it is published.
+    pub folder: Option<PathBuf>,
 }
 
 impl AppState {
@@ -67,9 +26,11 @@ impl AppState {
             Ok(spec) => spec,
             Err(why) => return self.published(Err(why), cx),
         };
+        let folder = spec.content.clone().filter(|p| p.is_dir());
         self.tools.publish = PublishRun {
             running: true,
             dry_run,
+            folder,
             ..PublishRun::default()
         };
         let (tx, rx) = async_channel::unbounded::<Progress>();
@@ -105,7 +66,18 @@ impl AppState {
             Ok(_) => (ToastKind::Info, "Published to the Workshop".to_owned()),
             Err(why) => (ToastKind::Error, why.clone()),
         };
+        let sent = match (&result, run.dry_run) {
+            (Ok(r), false) => r.item_id.map(|id| (id, run.folder.take())),
+            _ => None,
+        };
         run.outcome = Some(result);
         self.toast(toast.0, toast.1, cx);
+        if let Some((id, folder)) = sent {
+            if let Some(dir) = folder {
+                self.link_folder(id, dir, cx);
+            }
+            // The list and its numbers changed on Steam.
+            self.refresh_steam(cx);
+        }
     }
 }

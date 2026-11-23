@@ -23,8 +23,6 @@ impl Root {
 
     /// Shows a popup over everything and moves focus into it; when it
     /// closes, focus comes back to the window.
-    // The publish popups call it; until they land only tests do.
-    #[cfg_attr(not(test), allow(dead_code))]
     pub fn show_modal(
         &mut self,
         modal: Entity<Modal>,

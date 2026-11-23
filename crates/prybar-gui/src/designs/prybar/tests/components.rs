@@ -6,14 +6,12 @@ use prybar_workshop::SteamStatus;
 use super::{forms, window};
 use crate::app::Root;
 use crate::designs::modal::{Modal, EXIT};
-use crate::state::Screen;
 
 /// Arrows, Enter, Escape and type-to-jump on the visibility select.
 #[gpui::test]
 fn select_follows_the_keyboard(cx: &mut TestAppContext) {
     let (state, mut cx) = window(cx, false);
-    state.update(&mut cx, |s, cx| s.navigate(Screen::Publish, cx));
-    cx.run_until_parked();
+    super::details::new_popup(&state, &mut cx);
     let vis = forms(&mut cx).publish.visibility;
     let current = |cx: &mut VisualTestContext| vis.read_with(cx, |v, _| v.current());
     assert_eq!(current(&mut cx), 2, "new items start hidden");

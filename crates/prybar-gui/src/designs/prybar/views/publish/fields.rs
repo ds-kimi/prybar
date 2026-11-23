@@ -4,10 +4,8 @@ use gpui::{div, prelude::*, Context, Entity};
 
 use super::super::super::widgets::Tipped as _;
 use super::super::super::widgets::{self, Kind};
-use super::addon;
 use crate::app::{Forms, Root};
 use crate::designs::input::TextInput;
-use crate::state::AppState;
 use crate::theme::prybar::Tokens;
 
 /// A path field with a Choose… button that fills it; `folder` adds a
@@ -49,30 +47,4 @@ pub fn visibility(f: &Forms, t: Tokens) -> impl IntoElement {
         .gap_1()
         .child(div().text_xs().text_color(t.muted).child("Visibility"))
         .child(f.publish.visibility.clone())
-}
-
-/// The addon, its check right under it, then the preview image.
-pub fn files(s: &AppState, f: &Forms, t: Tokens, cx: &Context<Root>) -> impl IntoElement {
-    let p = &f.publish;
-    div()
-        .flex()
-        .flex_col()
-        .gap_3()
-        .child(picked(
-            "Addon folder or .gma",
-            "pb-pub-content",
-            &p.content,
-            true,
-            t,
-            cx,
-        ))
-        .child(addon::view(s, t))
-        .child(picked(
-            "Preview image",
-            "pb-pub-preview",
-            &p.preview,
-            false,
-            t,
-            cx,
-        ))
 }

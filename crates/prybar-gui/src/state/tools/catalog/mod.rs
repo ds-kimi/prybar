@@ -77,12 +77,3 @@ impl AppState {
         cx.notify();
     }
 }
-
-/// Previews live next to the config, under `previews/`.
-pub fn default_thumb(url: &str) -> Result<PathBuf, String> {
-    let dir = prybar_tools::config::config_path()
-        .ok()
-        .and_then(|p| Some(p.parent()?.join("previews")))
-        .unwrap_or_else(|| std::env::temp_dir().join("prybar-previews"));
-    prybar_workshop::thumb::cached(url, &dir)
-}

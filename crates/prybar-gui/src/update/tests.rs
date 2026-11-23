@@ -86,8 +86,11 @@ fn failed_download_shows_reason_and_link(cx: &mut TestAppContext) {
     assert!(matches!(phase, Phase::Failed(ref e) if e.contains("checksum")));
     assert!(cx.debug_bounds("pb-update").is_none());
     assert!(cx.debug_bounds("pb-update-link").is_some());
-    let toast = state.read_with(&cx, |s, _| s.toasts.last().map(|t| t.text.clone()));
-    assert!(toast.is_some_and(|t| t.contains("Update failed")));
+    // Settings may toast its games list after it; order is not the point.
+    let said = state.read_with(&cx, |s, _| {
+        s.toasts.iter().any(|t| t.text.contains("Update failed"))
+    });
+    assert!(said);
 }
 
 /// Up to date: no button, and turning auto off is remembered.

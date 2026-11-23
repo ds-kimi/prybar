@@ -8,6 +8,7 @@ use prybar_service::tools::{self, Game};
 use prybar_service::ServiceError;
 use prybar_tools::compile::CompileReport;
 use prybar_workshop::addon::AddonCheck;
+use prybar_workshop::changelog::Change;
 use prybar_workshop::spec::ItemSpec;
 use prybar_workshop::{Avatar, ListedItem, Progress, PublishReport, SteamStatus};
 
@@ -24,6 +25,9 @@ pub type AddonFn = fn(&Path) -> Result<AddonCheck, String>;
 pub type AvatarFn = fn(u32) -> Option<Avatar>;
 /// A preview URL to a cached image file.
 pub type ThumbFn = fn(&str) -> Result<std::path::PathBuf, String>;
+pub type HistoryFn = fn(u64) -> Result<Vec<Change>, String>;
+/// Where stats snapshots and folder links are kept.
+pub type DataFn = fn() -> std::path::PathBuf;
 
 #[derive(Clone, Copy)]
 pub struct Backend {
@@ -36,6 +40,8 @@ pub struct Backend {
     pub addon: AddonFn,
     pub avatar: AvatarFn,
     pub thumb: ThumbFn,
+    pub history: HistoryFn,
+    pub data_dir: DataFn,
 }
 
 impl Default for Backend {
@@ -54,7 +60,11 @@ impl Default for Backend {
             items: |app| tools::workshop_list(app).map_err(|e| explain(&e)),
             addon: |dir| tools::addon_check(dir).map_err(|e| e.to_string()),
             avatar: tools::steam_avatar,
-            thumb: super::default_thumb,
+            thumb: super::data::default_thumb,
+            history: |id| {
+                prybar_workshop::changelog::cached(id, &super::data::data_dir().join("changelogs"))
+            },
+            data_dir: super::data::data_dir,
         }
     }
 }

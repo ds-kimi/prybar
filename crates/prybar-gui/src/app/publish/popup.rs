@@ -1,0 +1,70 @@
+//! The create and edit popups, hosted by the shared modal.
+
+use gpui::{div, prelude::*, Context, Entity, Subscription, WeakEntity, Window};
+use prybar_workshop::ListedItem;
+
+use super::super::Root;
+use crate::designs::modal::Modal;
+use crate::theme::prybar::tokens;
+
+/// The popup's body. It draws through the root because the form, its
+/// inputs and its handlers all live there.
+pub struct PublishPopup {
+    root: WeakEntity<Root>,
+    _subs: Vec<Subscription>,
+}
+
+impl Render for PublishPopup {
+    fn render(&mut self, _: &mut Window, cx: &mut Context<Self>) -> impl IntoElement {
+        let Some(root) = self.root.upgrade() else {
+            return div().into_any_element();
+        };
+        root.update(cx, |r, cx| {
+            let state = r.state.clone();
+            let s = state.read(cx);
+            let t = tokens(s.light);
+            crate::designs::publish_popup(s, &r.forms, r.editing.as_ref(), t, cx)
+        })
+    }
+}
+
+impl Root {
+    /// Fills the form from `item` (or empties it for a new one) and opens
+    /// the popup; closing with edits asks first.
+    pub fn open_publish(
+        &mut self,
+        item: Option<ListedItem>,
+        window: &mut Window,
+        cx: &mut Context<Self>,
+    ) {
+        match &item {
+            Some(it) => self.edit_item(it, cx),
+            None => self.new_item(cx),
+        }
+        let title = item.as_ref().map_or("New Workshop item".to_owned(), |i| {
+            format!("Edit {}", i.title)
+        });
+        self.editing = item;
+        self.state
+            .update(cx, |s, _| s.tools.publish = Default::default());
+        let start = self.forms.publish.form(cx);
+        let inputs = self.forms.publish.clone();
+        let popup = popup(self, cx);
+        let modal = Modal::new(title, popup.into(), move |cx| inputs.form(cx) != start, cx);
+        self.show_modal(modal, window, cx);
+    }
+}
+
+/// Redraws on any state or form change, since the body reads both.
+fn popup(root: &Root, cx: &mut Context<Root>) -> Entity<PublishPopup> {
+    let (state, weak) = (root.state.clone(), cx.entity().downgrade());
+    let inputs: Vec<_> = root.forms.publish.all().into_iter().cloned().collect();
+    cx.new(|cx| {
+        let mut subs = vec![cx.observe(&state, |_, _, cx| cx.notify())];
+        subs.extend(inputs.iter().map(|i| cx.observe(i, |_, _, cx| cx.notify())));
+        PublishPopup {
+            root: weak,
+            _subs: subs,
+        }
+    })
+}

@@ -21,31 +21,43 @@ use crate::theme::prybar::Tokens;
 pub fn view(s: &AppState, f: &Forms, t: Tokens, cx: &Context<Root>) -> AnyElement {
     let steam = &s.tools.steam;
     let order = apply(&steam.items, &steam.catalog.query);
-    let count = match (order.len(), steam.items.len()) {
+    let head = head(order.len(), steam.items.len(), t, cx);
+    let main = div().flex_1().min_w_0().child(body(s, order, t, cx));
+    div()
+        .flex()
+        .flex_col()
+        .gap_2()
+        .child(head)
+        .child(toolbar::view(s, f, t, cx))
+        .child(
+            div()
+                .flex()
+                .items_start()
+                .gap_3()
+                .child(main)
+                .children(super::details::selected(s).map(|it| super::details::view(s, it, t, cx))),
+        )
+        .into_any_element()
+}
+
+/// The title, how many items show, and New item.
+fn head(shown: usize, all: usize, t: Tokens, cx: &Context<Root>) -> impl IntoElement {
+    let count = match (shown, all) {
         (0, 0) => String::new(),
         (a, b) if a == b => format!("{b} items"),
         (a, b) => format!("{a} of {b} items"),
     };
     let new = widgets::button("pb-items-new", "New item", Kind::Primary, true, t)
         .debug_selector(|| "pb-items-new".into())
-        .tip("Start a new Workshop item from an empty form", t)
-        .on_click(cx.listener(|this, _, _, cx| this.new_item(cx)));
+        .tip("Publish a new addon to the Workshop", t)
+        .on_click(cx.listener(|this, _, w, cx| this.open_publish(None, w, cx)));
     div()
         .flex()
-        .flex_col()
+        .items_center()
         .gap_2()
-        .child(
-            div()
-                .flex()
-                .items_center()
-                .gap_2()
-                .child(widgets::section("Your items", t).pt_0())
-                .child(div().flex_1().text_xs().text_color(t.muted).child(count))
-                .child(new),
-        )
-        .child(toolbar::view(s, f, t, cx))
-        .child(body(s, order, t, cx))
-        .into_any_element()
+        .child(widgets::section("Your items", t).pt_0())
+        .child(div().flex_1().text_xs().text_color(t.muted).child(count))
+        .child(new)
 }
 
 /// The list, or the one sentence that says why there is none and what

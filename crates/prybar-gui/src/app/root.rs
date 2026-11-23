@@ -7,11 +7,9 @@ use gpui::{
 };
 
 use super::Forms;
-use crate::designs::input::InputEvent;
 use crate::designs::modal::Modal;
-use crate::state::{AppState, Screen};
+use crate::state::AppState;
 use crate::theme::prybar::{tokens, Light};
-use crate::viewport::view::Full;
 
 pub struct Root {
     pub state: Entity<AppState>,
@@ -19,6 +17,8 @@ pub struct Root {
     pub(super) focus: FocusHandle,
     /// The open popup and the subscription that drops it when closed.
     pub(super) modal: Option<(Entity<Modal>, Subscription)>,
+    /// The item the edit popup is open on; `None` for a new item.
+    pub editing: Option<prybar_workshop::ListedItem>,
     _subs: Vec<Subscription>,
 }
 
@@ -36,15 +36,13 @@ impl Root {
         // without this, keys would reach nothing until the next click.
         let _refocus = cx.on_focus_lost(window, |this, window, cx| this.focus.focus(window, cx));
         let forms = Forms::new(cx);
-        let _search = cx.subscribe(&forms.search, |this, input, _: &InputEvent, cx| {
-            let query = input.read(cx).text().to_owned();
-            this.state.update(cx, |s, cx| {
-                s.search = Some(query);
-                cx.notify();
-            })
-        });
         let mut _subs = forms.publish.watch(&state, cx);
-        _subs.extend([_observe, _refocus, _search, full_view(&forms, cx)]);
+        _subs.extend([
+            _observe,
+            _refocus,
+            super::subs::search(&forms, cx),
+            super::subs::full_view(&forms, cx),
+        ]);
         // The bar's account badge needs Steam's answer on every screen.
         state.update(cx, |s, cx| s.refresh_steam(cx));
         Root {
@@ -52,6 +50,7 @@ impl Root {
             forms,
             focus,
             modal: None,
+            editing: None,
             _subs,
         }
     }
@@ -87,18 +86,4 @@ impl Focusable for Root {
     fn focus_handle(&self, _cx: &App) -> FocusHandle {
         self.focus.clone()
     }
-}
-
-/// The viewport asks for full size; the 3D preview screen is that mode,
-/// so the same key goes back to the model screen.
-fn full_view(forms: &Forms, cx: &mut Context<Root>) -> Subscription {
-    cx.subscribe(&forms.viewport, |this, _, _: &Full, cx| {
-        this.state.update(cx, |s, cx| {
-            let to = match s.screen {
-                Screen::ModelPreview => Screen::Inspector,
-                _ => Screen::ModelPreview,
-            };
-            s.navigate(to, cx)
-        })
-    })
 }

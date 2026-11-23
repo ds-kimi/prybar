@@ -30,3 +30,28 @@ fn publish_dry_run_then_upload(cx: &mut TestAppContext) {
         assert!(matches!(s.tools.publish.outcome, Some(Err(_))))
     });
 }
+
+/// An edit opened on a listed item sends only the fields that differ.
+#[test]
+fn edit_form_sends_only_changes() {
+    let item = super::fake::item();
+    let form = PublishForm {
+        item_id: "7".into(),
+        title: "Crate pack 2".into(),
+        tags: "addon".into(),
+        visibility: "public".into(),
+        editing: Some(item),
+        ..PublishForm::default()
+    };
+    let spec = form.spec().expect("valid");
+    assert_eq!(spec.title.as_deref(), Some("Crate pack 2"));
+    assert!(spec.visibility.is_none() && spec.tags.is_empty() && spec.content.is_none());
+    let new = PublishForm {
+        editing: None,
+        ..form
+    };
+    assert!(
+        new.spec().expect("valid").visibility.is_some(),
+        "a plain form sends all"
+    );
+}

@@ -2,7 +2,11 @@
 //! 1 MB or more, so still images are center-cropped, resized and saved
 //! as JPEG. GIFs pass untouched: re-encoding would drop the animation.
 
+mod info;
+
 use std::path::{Path, PathBuf};
+
+pub use info::{describe, PreviewInfo};
 
 use image::{imageops::FilterType, DynamicImage, ImageReader, Limits};
 

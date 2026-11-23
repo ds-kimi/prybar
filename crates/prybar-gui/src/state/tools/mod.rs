@@ -6,17 +6,22 @@ mod ask;
 mod backend;
 mod catalog;
 mod compile;
+mod data;
+mod form;
 mod games;
+mod item;
 mod publish;
 mod result;
 mod steam;
 
 pub use backend::Backend;
-pub use catalog::{default_thumb, prefs_lines, Catalog, ItemPrefs, Thumb};
+pub use catalog::{prefs_lines, Catalog, ItemPrefs, Thumb};
 #[cfg(test)]
 pub use compile::LineKind;
 pub use compile::{CompileOutcome, CompileRun};
-pub use publish::{PublishForm, PublishRun};
+pub use form::PublishForm;
+pub use item::{History, ItemView};
+pub use publish::PublishRun;
 pub use steam::SteamView;
 
 use prybar_service::tools::Game;
@@ -34,6 +39,7 @@ pub struct Tools {
     pub compile: CompileRun,
     pub publish: PublishRun,
     pub steam: SteamView,
+    pub item: ItemView,
     /// Set once the publish screen asked Steam the first time.
     pub steam_started: bool,
 }

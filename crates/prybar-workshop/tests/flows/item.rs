@@ -1,11 +1,11 @@
-use prybar_workshop::item::{changes, record, series, Draft, Links};
+use prybar_workshop::item::{changes, Draft, Links};
 use prybar_workshop::mock::MockSteam;
 use prybar_workshop::spec::{Visibility, GMOD_APP_ID};
 use prybar_workshop::{publish_with, ListedItem};
 
 use super::fixture::png;
 
-fn item() -> ListedItem {
+pub(super) fn item() -> ListedItem {
     ListedItem {
         item_id: 42,
         title: "Crates".into(),
@@ -56,23 +56,4 @@ fn folder_links_survive_a_round_trip_and_damage() {
     std::fs::write(&file, "x\ty\n\n42\n9\t/ok\n").unwrap();
     assert_eq!(Links::load(&file).0.get(&9).unwrap().to_str(), Some("/ok"));
     assert!(Links::load(&tmp.path().join("none")).0.is_empty());
-}
-
-#[test]
-fn snapshots_keep_one_row_per_day_and_skip_garbage() {
-    let tmp = tempfile::tempdir().unwrap();
-    let file = tmp.path().join("stats.tsv");
-    let mut it = item();
-    record(&file, &[it.clone()], 100).unwrap();
-    it.subscriptions = 15;
-    record(&file, &[it.clone()], 100).unwrap();
-    it.subscriptions = 20;
-    record(&file, &[it], 101).unwrap();
-    let mut text = std::fs::read_to_string(&file).unwrap();
-    text.push_str("garbage\n42\t-1\t3\t4\n42\t99999999999\t1\t1\n");
-    std::fs::write(&file, text).unwrap();
-    let pts = series(&file, 42);
-    let subs: Vec<u64> = pts.iter().map(|p| p.subscriptions).collect();
-    assert_eq!(subs, [15, 20]);
-    assert!(series(&file, 1).is_empty());
 }

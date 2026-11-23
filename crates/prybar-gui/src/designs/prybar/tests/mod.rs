@@ -1,4 +1,5 @@
 mod components;
+mod details;
 mod ime;
 mod input;
 mod publish;

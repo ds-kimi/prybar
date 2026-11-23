@@ -6,27 +6,16 @@ use std::sync::atomic::AtomicBool;
 
 use prybar_service::tools::Game;
 use prybar_tools::compile::CompileReport;
-use prybar_workshop::spec::Visibility;
-use prybar_workshop::{ListedItem, Progress, PublishReport, SteamStatus};
+use prybar_workshop::{Progress, PublishReport, SteamStatus};
 
 use crate::state::tools::Backend;
+
+pub(crate) use super::fake_item::item;
 
 pub(crate) fn backend() -> Backend {
     Backend {
         compile,
-        publish: |spec, dry, progress| {
-            progress(&Progress {
-                stage: "uploading".into(),
-                done: 1,
-                total: 2,
-            });
-            Ok(PublishReport {
-                dry_run: dry,
-                item_id: spec.item_id.or((!dry).then_some(42)),
-                created: spec.item_id.is_none(),
-                needs_legal_agreement: false,
-            })
-        },
+        publish,
         games: |detect| Ok(games(if detect { 3 } else { 2 })),
         save: |g| Ok(vec![g]),
         status: |_| SteamStatus::Ready {
@@ -39,24 +28,28 @@ pub(crate) fn backend() -> Backend {
             "https://bad" => Err("no".into()),
             _ => Ok(PathBuf::from(url)),
         },
+        history: super::fake_item::history,
+        data_dir: super::fake_item::data_dir,
     }
 }
 
-pub(crate) fn item() -> ListedItem {
-    ListedItem {
-        item_id: 7,
-        title: "Crate pack".into(),
-        tags: vec!["Addon".into()],
-        time_updated: 1_700_000_000,
-        time_created: 1_600_000_000,
-        visibility: Visibility::Public,
-        subscriptions: 12,
-        favorites: 3,
-        votes_up: 9,
-        votes_down: 1,
-        preview_url: None,
-        ..Default::default()
-    }
+/// Reports one progress step; a real upload gets id 42.
+fn publish(
+    spec: &prybar_workshop::spec::ItemSpec,
+    dry: bool,
+    progress: &mut dyn FnMut(&Progress),
+) -> Result<PublishReport, String> {
+    progress(&Progress {
+        stage: "uploading".into(),
+        done: 1,
+        total: 2,
+    });
+    Ok(PublishReport {
+        dry_run: dry,
+        item_id: spec.item_id.or((!dry).then_some(42)),
+        created: spec.item_id.is_none(),
+        needs_legal_agreement: false,
+    })
 }
 
 /// Prints three lines; a game named "Broken" fails the compile.

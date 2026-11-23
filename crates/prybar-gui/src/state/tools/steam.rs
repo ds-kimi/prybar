@@ -75,6 +75,8 @@ impl AppState {
                     Ok(items) => (items, None),
                     Err(why) => (Vec::new(), Some(why)),
                 };
+                let items = st.tools.steam.items.clone();
+                st.record_stats(&items, cx);
                 cx.notify();
             });
         })

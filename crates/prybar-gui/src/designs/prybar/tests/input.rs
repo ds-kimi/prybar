@@ -16,8 +16,7 @@ fn focus_field(cx: &mut VisualTestContext, selector: &'static str) {
 #[gpui::test]
 fn title_edits(cx: &mut TestAppContext) {
     let (state, mut cx) = window(cx, false);
-    state.update(&mut cx, |s, cx| s.navigate(Screen::Publish, cx));
-    cx.run_until_parked();
+    super::details::new_popup(&state, &mut cx);
     focus_field(&mut cx, "pb-pub-title");
     cx.simulate_input("Crate pack");
     let f = forms(&mut cx);
@@ -63,8 +62,7 @@ fn search_types_and_clears(cx: &mut TestAppContext) {
 #[gpui::test]
 fn enter_submits_or_breaks(cx: &mut TestAppContext) {
     let (state, mut cx) = window(cx, false);
-    state.update(&mut cx, |s, cx| s.navigate(Screen::Publish, cx));
-    cx.run_until_parked();
+    super::details::new_popup(&state, &mut cx);
     let p = forms(&mut cx).publish;
     let submitted = std::rc::Rc::new(std::cell::Cell::new(false));
     let seen = submitted.clone();

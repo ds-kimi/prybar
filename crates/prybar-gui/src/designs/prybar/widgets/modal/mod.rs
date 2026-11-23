@@ -2,9 +2,6 @@
 //! close button ask to close; with unsaved changes the popup asks first.
 //! Tab stays inside while it is open.
 
-// The publish popups open it; until they land only tests do.
-#![cfg_attr(not(test), allow(dead_code))]
-
 mod keys;
 mod view;
 

@@ -29,3 +29,16 @@ fn garbage_and_huge_canvases_fail_cleanly() {
     assert!(prepare_preview(&big_path, tmp.path()).is_err());
     assert!(prepare_preview(&tmp.path().join("none.png"), tmp.path()).is_err());
 }
+
+#[test]
+fn the_previewer_says_what_will_happen() {
+    use prybar_workshop::preview::describe;
+    let tmp = tempfile::tempdir().unwrap();
+    let wide = describe(&png(tmp.path(), 640, 480)).unwrap();
+    assert_eq!((wide.width, wide.height), (640, 480));
+    assert!(wide.resized && wide.problem.is_none());
+    assert!(!describe(&png(tmp.path(), 512, 512)).unwrap().resized);
+    let junk = tmp.path().join("junk.jpg");
+    std::fs::write(&junk, b"nope").unwrap();
+    assert!(describe(&junk).is_err());
+}

@@ -6,6 +6,7 @@ mod handlers;
 mod pick;
 mod publish;
 mod root;
+mod subs;
 #[cfg(test)]
 mod tests;
 mod ui;

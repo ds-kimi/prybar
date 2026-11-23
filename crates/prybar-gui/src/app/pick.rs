@@ -26,3 +26,27 @@ impl Root {
         .detach();
     }
 }
+
+impl Root {
+    /// Links a picked folder to the item; a cancel changes nothing.
+    pub fn pick_link(&mut self, id: u64, cx: &mut Context<Self>) {
+        let answer = cx.prompt_for_paths(PathPromptOptions {
+            files: false,
+            directories: true,
+            multiple: false,
+            prompt: Some("Link".into()),
+        });
+        cx.spawn(async move |this, cx| {
+            let Ok(Ok(Some(paths))) = answer.await else {
+                return;
+            };
+            let Some(dir) = paths.into_iter().next() else {
+                return;
+            };
+            let _ = this.update(cx, |r, cx| {
+                r.state.update(cx, |s, cx| s.link_folder(id, dir, cx))
+            });
+        })
+        .detach();
+    }
+}

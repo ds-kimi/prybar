@@ -5,6 +5,7 @@ use gpui::{App, Context, Entity, Subscription};
 
 mod fill;
 mod items;
+mod popup;
 mod visibility;
 
 pub use items::ItemsInputs;
@@ -74,6 +75,7 @@ impl PublishInputs {
             preview: text(&self.preview),
             content: text(&self.content),
             change_note: text(&self.change_note),
+            editing: None,
         }
     }
 

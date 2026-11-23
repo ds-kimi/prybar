@@ -52,7 +52,7 @@ pub fn details(it: &ListedItem) -> String {
         false => it.tags.join(", "),
     };
     format!(
-        "{}\nId {} · {} subscribers · {} favorites · {} up, {} down\nTags: {tags}\nClick to fill the form and update it.",
+        "{}\nId {} · {} subscribers · {} favorites · {} up, {} down\nTags: {tags}\nClick for its stats and history.",
         it.title, it.item_id, it.subscriptions, it.favorites, it.votes_up, it.votes_down,
     )
 }

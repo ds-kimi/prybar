@@ -5,4 +5,5 @@ mod fixture;
 mod item;
 mod mock;
 mod preview;
+mod snapshot;
 mod thumb;

@@ -16,6 +16,11 @@ impl Root {
         };
         text(&f.item_id, &item.item_id.to_string(), cx);
         text(&f.title, &item.title, cx);
+        text(&f.description, &item.description, cx);
+        text(&f.tags, &item.tags.join(", "), cx);
+        for e in [&f.content, &f.preview, &f.change_note] {
+            text(e, "", cx);
+        }
         let ix = SHOWN
             .iter()
             .position(|v| *v == item.visibility)
@@ -31,6 +36,8 @@ impl Root {
             &f.title,
             &f.description,
             &f.tags,
+            &f.content,
+            &f.preview,
             &f.change_note,
         ] {
             e.update(cx, |i, cx| i.set_text("", cx));

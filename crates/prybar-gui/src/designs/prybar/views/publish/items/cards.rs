@@ -20,6 +20,7 @@ const COLUMNS: usize = 4;
 struct Rows {
     shown: Vec<ListedItem>,
     thumbs: HashMap<u64, Thumb>,
+    selected: Option<u64>,
     cols: usize,
     height: f32,
     root: Entity<Root>,
@@ -28,13 +29,16 @@ struct Rows {
 
 pub fn view(s: &AppState, order: Vec<usize>, t: Tokens, cx: &Context<Root>) -> AnyElement {
     let c = &s.tools.steam.catalog;
-    let (cols, height) = if c.grid { (COLUMNS, 212.) } else { (1, 52.) };
+    // The details panel takes a column's room when an item is picked.
+    let wide = COLUMNS - usize::from(s.tools.item.selected.is_some());
+    let (cols, height) = if c.grid { (wide, 212.) } else { (1, 52.) };
     let rows = Rc::new(Rows {
         shown: order
             .iter()
             .map(|&i| s.tools.steam.items[i].clone())
             .collect(),
         thumbs: c.thumbs.clone(),
+        selected: s.tools.item.selected,
         cols,
         height,
         root: cx.entity(),
@@ -63,7 +67,8 @@ fn draw(rows: &Rows, range: Range<usize>, cx: &mut App) -> Vec<AnyElement> {
             if thumb.is_none() {
                 want.push((item.item_id, item.preview_url.clone()));
             }
-            card(i, item, thumb, rows.cols > 1, &rows.root, rows.t)
+            let on = rows.selected == Some(item.item_id);
+            card(i, item, thumb, (rows.cols > 1, on), &rows.root, rows.t)
         });
         let row = div()
             .h(px(rows.height))
