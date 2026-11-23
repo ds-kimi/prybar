@@ -19,7 +19,7 @@ prybar games --detect --save        # once
 prybar compile work/crate/crate.qc -g garrysmod
 ```
 
-MCP: `decompile_model {"inputs": ["/abs/crate.mdl"], "out": "/abs/work"}`, then `compile_model {"game": "garrysmod", "qc": "/abs/work/crate/crate.qc"}`. Expect counts and `failures: []`, then `success: true`. The compiled model lands in the game's `models` folder.
+MCP: `decompile_model {"inputs": ["/abs/crate.mdl"], "out": "/abs/work"}`, then `compile_model {"game": "garrysmod", "qc": "/abs/work/crate/crate.qc"}`. Expect counts and `failures: []`, then `success: true`. The compiled model lands in the game's `models` folder; `outputs` lists every file written.
 
 ## Fix a broken model
 

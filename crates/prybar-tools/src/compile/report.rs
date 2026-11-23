@@ -15,5 +15,8 @@ pub struct CompileReport {
     pub exit_code: Option<i32>,
     pub errors: Vec<LogLine>,
     pub warnings: Vec<LogLine>,
+    /// Files studiomdl says it wrote, so agents can find the result
+    /// without parsing the log themselves.
+    pub outputs: Vec<String>,
     pub log: String,
 }

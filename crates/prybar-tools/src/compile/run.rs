@@ -26,12 +26,14 @@ pub fn compile(
     log.push_str(&String::from_utf8_lossy(&output.stderr));
     // Parse before truncating so a late ERROR still fails the report.
     let (errors, warnings) = parse_log(&log);
+    let outputs = super::written_files(&log);
     truncate(&mut log);
     Ok(CompileReport {
         success: output.status.success() && errors.is_empty(),
         exit_code: output.status.code(),
         errors,
         warnings,
+        outputs,
         log,
     })
 }
