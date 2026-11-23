@@ -31,6 +31,7 @@ pub fn view(s: &AppState, f: &Forms, t: Tokens, cx: &Context<Root>) -> AnyElemen
         .child(toolbar::view(s, f, t, cx))
         .child(
             div()
+                .w_full()
                 .flex()
                 .items_start()
                 .gap_3()
