@@ -2,6 +2,7 @@
 //! can draw. Descriptions come from other people, so nothing here may
 //! panic: unknown or broken tags simply stay as the text they were.
 
+mod item;
 mod lex;
 mod parse;
 #[cfg(test)]

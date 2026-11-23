@@ -1,12 +1,5 @@
-use super::{parse, Node, Tag};
-
-fn text(s: &str) -> Node {
-    Node::Text(s.into())
-}
-
-fn tag(t: Tag, value: Option<&str>, kids: Vec<Node>) -> Node {
-    Node::Tag(t, value.map(Into::into), kids)
-}
+use super::super::{parse, Node, Tag};
+use super::{tag, text};
 
 /// A description like a real one: bold, a rule, a list, code, and a
 /// badge image inside a link.
@@ -51,67 +44,4 @@ fn values_and_broken_tags() {
     assert_eq!(parse("[u]never closed"), vec![text("[u]never closed")]);
     assert_eq!(parse("[*]no list"), vec![text("[*]no list")]);
     assert_eq!(parse("[code]open"), vec![text("[code]open")]);
-}
-
-/// Deep nesting stops at the cap and huge input stays linear.
-#[test]
-fn hostile_input() {
-    let deep = "[quote]".repeat(10_000) + "x";
-    fn depth(n: &[Node]) -> usize {
-        n.iter()
-            .map(|n| match n {
-                Node::Tag(_, _, k) => 1 + depth(k),
-                _ => 0,
-            })
-            .max()
-            .unwrap_or(0)
-    }
-    assert!(depth(&parse(&deep)) <= 1, "unclosed tags turn into text");
-    let closed = "[b]".repeat(1000) + &"[/b]".repeat(1000);
-    assert!(depth(&parse(&closed)) <= 25);
-    let huge = "[".repeat(200_000) + &"[code]".repeat(50_000);
-    let start = std::time::Instant::now();
-    let _ = parse(&huge);
-    assert!(start.elapsed().as_secs() < 5);
-}
-
-/// Random mixes of tag pieces and odd chars never panic, and text with
-/// no tag in it comes back unchanged.
-#[test]
-fn fuzz_smoke() {
-    let parts = [
-        "[",
-        "]",
-        "/",
-        "=",
-        "[b]",
-        "[/b]",
-        "[*]",
-        "[list]",
-        "[/list]",
-        "[code]",
-        "[/code]",
-        "[url=",
-        "é",
-        "\n",
-        "[table",
-        " ",
-        "[hr]",
-        "[/",
-        "x",
-        "[noparse]",
-        "🙂",
-    ];
-    let mut seed = 0x2545_f491_u64;
-    for _ in 0..3000 {
-        let mut s = String::new();
-        for _ in 0..(seed % 40) {
-            seed ^= seed << 13;
-            seed ^= seed >> 7;
-            seed ^= seed << 17;
-            s.push_str(parts[(seed % parts.len() as u64) as usize]);
-        }
-        let _ = parse(&s);
-    }
-    assert_eq!(parse("a [ b ] c"), vec![text("a [ b ] c")]);
 }

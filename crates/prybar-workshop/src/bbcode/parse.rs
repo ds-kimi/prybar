@@ -6,7 +6,7 @@ use super::{Node, Tag};
 
 /// Deeper nesting than this is text, so hostile input cannot make the
 /// tree, or the views drawn from it, recurse without end.
-const MAX_DEPTH: usize = 24;
+pub(super) const MAX_DEPTH: usize = 24;
 
 /// The description as nodes. Never fails: what is not valid markup
 /// stays as the text it was.
@@ -47,22 +47,6 @@ impl Tree {
         at
     }
 
-    /// `[*]` ends the item before it and starts one, only inside a list.
-    fn item(&mut self, raw: &str) {
-        if self.top() == Some(Tag::Item) {
-            self.pop(true);
-        }
-        if !matches!(self.top(), Some(Tag::List | Tag::Olist)) || self.stack.len() > MAX_DEPTH {
-            return self.push(Node::Text(raw.to_owned()));
-        }
-        self.stack.push(Frame {
-            tag: Some(Tag::Item),
-            value: None,
-            raw: raw.to_owned(),
-            kids: Vec::new(),
-        });
-    }
-
     /// Closes the nearest open tag of this kind; tags opened inside it
     /// and left open turn back into text. A closing tag with nothing to
     /// close is text.
@@ -74,9 +58,5 @@ impl Tree {
             self.pop(false);
         }
         self.pop(true);
-    }
-
-    fn top(&self) -> Option<Tag> {
-        self.stack.last().and_then(|f| f.tag)
     }
 }
