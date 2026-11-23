@@ -1,4 +1,5 @@
 mod cursor;
+mod endian;
 mod reader;
 mod reader_ext;
 

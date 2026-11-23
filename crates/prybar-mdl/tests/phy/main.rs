@@ -1,3 +1,4 @@
+mod big_endian;
 mod fixture;
 mod hostile;
 
