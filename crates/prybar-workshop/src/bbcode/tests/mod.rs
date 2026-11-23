@@ -2,6 +2,7 @@
 
 mod cases;
 mod hostile;
+mod plain;
 
 use super::Node;
 use super::Tag;

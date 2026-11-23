@@ -20,6 +20,9 @@ fn help_lists_every_command_and_exit_codes() {
         "view",
         "publish",
         "games",
+        "workshop",
+        "texture",
+        "privacy",
     ];
     for cmd in cmds {
         assert!(text.contains(cmd), "missing {cmd}");

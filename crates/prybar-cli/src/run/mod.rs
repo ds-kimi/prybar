@@ -4,6 +4,7 @@ mod model;
 mod package;
 mod publish;
 mod tools;
+mod workshop;
 
 use crate::cli::Command;
 use crate::output::Output;
@@ -19,6 +20,9 @@ pub fn run(cmd: Command, out: &Output) -> u8 {
         Command::Compile(a) => tools::compile(&a, out),
         Command::View(a) => tools::view(&a, out),
         Command::Publish(a) => publish::publish(&a, out),
+        Command::Workshop(a) => workshop::workshop(&a, out),
+        Command::Texture(a) => workshop::texture(&a, out),
+        Command::Privacy(a) => workshop::privacy(&a, out),
         Command::Games(a) => tools::games(&a, out),
         Command::Version(a) => crate::update::version(&a, out),
         Command::SelfUpdate => crate::update::self_update(out),

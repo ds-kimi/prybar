@@ -4,11 +4,13 @@
 //! then every mounted game; previews follow the same order so what shows
 //! is what the game would draw.
 
+mod export;
 mod lookup;
 mod roots;
 mod sources;
 mod vmt;
 
+pub use export::{export_file, export_material, TextureReport};
 pub use lookup::{materials, MaterialReport};
 pub use sources::{Found, Sources};
 pub use vmt::base_texture;

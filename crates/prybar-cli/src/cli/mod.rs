@@ -4,10 +4,12 @@
 mod model;
 mod package;
 mod tools;
+mod workshop;
 
 pub use model::{DecompileArgs, InspectArgs};
 pub use package::{ListArgs, PackArgs, UnpackArgs};
 pub use tools::{CompileArgs, GamesArgs, PublishArgs, VersionArgs, ViewArgs};
+pub use workshop::{PrivacyArgs, TextureArgs, WorkshopArgs, WorkshopCommand};
 
 use clap::{Parser, Subcommand};
 
@@ -55,6 +57,14 @@ pub enum Command {
     View(ViewArgs),
     /// Create or update a Steam Workshop item, or list yours.
     Publish(PublishArgs),
+    /// Workshop helpers: your items, one item's stats and history,
+    /// preview image and BBCode description checks.
+    Workshop(WorkshopArgs),
+    /// Decode a VTF texture (a file, or a model's material) to PNG.
+    Texture(TextureArgs),
+    /// Read or change the desktop app's analytics choice and its log of
+    /// sent data. The CLI and MCP server never send anything.
+    Privacy(PrivacyArgs),
     /// Show configured games; detect Steam installs.
     Games(GamesArgs),
     /// Print the version; `--check` asks GitHub for the latest release.

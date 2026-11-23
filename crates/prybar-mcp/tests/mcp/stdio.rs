@@ -2,7 +2,7 @@ use serde_json::Value;
 use std::io::{BufRead, BufReader, Write};
 use std::process::{Command, Stdio};
 
-const TOOLS: [&str; 12] = [
+const TOOLS: [&str; 19] = [
     "inspect_model",
     "decompile_model",
     "list_package",
@@ -15,6 +15,13 @@ const TOOLS: [&str; 12] = [
     "config_get",
     "config_set",
     "check_update",
+    "workshop_status",
+    "workshop_items",
+    "workshop_item",
+    "check_preview",
+    "check_bbcode",
+    "decode_texture",
+    "privacy",
 ];
 
 /// Replays `scripts/mcp/handshake.jsonl` (the same file a person pipes

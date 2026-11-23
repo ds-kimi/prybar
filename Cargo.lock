@@ -4749,12 +4749,14 @@ dependencies = [
 name = "prybar-service"
 version = "0.1.0"
 dependencies = [
+ "image",
  "prybar-apk",
  "prybar-export",
  "prybar-gma",
  "prybar-hfs",
  "prybar-io",
  "prybar-mdl",
+ "prybar-telemetry",
  "prybar-tools",
  "prybar-vpk",
  "prybar-vtf",

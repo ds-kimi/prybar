@@ -6,9 +6,11 @@ mod error;
 pub mod model;
 pub mod ops;
 pub mod package;
+pub mod privacy;
 pub mod source;
 pub mod texture;
 pub mod tools;
+pub mod workshop;
 
 pub use error::{ExitCode, ServiceError};
 

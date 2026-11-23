@@ -16,7 +16,9 @@ impl Prybar {
                 + Self::package_router()
                 + Self::external_router()
                 + Self::config_router()
-                + Self::update_router(),
+                + Self::update_router()
+                + Self::workshop_router()
+                + Self::check_router(),
         }
     }
 }

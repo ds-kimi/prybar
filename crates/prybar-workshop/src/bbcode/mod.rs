@@ -7,9 +7,11 @@ mod lex;
 mod parse;
 #[cfg(test)]
 mod tests;
+mod text;
 mod tree;
 
 pub use parse::parse;
+pub use text::plain;
 
 /// Every tag Steam's formatting help lists for Workshop descriptions.
 #[derive(Clone, Copy, PartialEq, Eq, Debug)]

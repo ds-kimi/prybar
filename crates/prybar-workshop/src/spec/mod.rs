@@ -8,4 +8,5 @@ mod validate;
 
 pub use content::{stage_content, GMOD_APP_ID};
 pub use item::{ItemSpec, Visibility};
+pub use text::{DESCRIPTION_MAX, TAGS_MAX, TAG_MAX, TITLE_MAX};
 pub use validate::validate;
