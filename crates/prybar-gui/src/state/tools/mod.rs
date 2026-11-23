@@ -7,6 +7,7 @@ mod backend;
 mod catalog;
 mod compile;
 mod data;
+pub use data::default_thumb;
 mod form;
 mod games;
 mod item;

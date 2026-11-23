@@ -1,6 +1,7 @@
 //! The create and edit popups: the same fields in three plain steps
 //! (content, details, picture), then one primary button.
 
+mod desc;
 mod frame;
 mod go;
 mod picture;
@@ -52,7 +53,7 @@ const PICTURE_COLUMN: f32 = 240.;
 
 const NOTE: &str = "Shown in the item's change history on the Workshop";
 const TITLE: &str = "The name shown on the Workshop, up to 128 characters";
-const DESC: &str = "What it is and how to use it; Steam BBCode works";
+pub(super) const DESC: &str = "What it is and how to use it; Steam BBCode works";
 const TAGS: &str = "Comma separated. Empty: the tags from addon.json, or the current ones";
 
 /// Step 1: what is uploaded, checked as soon as it is picked.
@@ -94,13 +95,7 @@ fn details(f: &Forms, t: Tokens) -> impl IntoElement {
         .gap_3()
         .child(widgets::section("2 · Details", t))
         .child(labeled("pb-pub-title", "Title", TITLE, &p.title, t))
-        .child(labeled(
-            "pb-pub-desc",
-            "Description",
-            DESC,
-            &p.description,
-            t,
-        ))
+        .child(desc::described(&p.editor, t))
         .child(labeled("pb-pub-tags", "Tags", TAGS, &p.tags, t))
         .child(fields::visibility(f, t))
         .child(labeled(

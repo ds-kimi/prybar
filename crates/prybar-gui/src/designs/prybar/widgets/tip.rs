@@ -36,6 +36,13 @@ pub trait Tipped: StatefulInteractiveElement + Sized {
 
 impl<E: StatefulInteractiveElement + Sized> Tipped for E {}
 
+/// The same card for elements that build their own tooltip, such as
+/// links inside a paragraph.
+pub fn card(text: impl Into<SharedString>, t: Tokens, cx: &mut gpui::App) -> gpui::AnyView {
+    let text = text.into();
+    cx.new(|_| Tip { text, t }).into()
+}
+
 impl Render for Tip {
     fn render(&mut self, _: &mut Window, _: &mut Context<Self>) -> impl IntoElement {
         let t = self.t;

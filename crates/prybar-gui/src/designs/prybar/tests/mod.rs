@@ -1,3 +1,4 @@
+mod bbcode;
 mod components;
 mod details;
 mod ime;

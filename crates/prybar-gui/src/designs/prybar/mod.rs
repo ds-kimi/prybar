@@ -9,7 +9,7 @@ mod views;
 mod widgets;
 
 pub use views::{publish_footer, publish_popup, wanted, wanted_textures};
-pub use widgets::{input, modal, select, Tipped};
+pub use widgets::{bbcode, input, modal, select, Tipped};
 
 use gpui::{div, prelude::*, AnyElement, Context, Entity};
 

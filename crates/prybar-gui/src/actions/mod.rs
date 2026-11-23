@@ -18,7 +18,8 @@ actions!(
         ToggleFullView,
         ToggleWire,
         ToggleBones,
-        TogglePlay
+        TogglePlay,
+        FormatLink
     ]
 );
 
@@ -48,6 +49,8 @@ pub fn bindings() -> Vec<KeyBinding> {
         KeyBinding::new("escape", Back, None),
         KeyBinding::new(key!("f"), Search, None),
         KeyBinding::new(key!("k"), TogglePalette, None),
+        // Inside a field that takes markup, mod-k makes a link instead.
+        KeyBinding::new(key!("k"), FormatLink, Some("Markup")),
         KeyBinding::new(key!("shift-p"), TogglePalette, None),
         KeyBinding::new(key!("shift-l"), ToggleTheme, None),
         KeyBinding::new("tab", FocusNext, None),

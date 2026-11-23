@@ -1,6 +1,7 @@
 //! Building blocks. Each interactive one has hover, press, focus-visible
 //! and disabled states drawn from the tokens.
 
+pub mod bbcode;
 mod button;
 mod field;
 pub mod input;
@@ -9,7 +10,7 @@ mod nav;
 pub mod select;
 pub mod tip;
 
-pub use button::{button, Kind};
+pub use button::{button, icon_button, Kind};
 pub use field::{field, readonly, switch};
 pub use nav::nav_item;
 pub use tip::Tipped;

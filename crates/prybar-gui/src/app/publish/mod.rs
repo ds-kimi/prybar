@@ -3,6 +3,7 @@
 
 use gpui::{App, Context, Entity, Subscription};
 
+mod desc;
 mod fill;
 mod items;
 mod popup;
@@ -12,6 +13,7 @@ pub use items::ItemsInputs;
 
 use super::forms::field;
 use super::Root;
+use crate::designs::bbcode::BbEditor;
 use crate::designs::input::TextInput;
 use crate::designs::select::Select;
 use crate::state::tools::PublishForm;
@@ -23,6 +25,8 @@ pub struct PublishInputs {
     pub item_id: Entity<TextInput>,
     pub title: Entity<TextInput>,
     pub description: Entity<TextInput>,
+    /// The BBCode toolbar and preview around the description.
+    pub editor: Entity<BbEditor>,
     pub tags: Entity<TextInput>,
     pub visibility: Entity<Select>,
     pub content: Entity<TextInput>,
@@ -34,11 +38,13 @@ pub struct PublishInputs {
 
 impl PublishInputs {
     pub fn new(cx: &mut App) -> Self {
-        let about = "What it is and how to use it";
+        let description = desc::field(cx);
+        let editor = desc::editor(&description, cx);
         PublishInputs {
             item_id: field(cx, "Empty for a new item", "", false, checks::item_id),
             title: field(cx, "Addon name", "", false, checks::title),
-            description: field(cx, about, "", true, checks::description),
+            description,
+            editor,
             tags: field(cx, "Empty: from addon.json", "", false, checks::tags),
             visibility: visibility(cx),
             content: field(cx, "Addon folder or .gma", "", false, checks::existing),
