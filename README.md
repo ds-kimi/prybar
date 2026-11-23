@@ -57,6 +57,18 @@ prybar pack addon_src -o addon.gma                          # needs addon.json
 
 Add `--json` for one machine-readable document on stdout. Exit codes are stable: see [docs/cli/README.md](docs/cli/README.md).
 
+## Performance
+
+Decompiling all 2,201 models of Half-Life 2's `hl2_misc_dir.vpk` (QC, reference, LOD, physics and animation SMDs), same machine (Apple M5, 10 cores), same input:
+
+| Tool | Time | |
+|---|---:|---|
+| **prybar**, all cores | **3.8 s** | `▏` |
+| **prybar**, one core | **16.6 s** | `███` |
+| Crowbar 0.74 | 128 s | `████████████████████████` |
+
+About **30× faster** than Crowbar on a multi-core machine and about **8× faster** on a single core. Every model decompiled with no failures in both tools.
+
 ## MCP server
 
 `prybar-mcp` speaks MCP over stdio and exposes the same operations as tools (`inspect_model`, `decompile_model`, `list_package`, `unpack_package`, `pack_package`, `compile_model`, `view_model`, `publish_workshop`, `games_list`, `config_get`, `config_set`). Client snippets for Claude Desktop, Claude Code, Cursor, Codex and VS Code: [docs/agents/mcp-config.md](docs/agents/mcp-config.md).
