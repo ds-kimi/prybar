@@ -66,13 +66,15 @@ pub const UNSUPPORTED: &[Unsupported] = &[
         id: "l4d2",
         name: "Left 4 Dead 2",
         app_id: 550,
-        reason: "uses the legacy single-file Workshop; publish with Valve's L4D2 Workshop Publisher",
+        reason:
+            "uses the legacy single-file Workshop; publish with Valve's L4D2 Workshop Publisher",
     },
     Unsupported {
         id: "portal2",
         name: "Portal 2",
         app_id: 620,
-        reason: "uses the legacy Workshop; publish from the Puzzle Maker or Portal 2 Authoring Tools",
+        reason:
+            "uses the legacy Workshop; publish from the Puzzle Maker or Portal 2 Authoring Tools",
     },
     Unsupported {
         id: "css",

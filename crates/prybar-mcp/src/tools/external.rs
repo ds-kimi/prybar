@@ -40,7 +40,7 @@ impl Prybar {
     }
 
     #[tool(
-        description = "Create or update a Steam Workshop item from a JSON spec file, or list the user's items with `list_app_id`. Needs a prybar build with the `workshop` feature and a running, signed-in Steam client. Use `dry_run` first: a real publish is visible on Steam.",
+        description = "Create or update a Steam Workshop item from a JSON spec file, list the user's items with `game` (or `list_app_id`), or list supported and installed games with `list_games`. Supported games: Garry's Mod (`garrysmod`, 4000) and Team Fortress 2 maps (`tf2`, 440); the description is Steam BBCode. Needs a prybar build with the `workshop` feature and a running, signed-in Steam client. Use `dry_run` first: a real publish is visible on Steam.",
         annotations(
             destructive_hint = true,
             idempotent_hint = false,
@@ -48,13 +48,24 @@ impl Prybar {
         )
     )]
     async fn publish_workshop(&self, Parameters(a): Parameters<PublishArgs>) -> CallToolResult {
+        if a.list_games {
+            return blocking(|| Ok(tools::workshop_games())).await;
+        }
         if let Some(app_id) = a.list_app_id {
             return blocking(move || tools::workshop_list(app_id)).await;
         }
+        let game = a.game.clone();
         match a.spec.as_deref().map(|s| guard::absolute("spec", s)) {
-            Some(Ok(spec)) => blocking(move || publish(&spec, a.dry_run, a.confirm)).await,
+            Some(Ok(spec)) => blocking(move || publish(&spec, game, a.dry_run, a.confirm)).await,
             Some(Err(e)) => failure(&e),
-            None => failure(&ServiceError::Usage("pass `spec` or `list_app_id`".into())),
+            None => match game {
+                Some(g) => {
+                    blocking(move || tools::workshop_list(tools::workshop_app_id(&g)?)).await
+                }
+                None => failure(&ServiceError::Usage(
+                    "pass `spec`, `game`, `list_app_id` or `list_games`".into(),
+                )),
+            },
         }
     }
 }
@@ -65,6 +76,7 @@ impl Prybar {
 /// forgetting `dry_run`.
 fn publish(
     spec: &std::path::Path,
+    game: Option<String>,
     dry_run: bool,
     confirm: bool,
 ) -> Result<prybar_workshop::PublishReport> {
@@ -74,7 +86,10 @@ fn publish(
                 .into(),
         ));
     }
-    let item = tools::load_spec(spec)?;
+    let mut item = tools::load_spec(spec)?;
+    if let Some(g) = game {
+        item.app_id = tools::workshop_app_id(&g)?;
+    }
     for (field, path) in [("preview", &item.preview), ("content", &item.content)] {
         if let Some(p) = path {
             guard::absolute(field, &p.to_string_lossy())?;

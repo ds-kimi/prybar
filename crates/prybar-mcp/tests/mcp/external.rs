@@ -40,3 +40,31 @@ async fn publish_workshop_checks_its_spec() {
     let (_, v) = call(&c, "publish_workshop", args).await;
     assert_eq!(v["kind"], "invalid_input");
 }
+
+#[tokio::test]
+async fn publish_workshop_lists_games_and_resolves_game_names() {
+    let tmp = tempfile::tempdir().unwrap();
+    let c = connect().await;
+    let (err, v) = call(&c, "publish_workshop", json!({ "list_games": true })).await;
+    assert!(!err, "{v}");
+    assert_eq!(v["supported"][0]["app_id"], 4000);
+    assert!(v["unsupported"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .any(|g| g["id"] == "l4d2"));
+    let (err, v) = call(&c, "publish_workshop", json!({ "game": "l4d2" })).await;
+    assert!(
+        err && v["error"].as_str().unwrap().contains("legacy"),
+        "{v}"
+    );
+    let map = tmp.path().join("map");
+    std::fs::create_dir_all(&map).unwrap();
+    std::fs::write(map.join("ctf_crate.bsp"), b"VBSP").unwrap();
+    let spec = tmp.path().join("item.json");
+    let body = json!({ "app_id": 4000, "title": "Crate", "content": map });
+    std::fs::write(&spec, body.to_string()).unwrap();
+    let args = json!({ "spec": spec, "game": "tf2", "dry_run": true });
+    let (err, v) = call(&c, "publish_workshop", args).await;
+    assert!(!err && v["dry_run"] == true, "{v}");
+}

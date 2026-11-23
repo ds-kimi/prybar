@@ -5,6 +5,7 @@ mod config;
 mod games;
 mod publish;
 mod spec;
+mod targets;
 mod view;
 mod workshop;
 
@@ -15,6 +16,7 @@ pub use prybar_tools::config::{Game, Packer};
 pub use prybar_tools::paths::steam_libraries;
 pub use publish::{publish, workshop_list};
 pub use spec::load_spec;
+pub use targets::{workshop_app_id, workshop_games, WorkshopGames};
 pub use view::{view, ViewReport};
 pub use workshop::{addon_check, steam_avatar, steam_status};
 

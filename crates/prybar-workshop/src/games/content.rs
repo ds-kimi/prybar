@@ -37,9 +37,7 @@ fn has_map(dir: &Path) -> bool {
         std::fs::read_dir(dir.join(sub)).is_ok_and(|rd| {
             rd.flatten().any(|e| {
                 let p = e.path();
-                p.is_file()
-                    && p.extension()
-                        .is_some_and(|x| x.eq_ignore_ascii_case("bsp"))
+                p.is_file() && p.extension().is_some_and(|x| x.eq_ignore_ascii_case("bsp"))
             })
         })
     })

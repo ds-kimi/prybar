@@ -9,9 +9,7 @@ use crate::preview::{PREVIEW_MAX, SOURCE_MAX};
 
 /// Every check Steam would otherwise fail on mid-upload.
 pub fn validate(spec: &ItemSpec) -> Result<(), WorkshopError> {
-    if spec.app_id == 0 {
-        return Err(WorkshopError::invalid("app_id", "must be set"));
-    }
+    // Also refuses an unset (0) app id.
     crate::games::supported(spec.app_id)?;
     if spec.item_id.is_none() && spec.content.is_none() {
         return Err(WorkshopError::invalid(

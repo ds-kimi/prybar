@@ -22,7 +22,10 @@ pub(super) fn check_content(app_id: u32, path: &Path) -> Result<(), WorkshopErro
         return Err(WorkshopError::invalid("content", format!("must be {want}")));
     }
     if app_id != GMOD_APP_ID && !path.is_dir() {
-        return Err(WorkshopError::invalid("content", "must be an existing folder"));
+        return Err(WorkshopError::invalid(
+            "content",
+            "must be an existing folder",
+        ));
     }
     crate::games::check_game_content(app_id, path)
 }

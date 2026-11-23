@@ -4,12 +4,16 @@ use crate::output::Output;
 use prybar_service::{tools, Result, ServiceError};
 
 pub fn publish(a: &PublishArgs, out: &Output) -> Result<u8> {
-    if let Some(app_id) = a.status {
-        out.emit(&tools::steam_status(app_id), pretty);
+    if a.games {
+        out.emit(&tools::workshop_games(), pretty);
         return Ok(0);
     }
-    if let Some(app_id) = a.list {
-        let items = tools::workshop_list(app_id)?;
+    if let Some(game) = &a.status {
+        out.emit(&tools::steam_status(tools::workshop_app_id(game)?), pretty);
+        return Ok(0);
+    }
+    if let Some(game) = &a.list {
+        let items = tools::workshop_list(tools::workshop_app_id(game)?)?;
         out.emit(&items, pretty);
         return Ok(0);
     }
@@ -18,7 +22,10 @@ pub fn publish(a: &PublishArgs, out: &Output) -> Result<u8> {
             "publish needs a spec file or --list".into(),
         ));
     };
-    let spec = tools::load_spec(path)?;
+    let mut spec = tools::load_spec(path)?;
+    if let Some(game) = &a.game {
+        spec.app_id = tools::workshop_app_id(game)?;
+    }
     let report = tools::publish(&spec, a.dry_run, &mut |p| {
         out.progress(&format!("{}: {}/{}", p.stage, p.done, p.total));
     })?;
