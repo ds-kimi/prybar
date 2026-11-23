@@ -89,13 +89,30 @@ its tooltip says why (not running, not logged in, game not owned, no Steam
 support in this build) and a click checks again. Every button, toggle and
 control explains itself in a tooltip after a short pause.
 
-Publish repeats what blocks Steam, if anything, with Retry, lists your Garry's Mod items (a click fills the id and
-title to update one), takes an addon folder (its `addon.json` type and tags
-and every file the game refuses are listed as you type) or a `.gma`, and
-fits a png/jpg preview to 512x512 under 1 MB (a GIF goes as is and must be
-under 1 MB). Empty tags take `Addon`, the type and the tags from
-`addon.json`. Steam's stages and bytes show during upload; Steam has no
-cancel for a submitted update. Release builds include Steam support; from
+Publish repeats what blocks Steam, if anything, with Retry, and lists your
+Garry's Mod items as a grid or list (search, sort, visibility and tag
+filters). A click on an item opens its details on the right: subscribers,
+unique subscribers, favorites, votes, views and comments (each explained on
+hover), a chart of subscribers per day, its linked addon folder and its
+version history. Steam only gives today's totals, so the app saves one
+snapshot per item per day each time it lists them (`workshop-stats.tsv`
+next to the config) and the chart says from which date it has data. The
+history is read from the item's public Workshop changelog page and cached
+for a day (`changelogs/`).
+
+New item and Edit open a popup in three steps: content (an addon folder,
+whose `addon.json` type and tags and every refused file are listed as you
+type, or a `.gma`), details (title, description, tags, visibility), and the
+preview image. Click the square to pick an image: it shows the center crop
+the Workshop shows, the size, and whether Steam gets it as is or resized to
+512x512 under 1 MB (a GIF goes as is and must be under 1 MB). Empty tags
+take `Addon`, the type and the tags from `addon.json` on create and keep
+the current tags on edit. An edit sends only the fields you changed.
+Content sent from a folder links that folder to the item
+(`workshop-links.txt`); Link folder… in the details does it by hand, and
+Update content then sends the linked folder in one click. Steam's stages
+and bytes show during upload; Steam has no cancel for a submitted update.
+Release builds include Steam support; from
 source: `cargo run -p prybar-gui --features workshop` and copy
 `libsteam_api.dylib` (from `target/debug/build/steamworks-sys-*/out/`) next
 to the binary.
@@ -110,12 +127,14 @@ Tests only use a mocked Steam. One real upload checks the whole path:
 3. Make a test folder: `addon.json` with
    `{"title": "prybar test", "type": "tool", "tags": ["fun"]}` and
    `lua/autorun/prybar_test.lua` with `print("prybar")`.
-4. Item id empty, title `prybar test`, visibility `Hidden`, content the
-   folder, a preview png of any size. Dry run, then Publish.
+4. New item: content the folder, title `prybar test`, visibility `Hidden`,
+   click the square and pick a png of any size. Dry run, then Publish.
 5. Expect the stages, then "Published item <id>" and Open in Steam. On the
    page: private, preview 512x512, tags Addon / tool / fun.
-6. Update: click the item in the list, change note `second`, Publish. The
-   page shows the change note.
+6. Update: click the item, Edit, change the title to `prybar test 2` and
+   the note to `second`, Save to Workshop. The page shows the new title and
+   the change note; the description and tags are untouched. Back in the
+   details, Update content sends the linked folder again.
 7. Delete the item on its Steam page.
 
 
