@@ -12,6 +12,7 @@ pub fn validate(spec: &ItemSpec) -> Result<(), WorkshopError> {
     if spec.app_id == 0 {
         return Err(WorkshopError::invalid("app_id", "must be set"));
     }
+    crate::games::supported(spec.app_id)?;
     if spec.item_id.is_none() && spec.content.is_none() {
         return Err(WorkshopError::invalid(
             "content",

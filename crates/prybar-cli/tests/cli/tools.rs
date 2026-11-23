@@ -63,6 +63,7 @@ fn publish_dry_run_validates() {
     let tmp = tempdir().unwrap();
     let content = tmp.path().join("content");
     std::fs::create_dir_all(&content).unwrap();
+    std::fs::write(content.join("ctf_crate.bsp"), b"VBSP").unwrap();
     let spec = serde_json::json!({
         "app_id": 440, "title": "Crate", "content": content, "tags": ["props"]
     });

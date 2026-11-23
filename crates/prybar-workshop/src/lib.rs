@@ -11,6 +11,7 @@ pub mod bbcode;
 pub mod catalog;
 pub mod changelog;
 mod error;
+pub mod games;
 pub mod http;
 pub mod item;
 pub mod preview;

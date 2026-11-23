@@ -2,6 +2,7 @@ mod addon;
 mod catalog;
 mod changelog;
 mod fixture;
+mod games;
 mod item;
 mod mock;
 mod preview;

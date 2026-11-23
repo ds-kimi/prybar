@@ -23,6 +23,8 @@ fn update_needs_only_an_id_and_non_gmod_takes_a_folder() {
     };
     let report = publish(&update, true, &mut |_| {}).unwrap();
     assert_eq!(report.item_id, Some(42));
+    std::fs::create_dir_all(tmp.path().join("maps")).unwrap();
+    std::fs::write(tmp.path().join("maps/ctf_test.bsp"), b"VBSP").unwrap();
     let tf2 = ItemSpec {
         app_id: 440,
         title: Some("hat".into()),

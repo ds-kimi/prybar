@@ -17,20 +17,14 @@ pub(super) fn check_content(app_id: u32, path: &Path) -> Result<(), WorkshopErro
     if app_id == GMOD_APP_ID && path.is_dir() {
         return check_folder(path);
     }
-    let ok = if app_id == GMOD_APP_ID {
-        is_gma && path.is_file()
-    } else {
-        path.is_dir()
-    };
-    if !ok {
-        let want = if app_id == GMOD_APP_ID {
-            "an existing .gma file or addon folder"
-        } else {
-            "an existing folder"
-        };
+    if app_id == GMOD_APP_ID && !(is_gma && path.is_file()) {
+        let want = "an existing .gma file or addon folder";
         return Err(WorkshopError::invalid("content", format!("must be {want}")));
     }
-    Ok(())
+    if app_id != GMOD_APP_ID && !path.is_dir() {
+        return Err(WorkshopError::invalid("content", "must be an existing folder"));
+    }
+    crate::games::check_game_content(app_id, path)
 }
 
 /// Lists the first problems in the error so a CLI user sees what to fix.
