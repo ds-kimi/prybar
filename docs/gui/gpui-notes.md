@@ -1,8 +1,7 @@
 # GPUI notes
 
-Shared reading for the GUI lots. Paths starting with `zed/` point into the
-reference checkout at `~/Documents/prybar-ref-zed` (read only, never copied
-into this repo).
+Notes on the GPUI API used by prybar-gui. Paths starting with `zed/` point
+into a checkout of https://github.com/zed-industries/zed at the pinned rev.
 
 ## Dependency
 
