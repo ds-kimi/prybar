@@ -68,21 +68,23 @@ fn content(
         Some(_) => "1 · New content (optional)",
         None => "1 · Content",
     };
-    let p = &f.publish;
+    // Only Garry's Mod has addon.json and a whitelist to check.
+    let gma = s.tools.steam.gma();
+    let label = ["Map folder (with a .bsp)", "Addon folder or .gma"][usize::from(gma)];
     div()
         .flex()
         .flex_col()
         .gap_3()
         .child(widgets::section(title, t).pt_0())
         .child(fields::picked(
-            "Addon folder or .gma",
+            label,
             "pb-pub-content",
-            &p.content,
+            &f.publish.content,
             true,
             t,
             cx,
         ))
-        .child(addon::view(s, t))
+        .when(gma, |el| el.child(addon::view(s, t)))
         .when_some(editing, |el, it| el.child(go::link_hint(s, it, t)))
 }
 

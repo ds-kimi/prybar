@@ -29,6 +29,8 @@ pub type ThumbFn = fn(&str) -> Result<std::path::PathBuf, String>;
 pub type HistoryFn = fn(u64) -> Result<Log, Failure>;
 /// Where stats snapshots and folder links are kept.
 pub type DataFn = fn() -> std::path::PathBuf;
+/// Supported Workshop games and which are installed here.
+pub type TargetsFn = fn() -> tools::WorkshopGames;
 
 #[derive(Clone, Copy)]
 pub struct Backend {
@@ -43,6 +45,7 @@ pub struct Backend {
     pub thumb: ThumbFn,
     pub history: HistoryFn,
     pub data_dir: DataFn,
+    pub targets: TargetsFn,
 }
 
 impl Default for Backend {
@@ -66,6 +69,7 @@ impl Default for Backend {
                 prybar_workshop::changelog::cached(id, &super::data::data_dir().join("changelogs"))
             },
             data_dir: super::data::data_dir,
+            targets: tools::workshop_games,
         }
     }
 }

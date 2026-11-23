@@ -1,7 +1,7 @@
 //! The publish popup's fields as typed, turned into what Steam is sent.
 
 use prybar_workshop::item::{changes, Draft};
-use prybar_workshop::spec::{ItemSpec, Visibility, GMOD_APP_ID};
+use prybar_workshop::spec::{ItemSpec, Visibility};
 use prybar_workshop::ListedItem;
 
 /// The publish fields as text, straight from the inputs.
@@ -26,7 +26,8 @@ fn some(s: &str) -> Option<String> {
 
 impl PublishForm {
     /// Empty fields stay unset, so an update only changes what was typed.
-    pub fn spec(&self) -> Result<ItemSpec, String> {
+    /// `app_id` is the Workshop game picked on the page.
+    pub fn spec(&self, app_id: u32) -> Result<ItemSpec, String> {
         let item_id = match some(&self.item_id) {
             None => None,
             Some(id) => Some(
@@ -35,10 +36,10 @@ impl PublishForm {
             ),
         };
         if let Some(item) = self.editing.as_ref().filter(|i| Some(i.item_id) == item_id) {
-            return Ok(changes(GMOD_APP_ID, item, &self.draft(item)));
+            return Ok(changes(app_id, item, &self.draft(item)));
         }
         Ok(ItemSpec {
-            app_id: GMOD_APP_ID,
+            app_id,
             item_id,
             title: some(&self.title),
             description: some(&self.description),

@@ -8,6 +8,9 @@ use prybar_workshop::{Progress, PublishReport};
 use super::PublishForm;
 use crate::state::{AppState, ToastKind};
 
+const NO_GAME: &str = "No supported game is installed. Install Garry's Mod or Team Fortress 2 \
+                       in Steam, or add it in Settings.";
+
 #[derive(Default)]
 pub struct PublishRun {
     pub running: bool,
@@ -22,7 +25,8 @@ impl AppState {
     /// Validates and uploads (or only validates, for `dry_run`), with
     /// Steam's progress shown as it comes.
     pub fn publish(&mut self, form: PublishForm, dry_run: bool, cx: &mut Context<Self>) {
-        let spec = match form.spec() {
+        let app = self.tools.steam.game.ok_or_else(|| NO_GAME.to_owned());
+        let spec = match app.and_then(|a| form.spec(a)) {
             Ok(spec) => spec,
             Err(why) => return self.published(Err(why), cx),
         };

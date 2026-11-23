@@ -14,6 +14,7 @@ mod item;
 mod publish;
 mod result;
 mod steam;
+mod target;
 
 pub use backend::Backend;
 pub use catalog::{prefs_lines, Catalog, ItemPrefs, Thumb};

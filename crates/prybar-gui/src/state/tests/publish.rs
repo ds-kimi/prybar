@@ -6,6 +6,7 @@ use crate::state::tools::PublishForm;
 #[gpui::test]
 fn publish_dry_run_then_upload(cx: &mut TestAppContext) {
     let state = state(cx);
+    state.update(cx, |s, _| s.tools.steam.game = Some(4000));
     let form = PublishForm {
         title: "Crate".into(),
         content: "/a.gma".into(),
@@ -43,7 +44,7 @@ fn edit_form_sends_only_changes() {
         editing: Some(item),
         ..PublishForm::default()
     };
-    let spec = form.spec().expect("valid");
+    let spec = form.spec(4000).expect("valid");
     assert_eq!(spec.title.as_deref(), Some("Crate pack 2"));
     assert!(spec.visibility.is_none() && spec.tags.is_empty() && spec.content.is_none());
     let new = PublishForm {
@@ -51,7 +52,7 @@ fn edit_form_sends_only_changes() {
         ..form
     };
     assert!(
-        new.spec().expect("valid").visibility.is_some(),
+        new.spec(4000).expect("valid").visibility.is_some(),
         "a plain form sends all"
     );
 }

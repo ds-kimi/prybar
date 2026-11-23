@@ -104,8 +104,8 @@ fn empty_reason(steam: &SteamView, filtered_out: bool) -> Option<String> {
     });
     let why = why.or_else(|| {
         steam.items.is_empty().then(|| {
-            "You have no Garry's Mod items yet. Click New item to publish your first one."
-                .to_owned()
+            let name = steam.target().map_or("Workshop", |g| g.name);
+            format!("You have no {name} items yet. Click New item to publish your first one.")
         })
     });
     why.or_else(|| {

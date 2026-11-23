@@ -6,6 +6,7 @@ use std::sync::atomic::AtomicBool;
 
 use prybar_service::tools::Game;
 use prybar_tools::compile::CompileReport;
+use prybar_workshop::games::WORKSHOP_GAMES;
 use prybar_workshop::{Progress, PublishReport, SteamStatus};
 
 use crate::state::tools::Backend;
@@ -30,6 +31,11 @@ pub(crate) fn backend() -> Backend {
         },
         history: super::fake_item::history,
         data_dir: super::fake_item::data_dir,
+        targets: || prybar_service::tools::WorkshopGames {
+            detected: WORKSHOP_GAMES.to_vec(),
+            supported: WORKSHOP_GAMES.to_vec(),
+            unsupported: Vec::new(),
+        },
     }
 }
 

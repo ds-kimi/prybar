@@ -2,6 +2,7 @@
 //! a busy Steam.
 
 mod busy;
+mod games;
 mod grid;
 
 use gpui::{Entity, VisualTestContext};

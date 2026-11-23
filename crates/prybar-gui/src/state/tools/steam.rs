@@ -25,6 +25,10 @@ pub struct SteamView {
     /// each read wakes the Steam API.
     pub avatar: Option<Arc<RenderImage>>,
     pub catalog: super::Catalog,
+    /// Supported games and the installed ones; `None` until first asked.
+    pub games: Option<prybar_service::tools::WorkshopGames>,
+    /// App id of the game the page shows; follows the user's pick.
+    pub game: Option<u32>,
 }
 
 impl SteamView {
@@ -45,7 +49,10 @@ impl SteamView {
                 bad("Steam is open but no one is logged in. Log in, then click to check again.")
             }
             Some(SteamStatus::NotOwned) => {
-                bad("This Steam account does not own Garry's Mod, so it cannot publish for it.")
+                let name = self.target().map_or("this game", |g| g.name);
+                bad(&format!(
+                    "This Steam account does not own {name}, so it cannot publish for it."
+                ))
             }
             Some(SteamStatus::Disabled) => {
                 bad("This build has no Steam Workshop support. Dry run still checks everything.")
@@ -64,24 +71,13 @@ impl AppState {
         self.tools.steam.status = None;
         let b = self.tools.backend;
         let want_avatar = self.tools.steam.avatar.is_none();
+        let chosen = self.tools.steam.game;
         let work = cx
             .background_executor()
-            .spawn(async move { super::ask::ask(b, want_avatar) });
+            .spawn(async move { super::ask::ask(b, chosen, want_avatar) });
         cx.spawn(async move |this, cx| {
-            let (s, list, face) = work.await;
-            let _ = this.update(cx, |st, cx| {
-                st.tools.steam.status = Some(s);
-                let steam = &mut st.tools.steam;
-                steam.avatar = steam.avatar.take().or(face);
-                steam.items_read = Some(std::time::SystemTime::now());
-                (steam.items, steam.items_error) = match list {
-                    Ok(items) => (items, None),
-                    Err(why) => (Vec::new(), Some(why)),
-                };
-                let items = st.tools.steam.items.clone();
-                st.record_stats(&items, cx);
-                cx.notify();
-            });
+            let (games, game, answer) = work.await;
+            let _ = this.update(cx, |st, cx| st.answered(games, game, answer, cx));
         })
         .detach();
         cx.notify();
@@ -92,7 +88,8 @@ impl AppState {
     pub fn check_content(&mut self, path: &str, cx: &mut Context<Self>) {
         let path = PathBuf::from(path.trim());
         // Called on every redraw of the field, so stay quiet when nothing changes.
-        if !path.is_dir() {
+        let gma = self.tools.steam.gma();
+        if !gma || !path.is_dir() {
             if self.tools.steam.addon.take().is_some() {
                 cx.notify();
             }
