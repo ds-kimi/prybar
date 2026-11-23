@@ -38,6 +38,8 @@ pub struct Layout {
     pub model_name_len: usize,
     /// False when hitboxes are 32-byte records with no name offset.
     pub hitbox_named: bool,
+    /// 2531 stores decodable vertices in the MDL (triangles in VTX v107).
+    pub inline_vertices: bool,
 }
 
 /// v32-v37 share the header; v27-v31 slot an old hitbox pair in after the
@@ -92,6 +94,7 @@ const V37: Layout = Layout {
     model_stride: 140,
     model_name_len: 64,
     hitbox_named: true,
+    inline_vertices: false,
 };
 
 const V2531: Layout = Layout {
@@ -115,4 +118,5 @@ const V2531: Layout = Layout {
     model_stride: 224,
     model_name_len: 128,
     hitbox_named: false,
+    inline_vertices: true,
 };

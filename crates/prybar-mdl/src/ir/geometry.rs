@@ -7,7 +7,7 @@ pub struct Vertex {
     pub normal: Vec3,
     /// Texture coordinates as stored by Source (v grows downwards).
     pub uv: [f32; 2],
-    /// `(bone index, weight)`, at most three entries.
+    /// `(bone index, weight)`: at most three entries, four for MDL 2531.
     pub weights: Vec<(u8, f32)>,
 }
 

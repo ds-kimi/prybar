@@ -28,7 +28,7 @@ pub use goldsrc::{parse as parse_goldsrc, Companions};
 pub use header::Header;
 pub use inspect::{inspect, Summary};
 pub use ir::ModelIr;
-pub use mesh::load_geometry;
+pub use mesh::{load_geometry, load_triangles};
 pub use phy::parse_phy;
 pub use v44::parse as parse_v44;
 pub use v53::{embedded, Embedded};

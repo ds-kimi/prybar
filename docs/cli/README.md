@@ -35,7 +35,9 @@ Every GUI feature and its CLI and MCP counterparts: [parity](../agents/parity.md
   matches subfolders).
 
 Companions (`.vvd`, `.dx90.vtx`/`.vtx`/`.dx80.vtx`/`.sw.vtx`, `.phy`,
-`.ani`, GoldSrc `T.mdl` and `NN.mdl`) are read from the same place. A
+`.ani`, GoldSrc `T.mdl` and `NN.mdl`) are read from the same place.
+Vampire: Bloodlines (MDL 2531) keeps its vertices in the `.mdl` and needs
+only the `.dx80.vtx` (or `.dx7_2bone.vtx`) for triangles; there is no `.vvd`. A
 missing or broken companion becomes a `notes` entry; the model is still
 decompiled.
 

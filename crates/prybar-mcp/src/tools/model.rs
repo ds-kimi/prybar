@@ -28,7 +28,7 @@ impl Prybar {
     }
 
     #[tool(
-        description = "Decompile models to QC + SMD (+ VTA flexes, VRD procedural bones) source files; existing files of the same name in `out` are overwritten. Models are processed in parallel; one bad model does not stop the others. Returns counts, the first 50 results and the first 50 failures.",
+        description = "Decompile models to QC + SMD (+ VTA flexes, VRD procedural bones) source files; existing files of the same name in `out` are overwritten. Models are processed in parallel; one bad model does not stop the others. Companions (.vvd, .vtx, .phy, .ani) must sit next to each .mdl; Vampire: Bloodlines MDL 2531 has no .vvd and needs only its .dx80.vtx. Returns counts, the first 50 results and the first 50 failures.",
         annotations(
             destructive_hint = false,
             idempotent_hint = true,

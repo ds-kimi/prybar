@@ -19,6 +19,8 @@ pub fn load(origin: Origin, stem: &str) -> Result<ModelIr> {
     let mut ir = prybar_mdl::parse_with_ani(&mdl, ani.as_deref()).map_err(bad)?;
     if version.family != Family::SourceLegacy {
         geometry::attach(origin, stem, &mut ir);
+    } else if version.number == 2531 {
+        geometry::attach_v2531(origin, stem, &mut ir);
     }
     Ok(ir)
 }
