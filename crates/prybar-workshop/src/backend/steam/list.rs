@@ -38,7 +38,9 @@ fn page(client: &Client, app_id: u32, n: u32) -> Result<(Vec<ListedItem>, u32), 
     let query = client
         .ugc()
         .query_user(account, UserList::Published, UGCType::Items, order, ids, n)
-        .map_err(|e| WorkshopError::Steam(e.to_string()))?;
+        .map_err(|e| WorkshopError::Steam(e.to_string()))?
+        // The edit popup starts from the full text, not the 255-char cut.
+        .set_return_long_description(true);
     let (tx, rx) = channel();
     // QueryResults borrows Steam memory, so copy out inside the callback.
     query.fetch(move |res| {
@@ -57,6 +59,7 @@ fn listed(r: &QueryResults) -> Vec<ListedItem> {
     rows.map(|(i, q)| ListedItem {
         item_id: q.published_file_id.0,
         title: q.title,
+        description: q.description,
         tags: q.tags,
         time_updated: q.time_updated,
         time_created: q.time_created,
@@ -71,6 +74,9 @@ fn listed(r: &QueryResults) -> Vec<ListedItem> {
         votes_up: q.num_upvotes,
         votes_down: q.num_downvotes,
         preview_url: r.preview_url(i),
+        unique_subscriptions: stat(i, UGCStatisticType::UniqueSubscriptions),
+        views: stat(i, UGCStatisticType::UniqueWebsiteViews),
+        comments: stat(i, UGCStatisticType::Comments),
     })
     .collect()
 }

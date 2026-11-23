@@ -19,7 +19,7 @@ pub fn cached(url: &str, dir: &Path) -> Result<PathBuf, String> {
     if !url.starts_with("https://") {
         return Err("preview is not an https link".into());
     }
-    let bytes = download(url)?;
+    let bytes = download(url, MAX_BYTES)?;
     std::fs::create_dir_all(dir).map_err(|e| e.to_string())?;
     // Write aside then rename, so a crash never leaves half an image
     // that the next run would take for a cached one.
@@ -37,7 +37,8 @@ fn name(url: &str) -> String {
     format!("{:016x}.img", h.finish())
 }
 
-fn download(url: &str) -> Result<Vec<u8>, String> {
+/// A bounded https GET; `max` stops a hostile server from filling memory.
+pub(crate) fn download(url: &str, max: u64) -> Result<Vec<u8>, String> {
     let agent: ureq::Agent = ureq::Agent::config_builder()
         .timeout_global(Some(Duration::from_secs(20)))
         .user_agent(concat!("prybar/", env!("CARGO_PKG_VERSION")))
@@ -47,11 +48,11 @@ fn download(url: &str) -> Result<Vec<u8>, String> {
     let mut bytes = Vec::new();
     resp.into_body()
         .into_reader()
-        .take(MAX_BYTES + 1)
+        .take(max + 1)
         .read_to_end(&mut bytes)
         .map_err(|e| e.to_string())?;
-    if bytes.len() as u64 > MAX_BYTES {
-        return Err("preview is larger than 4 MB".into());
+    if bytes.len() as u64 > max {
+        return Err(format!("the answer is larger than {} KB", max >> 10));
     }
     Ok(bytes)
 }

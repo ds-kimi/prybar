@@ -55,6 +55,7 @@ pub(crate) fn item() -> ListedItem {
         votes_up: 9,
         votes_down: 1,
         preview_url: None,
+        ..Default::default()
     }
 }
 

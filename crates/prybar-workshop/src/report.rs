@@ -20,10 +20,11 @@ pub struct PublishReport {
     pub needs_legal_agreement: bool,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
+#[derive(Debug, Clone, Default, PartialEq, Eq, Serialize)]
 pub struct ListedItem {
     pub item_id: u64,
     pub title: String,
+    pub description: String,
     pub tags: Vec<String>,
     pub time_updated: u32,
     pub time_created: u32,
@@ -33,6 +34,10 @@ pub struct ListedItem {
     pub votes_up: u32,
     pub votes_down: u32,
     pub preview_url: Option<String>,
+    pub unique_subscriptions: u64,
+    /// Unique visitors of the Workshop page.
+    pub views: u64,
+    pub comments: u64,
 }
 
 /// Each state names the one thing the user must do next, so the UI can

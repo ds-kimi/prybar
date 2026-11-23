@@ -26,6 +26,7 @@ fn listed() -> Vec<ListedItem> {
             votes_up: i,
             votes_down: 250 - i,
             preview_url: None,
+            ..Default::default()
         })
         .collect();
     steam.list(GMOD_APP_ID).unwrap()
