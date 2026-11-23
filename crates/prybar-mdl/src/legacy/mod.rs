@@ -1,10 +1,12 @@
 //! MDL 2531 and v27-v37: the pre-release Source formats. They predate the
 //! VVD/VTX split and many of their structs are only partly known, so the
-//! parser recovers the skeleton, markers, materials and body part names,
-//! and lists everything else in [`ModelIr::notes`].
+//! parser recovers the skeleton, markers, materials and body part names
+//! (plus meshes and vertices for 2531), and lists everything else in
+//! [`ModelIr::notes`].
 
 mod body;
 mod bones;
+mod geometry;
 mod header;
 mod layout;
 mod markers;
@@ -27,6 +29,9 @@ pub fn parse(data: &[u8]) -> Result<ModelIr> {
     ir.skins = body::skins(&r, &hdr, &lay)?;
     ir.body_parts = body::body_parts(&r, &hdr, &lay)?;
     ir.notes = notes(&hdr, &lay);
+    if lay.inline_vertices {
+        geometry::attach(&r, &hdr, &lay, &mut ir)?;
+    }
     Ok(ir)
 }
 
@@ -53,7 +58,10 @@ fn base_ir(r: &Source, hdr: &LegacyHeader, lay: &Layout) -> Result<ModelIr> {
 /// Names each section the file has but the parser leaves out, so callers
 /// see exactly what a decompile of this version will be missing.
 fn notes(hdr: &LegacyHeader, lay: &Layout) -> Vec<String> {
-    let mut out = vec!["meshes: legacy vertex data is not decoded".to_string()];
+    let mut out = Vec::new();
+    if !lay.inline_vertices {
+        out.push("meshes: legacy vertex data is not decoded".to_string());
+    }
     let sections = [
         (lay.anims, "animations"),
         (lay.seqs, "sequences"),

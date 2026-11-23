@@ -1,8 +1,11 @@
 //! MDL 2531 and v27-v37 parsing on synthetic files.
 
 mod builder;
+mod geometry;
 mod hostile;
+mod inline;
 mod records;
+mod vtx107;
 
 use prybar_mdl::{detect, inspect, parse, Family};
 
@@ -25,7 +28,10 @@ fn check(version: i32) -> prybar_mdl::ModelIr {
     );
     assert_eq!(part.models[0].bounding_radius, 9.0);
     assert!(ir.notes.iter().any(|n| n.starts_with("animations: 3")));
-    assert!(ir.notes.iter().any(|n| n.starts_with("meshes")));
+    assert_eq!(
+        ir.notes.iter().any(|n| n.starts_with("meshes")),
+        version != 2531
+    );
     assert_eq!(inspect(&buf).unwrap().notes, ir.notes);
     ir
 }
