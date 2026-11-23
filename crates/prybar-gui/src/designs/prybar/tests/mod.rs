@@ -2,6 +2,7 @@ mod components;
 mod details;
 mod ime;
 mod input;
+mod layout;
 mod publish;
 mod shell;
 mod tips;

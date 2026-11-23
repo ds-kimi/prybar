@@ -11,6 +11,7 @@ mod run;
 mod screen;
 #[cfg(test)]
 pub(crate) mod tests;
+pub mod toast;
 pub mod tools;
 
 use std::path::PathBuf;
@@ -22,12 +23,6 @@ pub use tools::Tools;
 
 use gpui::Context;
 use prybar_service::model::DecompileReport;
-
-/// Oldest toasts drop off past this, so errors never pile up forever.
-const MAX_TOASTS: usize = 5;
-
-/// How long a confirmation toast stays on screen.
-const TOAST_LIFE: std::time::Duration = std::time::Duration::from_secs(4);
 
 #[derive(Default)]
 pub struct AppState {
@@ -86,31 +81,5 @@ impl AppState {
             self.screen = screen;
             cx.notify();
         }
-    }
-
-    pub fn toast(&mut self, kind: ToastKind, text: String, cx: &mut Context<Self>) {
-        self.next_id += 1;
-        self.toasts.push(Toast {
-            id: self.next_id,
-            kind,
-            text,
-        });
-        if self.toasts.len() > MAX_TOASTS {
-            self.toasts.remove(0);
-        }
-        // Confirmations fade on their own; errors stay until pushed out.
-        if kind == ToastKind::Info {
-            let id = self.next_id;
-            let timer = cx.background_executor().timer(TOAST_LIFE);
-            cx.spawn(async move |this, cx| {
-                timer.await;
-                let _ = this.update(cx, |s, cx| {
-                    s.toasts.retain(|t| t.id != id);
-                    cx.notify();
-                });
-            })
-            .detach();
-        }
-        cx.notify();
     }
 }

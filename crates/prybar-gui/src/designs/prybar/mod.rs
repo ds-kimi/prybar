@@ -8,7 +8,7 @@ pub(crate) mod tests;
 mod views;
 mod widgets;
 
-pub use views::{publish_popup, wanted, wanted_textures};
+pub use views::{publish_footer, publish_popup, wanted, wanted_textures};
 pub use widgets::{input, modal, select, Tipped};
 
 use gpui::{div, prelude::*, AnyElement, Context, Entity};
@@ -31,7 +31,7 @@ pub fn render(state: Entity<AppState>, f: &Forms, cx: &mut Context<Root>) -> Any
         .child(shell::bar(s, t, cx))
         .children(views::notice(s, t, cx))
         .child(views::screen(s, f, t, cx))
-        .child(shell::toasts::stack(s, t))
+        .child(shell::toasts::stack(s, t, cx))
         .children(s.palette.then(|| shell::palette::overlay(t, cx)))
         .into_any_element()
 }

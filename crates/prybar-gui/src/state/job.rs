@@ -26,4 +26,10 @@ pub struct Toast {
     pub id: u64,
     pub kind: ToastKind,
     pub text: String,
+    /// Sliding out; dropped from the list once the exit has played.
+    pub leaving: bool,
+    /// The pointer is on it, so its timer waits.
+    pub hovered: bool,
+    /// Bumped on every hover change so an older timer finds itself stale.
+    pub epoch: u32,
 }

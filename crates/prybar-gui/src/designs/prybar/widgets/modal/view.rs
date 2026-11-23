@@ -3,8 +3,8 @@
 use std::time::Duration;
 
 use gpui::{
-    div, ease_out_quint, prelude::*, px, relative, Animation, AnimationExt as _, Context,
-    FontWeight, MouseButton, Window,
+    div, ease_out_quint, prelude::*, Animation, AnimationExt as _, Context, FontWeight,
+    MouseButton, Pixels, Size, Window,
 };
 
 use super::super::tip::Tipped as _;
@@ -13,9 +13,9 @@ use super::Modal;
 use crate::theme::prybar::{tokens, Light, Tokens};
 
 impl Render for Modal {
-    fn render(&mut self, _: &mut Window, cx: &mut Context<Self>) -> impl IntoElement {
+    fn render(&mut self, window: &mut Window, cx: &mut Context<Self>) -> impl IntoElement {
         let t = tokens(cx.try_global::<Light>().is_some_and(|l| l.0));
-        let card = self.card(t, cx);
+        let card = self.card(window.viewport_size(), t, cx);
         let (from, to) = if self.closing { (1., 0.) } else { (0., 1.) };
         div()
             .id("pb-modal-backdrop")
@@ -46,8 +46,9 @@ impl Render for Modal {
 
 impl Modal {
     /// The body scrolls on its own so a small window never hides the
-    /// header and its close button.
-    fn card(&self, t: Tokens, cx: &mut Context<Self>) -> impl IntoElement {
+    /// header, its close button or the actions pinned at the bottom.
+    fn card(&self, window: Size<Pixels>, t: Tokens, cx: &mut Context<Self>) -> impl IntoElement {
+        let size = super::card_size(window);
         let body = div()
             .id("pb-modal-body")
             .flex_1()
@@ -61,21 +62,20 @@ impl Modal {
             .track_focus(&self.focus)
             .tab_group()
             .occlude()
-            .w(px(560.))
-            .max_w(relative(0.92))
-            .max_h(relative(0.86))
+            .w(size.width)
+            .max_h(size.height)
             .flex()
             .flex_col()
             .rounded_lg()
             .bg(t.raised)
             .border_1()
             .border_color(t.border)
-            .shadow_lg()
-            .on_mouse_down(MouseButton::Left, |_, _, cx| cx.stop_propagation());
+            .shadow_lg();
         Self::keys(card, cx)
             .child(self.header(t, cx))
             .children(self.confirming.then(|| self.confirm(t, cx)))
             .child(body)
+            .children(self.footer_bar(t))
     }
 
     fn header(&self, t: Tokens, cx: &mut Context<Self>) -> impl IntoElement {

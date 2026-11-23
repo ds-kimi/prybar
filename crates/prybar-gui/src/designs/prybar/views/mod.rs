@@ -15,7 +15,7 @@ use gpui::{div, prelude::*, AnyElement, Context};
 
 pub use preview::{wanted, wanted_textures};
 pub use privacy::notice;
-pub use publish::popup as publish_popup;
+pub use publish::{footer as publish_footer, popup as publish_popup};
 
 use super::motion;
 use super::widgets::Tipped as _;

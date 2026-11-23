@@ -2,8 +2,12 @@
 //! close button ask to close; with unsaved changes the popup asks first.
 //! Tab stays inside while it is open.
 
+mod footer;
 mod keys;
+mod size;
 mod view;
+
+pub use size::{card_size, wide};
 
 use std::rc::Rc;
 use std::time::Duration;
@@ -21,6 +25,8 @@ pub struct Closed;
 pub struct Modal {
     title: SharedString,
     body: AnyView,
+    /// Stays pinned under the scrolling body, so actions never scroll away.
+    footer: Option<AnyView>,
     focus: FocusHandle,
     /// Asked on every close request; `true` shows the discard prompt.
     dirty: Rc<dyn Fn(&App) -> bool>,
@@ -34,6 +40,7 @@ impl Modal {
     pub fn new(
         title: impl Into<SharedString>,
         body: AnyView,
+        footer: Option<AnyView>,
         dirty: impl Fn(&App) -> bool + 'static,
         cx: &mut App,
     ) -> Entity<Modal> {
@@ -41,6 +48,7 @@ impl Modal {
         cx.new(|cx| Modal {
             title,
             body,
+            footer,
             focus: cx.focus_handle(),
             dirty: Rc::new(dirty),
             confirming: false,

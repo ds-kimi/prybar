@@ -9,7 +9,7 @@ mod popup;
 mod result;
 mod steam;
 
-pub use popup::view as popup;
+pub use popup::{footer, view as popup};
 
 use gpui::{div, prelude::*, px, AnyElement, Context};
 

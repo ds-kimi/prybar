@@ -4,17 +4,16 @@
 use std::cell::RefCell;
 use std::path::PathBuf;
 
-use gpui::{div, img, prelude::*, px, AnyElement, Context, ObjectFit};
+use gpui::{div, prelude::*, AnyElement, Context};
 use prybar_workshop::preview::{describe, PreviewInfo};
 use prybar_workshop::ListedItem;
 
-use super::super::super::super::widgets::Tipped as _;
 use crate::app::{Forms, Root};
 use crate::state::tools::Thumb;
 use crate::state::AppState;
 use crate::theme::prybar::Tokens;
 
-fn line(text: String, bad: bool, t: Tokens) -> gpui::Div {
+pub(super) fn line(text: String, bad: bool, t: Tokens) -> gpui::Div {
     div()
         .text_xs()
         .text_color(if bad { t.danger } else { t.muted })
@@ -27,10 +26,12 @@ thread_local! {
     static LAST: RefCell<Option<(PathBuf, Result<PreviewInfo, String>)>> = const { RefCell::new(None) };
 }
 
+/// In its own column the notes go under the square; stacked, beside it.
 pub fn view(
     s: &AppState,
     f: &Forms,
     editing: Option<&ListedItem>,
+    wide: bool,
     t: Tokens,
     cx: &Context<Root>,
 ) -> AnyElement {
@@ -42,61 +43,28 @@ pub fn view(
     let shown = (!typed.is_empty())
         .then(|| PathBuf::from(&typed))
         .or(current);
-    let lines = match typed.is_empty() {
-        true => vec![line(
-            if editing.is_some() { KEEP } else { NONE }.into(),
-            false,
-            t,
-        )],
-        false => about(&PathBuf::from(&typed), t),
-    };
+    let lines = about(&typed, editing.is_some(), t);
+    let notes = div().flex_1().min_w_0().flex().flex_col().gap_1();
     div()
         .flex()
+        .when(wide, |el| el.flex_col())
         .gap_3()
-        .child(frame(shown, f, t, cx))
-        .child(div().flex().flex_col().gap_1().children(lines))
+        .child(super::frame::frame(shown, f, wide, t, cx))
+        .child(notes.children(lines))
         .into_any_element()
 }
 
-/// The square itself; a click picks another file.
-fn frame(shown: Option<PathBuf>, f: &Forms, t: Tokens, cx: &Context<Root>) -> impl IntoElement {
-    let target = f.publish.preview.clone();
-    let inner = match shown {
-        Some(p) => img(p)
-            .size_full()
-            .object_fit(ObjectFit::Cover)
-            .into_any_element(),
-        None => line("Click to pick".into(), false, t)
-            .size_full()
-            .flex()
-            .items_center()
-            .justify_center()
-            .into_any_element(),
-    };
-    div()
-        .id("pb-pub-picture")
-        .debug_selector(|| "pb-pub-picture".into())
-        .size(px(160.))
-        .flex_none()
-        .rounded_md()
-        .overflow_hidden()
-        .border_1()
-        .border_color(t.border)
-        .bg(t.active)
-        .cursor_pointer()
-        .hover(move |s| s.border_color(t.rust))
-        .tip(PICK, t)
-        .on_click(cx.listener(move |this, _, _, cx| this.pick_into(target.clone(), false, cx)))
-        .child(inner)
-}
-
-const PICK: &str = "Click to pick an image. The Workshop shows it as this square.";
 const KEEP: &str = "Steam shows a 512×512 square under 1 MB. The current image stays.";
 const NONE: &str =
     "Steam shows a 512×512 square under 1 MB. No image yet: Steam shows a grey tile.";
 
-/// Size, what Steam will get, and why it cannot be sent when it cannot.
-fn about(path: &PathBuf, t: Tokens) -> Vec<gpui::Div> {
+/// Size, what Steam will get, and why it cannot be sent when it cannot;
+/// with no file picked, what happens without one.
+fn about(typed: &str, editing: bool, t: Tokens) -> Vec<gpui::Div> {
+    if typed.is_empty() {
+        return vec![line(if editing { KEEP } else { NONE }.into(), false, t)];
+    }
+    let path = &PathBuf::from(typed);
     let info = LAST.with_borrow_mut(|last| {
         if last.as_ref().is_none_or(|(p, _)| p != path) {
             *last = Some((path.clone(), describe(path)));

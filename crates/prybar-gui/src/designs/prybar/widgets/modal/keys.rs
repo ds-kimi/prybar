@@ -1,6 +1,6 @@
 //! Keys inside the popup: Escape asks to close, Tab cycles its own fields.
 
-use gpui::{prelude::*, Context, Div, Stateful, Window};
+use gpui::{prelude::*, Context, Div, MouseButton, Stateful, Window};
 
 use super::Modal;
 use crate::actions::{Back, FocusNext, FocusPrev};
@@ -9,9 +9,11 @@ use crate::actions::{Back, FocusNext, FocusPrev};
 const MAX_STEPS: usize = 256;
 
 impl Modal {
-    /// Escape is the app's Back key; inside the popup it means close.
+    /// Escape is the app's Back key; inside the popup it means close. A
+    /// click inside never reaches the backdrop, which would close it.
     pub(super) fn keys(el: Stateful<Div>, cx: &mut Context<Self>) -> Stateful<Div> {
-        el.on_action(cx.listener(|this, _: &Back, _, cx| this.request_close(cx)))
+        el.on_mouse_down(MouseButton::Left, |_, _, cx| cx.stop_propagation())
+            .on_action(cx.listener(|this, _: &Back, _, cx| this.request_close(cx)))
             .on_action(cx.listener(|this, _: &FocusNext, w, cx| this.cycle(false, w, cx)))
             .on_action(cx.listener(|this, _: &FocusPrev, w, cx| this.cycle(true, w, cx)))
     }

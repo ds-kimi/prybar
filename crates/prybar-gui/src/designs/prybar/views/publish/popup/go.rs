@@ -1,4 +1,4 @@
-use gpui::{div, prelude::*, Context};
+use gpui::{div, prelude::*, AnyElement, Context};
 use prybar_workshop::ListedItem;
 
 use super::super::super::super::widgets::Tipped as _;
@@ -7,9 +7,21 @@ use crate::app::{Forms, Root};
 use crate::state::AppState;
 use crate::theme::prybar::Tokens;
 
+/// The last run's outcome sits right above the actions that start one,
+/// pinned under the scrolling form.
+pub fn footer(s: &AppState, f: &Forms, editing: bool, t: Tokens, cx: &Context<Root>) -> AnyElement {
+    div()
+        .flex()
+        .flex_col()
+        .gap_3()
+        .child(super::super::result::view(s, t, cx))
+        .child(buttons(s, f, editing, t, cx))
+        .into_any_element()
+}
+
 /// Both wait for a clean form and for the run in flight. An edit sends
 /// only the fields that differ from the item as listed.
-pub fn buttons(
+fn buttons(
     s: &AppState,
     f: &Forms,
     editing: bool,

@@ -42,7 +42,7 @@ fn open(cx: &mut VisualTestContext, dirty: bool) -> gpui::Entity<Modal> {
     let input = forms(cx).out;
     cx.update(|w, cx| {
         let body = input.clone().into();
-        let modal = Modal::new("Edit", body, move |_| dirty, cx);
+        let modal = Modal::new("Edit", body, None, move |_| dirty, cx);
         root.update(cx, |r, cx| r.show_modal(modal.clone(), w, cx));
         modal
     })
