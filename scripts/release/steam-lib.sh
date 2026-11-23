@@ -6,7 +6,7 @@
 set -eu
 target="$1"
 shift
-lib=$(find "target/$target/release/build" -path '*steamworks-sys-*/out/*' \
+lib=$(find "target/$target/release/build" -path '*steamworks-sys*/out/*' \
   \( -name libsteam_api.dylib -o -name libsteam_api.so -o -name steam_api64.dll \) | head -n 1)
 if [ -z "$lib" ]; then
   echo "steam-lib: no Steam API library under target/$target/release/build" >&2
