@@ -88,6 +88,8 @@ pub(super) fn field(
         multiline,
         text: text.to_owned(),
         check,
+        rows: (4, 8),
+        markup: false,
     };
     cx.new(|cx| TextInput::new(spec, cx))
 }

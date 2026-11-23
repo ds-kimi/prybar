@@ -22,7 +22,7 @@ impl TextInput {
             cx.stop_propagation();
             return window.show_character_palette();
         }
-        if self.clipboard(k, cx) {
+        if self.clipboard(k, cx) || self.shortcut(k, cx) {
             cx.stop_propagation();
             return;
         }
@@ -35,7 +35,9 @@ impl TextInput {
             return;
         };
         cx.stop_propagation();
-        self.edit(op, cx);
+        if !self.by_row(&op, window, cx) {
+            self.edit(op, cx);
+        }
     }
 
     fn clipboard(&mut self, k: &Keystroke, cx: &mut Context<Self>) -> bool {

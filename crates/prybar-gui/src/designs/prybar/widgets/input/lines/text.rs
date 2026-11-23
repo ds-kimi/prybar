@@ -7,11 +7,13 @@ use std::rc::Rc;
 use std::time::Duration;
 
 use gpui::{
-    canvas, div, prelude::*, px, Animation, AnimationExt as _, AnyElement, Bounds, Canvas, Div,
-    ElementInputHandler, Entity, FocusHandle, Pixels, Rgba,
+    canvas, div, prelude::*, px, Animation, AnimationExt as _, AnyElement, Bounds, Canvas, Context,
+    Div, ElementInputHandler, Entity, FocusHandle, Pixels, Rgba, Window,
 };
 
-use super::{TextInput, LINE};
+use super::super::buffer::Op;
+use super::super::step::Dir;
+use super::super::{TextInput, LINE};
 use crate::theme::prybar::Tokens;
 
 /// What one row needs to know about the field around it.
@@ -82,9 +84,37 @@ pub fn probe(
     field: Entity<TextInput>,
 ) -> Canvas<()> {
     canvas(
-        move |b, _, _| bounds.set(Some(b)),
+        move |b, window, _| {
+            // A new width rewraps the text, which the frame already
+            // drawn did not know; draw once more with it.
+            let old = bounds.replace(Some(b)).map(|o| o.size.width);
+            if old != Some(b.size.width) {
+                window.on_next_frame(|window, _| window.refresh());
+            }
+        },
         move |b, _, window, cx| {
             window.handle_input(&focus, ElementInputHandler::new(b, field), cx);
         },
     )
+}
+
+impl TextInput {
+    /// Up and down in a multi-line field follow the drawn rows, which
+    /// only the view knows; true when the move was made here.
+    pub(in super::super) fn by_row(
+        &mut self,
+        op: &Op,
+        window: &Window,
+        cx: &mut Context<Self>,
+    ) -> bool {
+        let Op::Move(d @ (Dir::Up | Dir::Down), select) = op else {
+            return false;
+        };
+        if !self.spec.multiline {
+            return false;
+        }
+        self.vertical(*d == Dir::Up, *select, window);
+        cx.notify();
+        true
+    }
 }

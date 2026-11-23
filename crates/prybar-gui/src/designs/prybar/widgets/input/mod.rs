@@ -7,11 +7,12 @@ mod buffer;
 mod edit;
 mod ime;
 mod keys;
+mod lines;
+mod markup;
 mod mouse;
 mod step;
 #[cfg(test)]
 mod tests;
-mod text;
 mod view;
 
 use std::{cell::Cell, ops::Range, rc::Rc};
@@ -31,6 +32,9 @@ pub enum InputEvent {
     Changed,
     /// Enter in a one-line field.
     Submit,
+    /// Mod-b, mod-i, mod-u or mod-k in a field that takes markup; the
+    /// owner knows which tags they mean.
+    Format(&'static str),
 }
 
 /// How a field starts: hint, kind and the rule its text must follow.
@@ -40,6 +44,10 @@ pub struct Spec {
     pub text: String,
     /// A plain message when the text is not usable, `None` when it is.
     pub check: fn(&str) -> Option<&'static str>,
+    /// Least and most rows a multi-line field shows before it scrolls.
+    pub rows: (usize, usize),
+    /// Formatting shortcuts go to the owner as [`InputEvent::Format`].
+    pub markup: bool,
 }
 
 pub struct TextInput {
@@ -53,6 +61,11 @@ pub struct TextInput {
     marked: Option<Range<usize>>,
     /// How far a one-line field is slid left to keep the caret in view.
     scroll: Pixels,
+    /// How far a multi-line field is scrolled down, and how far it can be.
+    vscroll: Pixels,
+    vmax: Pixels,
+    /// Caret and length when the caret was last brought into view.
+    followed: (usize, usize),
     /// Errors wait for the first edit, so a fresh form is not all red.
     touched: bool,
 }
@@ -71,6 +84,9 @@ impl TextInput {
             dragging: false,
             marked: None,
             scroll: px(0.),
+            vscroll: px(0.),
+            vmax: px(0.),
+            followed: (usize::MAX, 0),
             touched: false,
         }
     }

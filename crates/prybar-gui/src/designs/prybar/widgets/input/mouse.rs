@@ -6,20 +6,20 @@ use gpui::{Context, MouseDownEvent, MouseMoveEvent, MouseUpEvent, Pixels, Point,
 use super::{TextInput, LINE};
 
 impl TextInput {
-    /// The text offset under a window position, by shaping the line
+    /// The text offset under a window position, by shaping the row
     /// under it the way it is drawn.
     pub(super) fn index_at(&self, p: Point<Pixels>, window: &Window) -> usize {
         let text = &self.buf.text;
         let Some(b) = self.bounds.get() else {
             return text.len();
         };
-        let lines: Vec<&str> = text.split('\n').collect();
-        let row = ((p.y - b.origin.y) / LINE).floor().max(0.) as usize;
-        let row = row.min(lines.len().saturating_sub(1));
-        let start: usize = lines[..row].iter().map(|l| l.len() + 1).sum();
-        let line = lines.get(row).copied().unwrap_or("");
-        let shaped = self.shape(line, window);
-        start + shaped.closest_index_for_x(p.x - b.origin.x + self.scroll)
+        let rows = self.rows(window);
+        let row = ((p.y - b.origin.y + self.vscroll) / LINE).floor().max(0.) as usize;
+        let Some(r) = rows.get(row).or(rows.last()) else {
+            return text.len();
+        };
+        let shaped = self.shape(&text[r.clone()], window);
+        r.start + shaped.closest_index_for_x(p.x - b.origin.x + self.scroll)
     }
 
     pub(super) fn on_down(

@@ -176,13 +176,13 @@ impl EntityInputHandler for TextInput {
         _: &mut Context<Self>,
     ) -> Option<Bounds<Pixels>> {
         let r = self.bytes(&r);
-        let t = &self.buf.text;
-        let start = t[..r.start].rfind('\n').map_or(0, |i| i + 1);
-        let end = t[start..].find('\n').map_or(t.len(), |i| start + i);
-        let row = t[..start].matches('\n').count() as f32;
-        let shaped = self.shape(&t[start..end], window);
-        let x = |at: usize| b.left() + shaped.x_for_index(at.min(end) - start) - self.scroll;
-        let top = b.top() + LINE * row;
+        let rows = self.rows(window);
+        let row = super::lines::row_of(&rows, r.start);
+        let line = rows.get(row).cloned().unwrap_or(0..0);
+        let shaped = self.shape(&self.buf.text[line.clone()], window);
+        let at = |i: usize| i.clamp(line.start, line.end) - line.start;
+        let x = |i: usize| b.left() + shaped.x_for_index(at(i)) - self.scroll;
+        let top = b.top() + LINE * row as f32 - self.vscroll;
         Some(Bounds::from_corners(
             point(x(r.start), top),
             point(x(r.end), top + LINE),

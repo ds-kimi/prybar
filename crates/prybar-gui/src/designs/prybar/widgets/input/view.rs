@@ -1,12 +1,16 @@
 //! Drawing a field: the box with its hover, focus and error states, the
 //! text or the hint, and the error line under it.
 
+use std::ops::Range;
+
 use gpui::{
-    div, prelude::*, px, App, Context, Div, FocusHandle, Focusable, MouseButton, Stateful, Window,
+    div, prelude::*, App, Context, Div, FocusHandle, Focusable, MouseButton, Stateful, Window,
 };
 
-use super::text::{caret, probe, row, Marks};
-use super::{TextInput, FONT, LINE};
+use super::lines::row_of;
+use super::lines::text::{caret, probe, row, Marks};
+use super::{InputEvent, TextInput, FONT, LINE};
+use crate::actions::FormatLink;
 use crate::theme::prybar::{tokens, Light, Tokens};
 
 impl Render for TextInput {
@@ -15,12 +19,16 @@ impl Render for TextInput {
         let focused = self.focus.is_focused(window);
         let error = self.error().filter(|_| self.touched);
         self.follow_caret(window);
+        let rows = self.rows(window);
+        let shown = self.spec.multiline.then(|| self.follow_rows(&rows));
         let probe = probe(self.bounds.clone(), self.focus.clone(), cx.entity());
-        let lines = self.lines(focused, t).relative().left(-self.scroll);
+        let lines = self.lines(focused, &rows, t).relative();
+        let lines = lines.left(-self.scroll).top(-self.vscroll);
         let text = div()
             .relative()
             .flex_1()
             .min_w_0()
+            .when_some(shown, |el, h| el.h(h).overflow_hidden())
             .child(probe.absolute().size_full())
             .child(lines);
         let field = self.frame(error.is_some(), t, cx).child(text);
@@ -47,7 +55,8 @@ impl TextInput {
         div()
             .id("input")
             .track_focus(&self.focus)
-            .key_context("TextInput")
+            .key_context(["TextInput", "TextInput Markup"][self.spec.markup as usize])
+            .on_action(cx.listener(|_, _: &FormatLink, _, cx| cx.emit(InputEvent::Format("k"))))
             .px_2()
             .py_1p5()
             .flex()
@@ -60,7 +69,7 @@ impl TextInput {
             .line_height(LINE)
             .cursor_text()
             .when(self.spec.multiline, |el| {
-                el.min_h(px(96.)).overflow_y_scroll()
+                el.on_scroll(cx.listener(Self::on_wheel))
             })
             .hover(move |s| s.border_color(t.muted))
             .focus(move |s| s.border_color(t.rust))
@@ -70,8 +79,9 @@ impl TextInput {
             .on_key_down(cx.listener(Self::on_key))
     }
 
-    /// One row per line; an empty field shows its hint after the caret.
-    fn lines(&self, focused: bool, t: Tokens) -> Div {
+    /// One element per drawn row; an empty field shows its hint after
+    /// the caret, which is drawn on one row only even at a wrap point.
+    fn lines(&self, focused: bool, rows: &[Range<usize>], t: Tokens) -> Div {
         let text = &self.buf.text;
         if text.is_empty() {
             let hint = div().text_color(t.muted).child(self.spec.placeholder);
@@ -82,18 +92,15 @@ impl TextInput {
                 .when(focused, |el| el.child(caret(t)))
                 .child(hint);
         }
-        let marks = Marks {
-            sel: self.buf.range(),
-            marked: self.marked.clone(),
-            head: focused.then_some(self.buf.head),
-        };
-        let mut start = 0;
-        let mut rows = Vec::new();
-        for line in text.split('\n') {
-            let end = start + line.len();
-            rows.push(row(text, start..end, &marks, t));
-            start = end + 1;
-        }
-        div().flex().flex_col().children(rows)
+        let at = row_of(rows, self.buf.head);
+        let drawn = rows.iter().enumerate().map(|(i, r)| {
+            let marks = Marks {
+                sel: self.buf.range(),
+                marked: self.marked.clone(),
+                head: (focused && i == at).then_some(self.buf.head),
+            };
+            row(text, r.clone(), &marks, t)
+        });
+        div().flex().flex_col().children(drawn)
     }
 }
