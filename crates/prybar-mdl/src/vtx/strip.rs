@@ -1,34 +1,36 @@
+use super::shape::{int, Shape};
 use crate::read::{table, Source};
 use crate::{Error, Result};
 
-/// Packed `StripGroupHeader_t` as written for v44-v49 (no topology fields).
-const GROUP_STRIDE: usize = 25;
-const STRIP_STRIDE: usize = 27;
-/// Packed `Vertex_t`; the mesh-relative VVD id sits at byte 4.
-const VERT_STRIDE: usize = 9;
 const STRIP_IS_TRISTRIP: u8 = 2;
 
-pub fn mesh_triangles(r: &Source, at: usize) -> Result<Vec<[u16; 3]>> {
+/// `groups` is the mesh's `(strip group count, offset)` pair.
+pub fn mesh_triangles(
+    r: &Source,
+    at: usize,
+    groups: (i32, i32),
+    sh: &Shape,
+) -> Result<Vec<[u16; 3]>> {
     let mut out = Vec::new();
-    for g in table(r, at, r.read(at)?, r.read(at + 4)?, GROUP_STRIDE)? {
-        group(r, g, &mut out)?;
+    for g in table(r, at, groups.0, groups.1, sh.group_stride)? {
+        group(r, g, sh, &mut out)?;
     }
     Ok(out)
 }
 
-fn group(r: &Source, at: usize, out: &mut Vec<[u16; 3]>) -> Result<()> {
-    let verts = table(r, at, r.read(at)?, r.read(at + 4)?, VERT_STRIDE)?
-        .into_iter()
-        .map(|v| r.read::<u16>(v + 4))
-        .collect::<prybar_io::Result<Vec<u16>>>()?;
-    let index_at = table(r, at, r.read(at + 8)?, r.read(at + 12)?, 2)?;
+fn group(r: &Source, at: usize, sh: &Shape, out: &mut Vec<[u16; 3]>) -> Result<()> {
+    let [vc, vo, ic, io, sc, so, _] = sh.group;
+    let verts = verts(r, at, sh, (int(r, at + vc, sh.narrow)?, r.read(at + vo)?))?;
+    let index_at = table(r, at, int(r, at + ic, sh.narrow)?, r.read(at + io)?, 2)?;
     let indices: Vec<u16> = index_at
         .iter()
         .map(|&i| r.read(i))
         .collect::<prybar_io::Result<_>>()?;
-    for s in table(r, at, r.read(at + 16)?, r.read(at + 20)?, STRIP_STRIDE)? {
-        let first = usize::try_from(r.read::<i32>(s + 4)?).unwrap_or(usize::MAX);
-        let count = usize::try_from(r.read::<i32>(s)?).unwrap_or(usize::MAX);
+    let [count_at, first_at, flags_at] = sh.strip;
+    let strips = (int(r, at + sc, sh.narrow)?, r.read(at + so)?);
+    for s in table(r, at, strips.0, strips.1, sh.strip_stride)? {
+        let first = usize::try_from(int(r, s + first_at, sh.narrow)?).unwrap_or(usize::MAX);
+        let count = usize::try_from(int(r, s + count_at, sh.narrow)?).unwrap_or(usize::MAX);
         let slice = first
             .checked_add(count)
             .and_then(|end| indices.get(first..end))
@@ -38,10 +40,24 @@ fn group(r: &Source, at: usize, out: &mut Vec<[u16; 3]>) -> Result<()> {
             })?;
         // Strips may share index ranges, so emitted triangles are charged too.
         r.charge(slice.len() * 6)?;
-        let strip = r.read::<u8>(s + 18)? & STRIP_IS_TRISTRIP != 0;
+        let strip = r.read::<u8>(s + flags_at)? & STRIP_IS_TRISTRIP != 0;
         emit(slice, strip, &verts, out)?;
     }
     Ok(())
+}
+
+/// Mesh-relative vertex ids of a group; static-prop groups store them bare.
+fn verts(r: &Source, at: usize, sh: &Shape, span: (i32, i32)) -> Result<Vec<u16>> {
+    let flags: u8 = r.read(at + sh.group[6])?;
+    let (stride, id) = if sh.static_flag != 0 && flags & sh.static_flag != 0 {
+        (2, 0)
+    } else {
+        (sh.vert_stride, sh.vert_id)
+    };
+    Ok(table(r, at, span.0, span.1, stride)?
+        .into_iter()
+        .map(|v| r.read::<u16>(v + id))
+        .collect::<prybar_io::Result<Vec<u16>>>()?)
 }
 
 /// VTX winds clockwise and SMD counter-clockwise, so each triangle is

@@ -1,6 +1,7 @@
-//! VTX (optimized model, version 7): per-LOD triangle lists that index
-//! into the VVD vertices of each mesh.
+//! VTX (optimized model, version 7, and 107 for MDL 2531): per-LOD
+//! triangle lists that index into the vertices of each mesh.
 
+mod shape;
 mod strip;
 mod tree;
 
@@ -23,11 +24,17 @@ pub struct Vtx {
 
 pub fn parse_vtx(data: &[u8]) -> Result<Vtx> {
     let r = Source::new(data);
+    // 107 is the only other version known; anything else reads as 7, as before.
+    let sh = if r.read::<i32>(0)? == 107 {
+        shape::V107
+    } else {
+        shape::V7
+    };
     let checksum = r.read(16)?;
     let parts = table(&r, 0, r.read(28)?, r.read(32)?, 8)?;
     let body_parts = parts
         .into_iter()
-        .map(|at| tree::body_part(&r, at))
+        .map(|at| tree::body_part(&r, at, &sh))
         .collect::<Result<_>>()?;
     Ok(Vtx {
         checksum,
