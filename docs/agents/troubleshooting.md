@@ -50,3 +50,11 @@ Read the returned log. Frequent causes:
 - MCP: call `check_update`; tell the user to run `prybar self-update`
   and restart the MCP server.
 
+
+## Workshop history is empty (`history_error`)
+
+`workshop item` / `workshop_item` read the version history from the public changelog page, which Steam rate-limits hard. A failed read keeps the item and fills `history_error`; an older cached copy is returned with `history_stale: true`. Wait a minute and retry. The `stats` points grow by one per day an item list is read (from the app, `workshop items` or `workshop_item`); a fresh machine starts with one.
+
+## Texture not found (`texture --material`)
+
+The material is looked up like the engine: the model's own tree (folder above `models/`), its package, then every configured game folder and its VPKs. Run `games --detect --save` so the game's VPKs are searched, or pass the `.vtf` file directly.

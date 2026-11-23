@@ -13,6 +13,11 @@ prybar --json pack <dir> -o <out.vpk|out.gma>
 prybar --json games [--detect --save]
 prybar --json compile <file.qc> -g <game>
 prybar publish <spec.json> --dry-run
+prybar --json workshop items <game> [--search T] [--sort subscribed]
+prybar --json workshop item <game> <id>
+prybar --json workshop bbcode <desc.txt>
+prybar --json texture <file.vtf> -o <out.png>
+prybar --json privacy
 ```
 
 - `--json` gives one JSON document on stdout; progress goes to stderr.
@@ -21,7 +26,7 @@ prybar publish <spec.json> --dry-run
 - Keep companions (`.vvd`, `.vtx`, `.phy`, `.ani`) next to the `.mdl`.
 - Do not commit or redistribute decompiled game assets.
 
-Docs for agents: `docs/agents/usecases.md` (recipes), `docs/agents/errors.md` (every error and fix), `docs/agents/troubleshooting.md`. Claude Code skill: `plugins/prybar/skills/prybar/SKILL.md`.
+Docs for agents: `docs/agents/usecases.md` (recipes), `docs/agents/parity.md` (GUI/CLI/MCP feature table), `docs/agents/errors.md` (every error and fix), `docs/agents/troubleshooting.md`. Claude Code skill: `plugins/prybar/skills/prybar/SKILL.md`.
 
 ## Working on the repo
 

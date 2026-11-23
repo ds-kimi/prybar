@@ -29,7 +29,7 @@ impl Default for Prybar {
     }
 }
 
-const INSTRUCTIONS: &str = "Source engine modding tools. Decompile MDL models (versions 4 to 53) to QC/SMD/VTA/VRD, list/unpack/pack VPK and GMA packages, list/unpack APK and HFS, compile with studiomdl, view with hlmv, publish to the Steam Workshop. Every path must be absolute. A model inside a package is written `<absolute package path>:<inner path>`, e.g. `C:/game/pak01_dir.vpk:models/props/crate.mdl`. Results are JSON; failures carry `error`, `kind` and the CLI exit `code`. Configure games with games_list (detect=true) or config_set before compile_model or view_model.";
+const INSTRUCTIONS: &str = "Source engine modding tools. Decompile MDL models (versions 4 to 53) to QC/SMD/VTA/VRD, list/unpack/pack VPK and GMA packages, list/unpack APK and HFS, compile with studiomdl, view with hlmv, publish to the Steam Workshop (list, search and inspect your items, check previews and BBCode descriptions), decode VTF textures to PNG, read or change the desktop app's analytics choice. Every path must be absolute. A model inside a package is written `<absolute package path>:<inner path>`, e.g. `C:/game/pak01_dir.vpk:models/props/crate.mdl`. Results are JSON; failures carry `error`, `kind` and the CLI exit `code`. Write tools that publish or change settings need `confirm: true`: ask the user first. Configure games with games_list (detect=true) or config_set before compile_model or view_model.";
 
 #[tool_handler(router = self.tool_router)]
 impl ServerHandler for Prybar {

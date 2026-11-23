@@ -14,9 +14,17 @@ prybar [--json] [--quiet] <command> [args]
 | `compile <qc> -g <game>` | studiomdl of the configured game |
 | `view <mdl> -g <game>` | hlmv of the configured game, detached |
 | `publish <spec.json> [--dry-run] [--game <game>]` / `publish --list <game>` / `publish --status <game>` / `publish --games` | Steam Workshop create/update (needs `--features workshop`). `<game>` is `garrysmod`, `tf2` or the app id; `--games` lists supported games, the installed ones and why others are unsupported ([workshop-games](../workshop-games.md)) |
+| `workshop items <game> [-s <text>] [--sort <key>] [--reverse] [--visibility <v>] [--tag <t>]` | Your items, searched and sorted like the app's list; sort keys `subscribed`, `rated`, `favorited`, `updated` (default), `newest`, `title`; visibility `public`, `friendsonly`, `private`, `unlisted` |
+| `workshop item <game> <id>` | One item: fields, stats, daily stats points, version history from the changelog page |
+| `workshop preview <image>` | Preview check: size, 512x512 crop, refusal reason |
+| `workshop bbcode <file\|->` | BBCode description check: length (max 7999), tags used, plain text |
+| `texture <file.vtf> -o <out.png> [--level <n>]` / `texture <model> --material <name> -o <out.png>` | Decode a VTF to PNG; with `--material` it is found like the engine does (model tree, package, configured games) |
+| `privacy [--on\|--off] [--clear-log]` | The desktop app's analytics choice and its log of sent data (the CLI itself sends nothing) |
 | `games [--detect] [--save]` | Configured games; detect Steam installs |
 | `version [--check]` | Version; `--check` gives `{current, latest, update_available}` (`latest` is `null` offline) |
 | `self-update` | Download, verify (SHA256SUMS + minisign) and install the latest release; `{current, latest, action, detail}` with `action` `up_to_date`, `installed` or `manual` (command or link in `detail`) |
+
+Every GUI feature and its CLI and MCP counterparts: [parity](../agents/parity.md).
 
 ## Model inputs
 

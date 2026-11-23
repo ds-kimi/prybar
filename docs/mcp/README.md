@@ -24,7 +24,16 @@ shared `prybar-service` crate.
 | `games_list` | configured games, `detect` Steam installs, `save` |
 | `config_get` | config path + games |
 | `config_set` | add/replace/remove one game (name, game_dir, packer) |
+| `workshop_status` | `{game}`: Steam running, signed in, game owned; `state` names what to fix |
+| `workshop_items` | your items for a game; `search`, `sort` (`subscribed`, `rated`, `favorited`, `updated`, `newest`, `title`), `reverse`, `visibility` (`public`, `friendsonly`, `private`, `unlisted`), `tag`; returns `total`, `tags`, `items` |
+| `workshop_item` | one item: fields, stats, `url`, daily `stats` points, version `history` (cached a day; `history_error` on rate limit) |
+| `check_preview` | preview image: size, bytes, `resized` (512x512 center crop), `problem` (over 32 MB, GIF of 1 MB or more) |
+| `check_bbcode` | Steam BBCode description: `chars` vs 7999, `tags` used, `plain` text |
+| `decode_texture` | `.vtf` file, or a model's `material`, to PNG (`level` = mip) |
+| `privacy` | desktop app analytics choice and sent-data log; `set`, `clear_log` need `confirm: true` |
 | `check_update` | `{current, latest, update_available, command}`; never installs (the user runs `prybar self-update`) |
+
+Every GUI feature and its CLI and MCP counterparts: [parity](../agents/parity.md).
 
 Agent-facing reference (errors, recipes, troubleshooting): `docs/agents/`. Client snippets: `docs/agents/mcp-config.md`.
 
@@ -39,6 +48,9 @@ Agent-facing reference (errors, recipes, troubleshooting): `docs/agents/`. Clien
   `\?\UNC\...`, `\.\pipe\...`) are refused: opening one leaks NTLM
   credentials.
 - Workshop spec `preview` and `content` paths must be absolute too.
+- Write tools that change what others see or the user's settings
+  (`publish_workshop` without `dry_run`, `privacy` with `set` or
+  `clear_log`) need `confirm: true`.
 - `config_set` cannot set `studiomdl` or `hlmv` (unknown fields are
   refused). `compile_model`/`view_model` run those paths and
   `unpack_package` can write files anywhere, so a prompt-injected agent

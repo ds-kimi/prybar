@@ -12,7 +12,10 @@ Source engine modding toolkit: CLI `prybar` and MCP server `prybar-mcp`. Prefer 
 - Turn a `.mdl` (+ `.vvd`, `.vtx`, `.phy`, `.ani`) into editable QC, SMD, VTA, VRD.
 - List, extract or build `.vpk` / `.gma` packages; read `.apk` and `.hfs`.
 - Compile a QC with the game's studiomdl; open a model in hlmv.
-- Publish or update a Steam Workshop item.
+- Publish or update a Steam Workshop item; list, search and sort your items, read an item's stats and version history.
+- Check a preview image or a BBCode description before upload.
+- Decode a VTF texture (file or a model's material) to PNG.
+- Read or change the desktop app's analytics choice and see what it sent.
 
 ## Workflow
 
@@ -23,7 +26,9 @@ Source engine modding toolkit: CLI `prybar` and MCP server `prybar-mcp`. Prefer 
 5. `pack` the addon folder to `.gma` (needs `addon.json`) or `.vpk`.
 6. `publish --dry-run`, then `publish`. Supported Workshop games: `garrysmod` (4000, addon folder or .gma) and `tf2` (440, map folder with a .bsp); pick with `--game`, list with `publish --games`. Descriptions are Steam BBCode.
 
-Recipes with exact calls: `docs/agents/usecases.md`.
+Workshop helpers: `workshop items <game> [--search --sort --reverse --visibility --tag]`, `workshop item <game> <id>`, `workshop preview <image>`, `workshop bbcode <file|->` (MCP `workshop_items`, `workshop_item`, `check_preview`, `check_bbcode`, `workshop_status`). Textures: `texture <vtf> -o out.png` or `texture <model> --material <name> -o out.png` (MCP `decode_texture`). Privacy: `privacy [--on|--off] [--clear-log]` (MCP `privacy`, `confirm: true` to change).
+
+Recipes with exact calls: `docs/agents/usecases.md`. GUI/CLI/MCP feature table: `docs/agents/parity.md`.
 
 ## Gotchas
 
@@ -33,6 +38,8 @@ Recipes with exact calls: `docs/agents/usecases.md`.
 - A bad model in a batch lands in `failures`; the batch continues.
 - `compile_model` failing is `success: false` with the log, not a tool error.
 - MCP `config_set` cannot set `studiomdl` or `hlmv` paths on purpose; use `games --detect --save` or edit the config file.
+- Descriptions are Steam BBCode, at most 7999 characters; run `check_bbcode` first. Visibility: `public`, `friendsonly`, `private`, `unlisted`.
+- Writes need `confirm: true` in MCP (`publish_workshop` without `dry_run`, `privacy` changes): ask the user first.
 - Never commit or redistribute game assets you decompile.
 
 ## JSON and exit codes

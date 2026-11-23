@@ -32,12 +32,14 @@ When nothing was decompiled the run exits with the failures' shared code (4 if t
 | `<game> uses the legacy ... Workshop` / `has no Steam Workshop` | that game cannot take uploads from prybar; use the tool named in the message |
 | `content: must be a folder with at least one compiled map (.bsp)...` | Team Fortress 2 items are map folders: put the `.bsp` in the folder or its `maps/` |
 | `a real publish needs `confirm: true`` (MCP) | `publish_workshop` without `dry_run` needs `confirm: true`; dry run first and ask the user |
+| ``unknown sort `X` `` / ``unknown visibility `X` `` | `workshop items`: use the values the message lists |
+| `changing privacy settings needs `confirm: true`` (MCP) | `privacy` with `set` or `clear_log` changes the user's settings; ask first |
 | `no user config directory on this system` | set `PRYBAR_CONFIG` to a file path |
 | read-only format | `pack` only writes `.vpk` and `.gma`; APK and HFS are read-only |
 
 ### not_found (3)
 
-`not found: <path>`: the model, package, QC, spec or the inner entry of `pkg:inner` does not exist. Use `list --filter` to see the real entry names.
+`not found: <path>`: the model, package, QC, spec or the inner entry of `pkg:inner` does not exist. Use `list --filter` to see the real entry names. Also `not found: materials/<name>.vtf` (`texture --material`: no search root holds it; configure the game with `games --detect --save`) and `not found: Workshop item N among your items` (`workshop item`: wrong id or game, or not your item).
 
 ### invalid_input (4)
 
@@ -52,6 +54,8 @@ Format of the message: `<input>: <detail>`.
 | `count N exceeds sanity cap C` | corrupt count field; the file is damaged or hostile |
 | `string at offset O has no terminator within M bytes` | corrupt string table |
 | `string at offset O is not valid UTF-8` | corrupt string table |
+| `<file.vtf>: ...` | `texture`: not a VTF, truncated, or a format not decoded; the message names it |
+| `<image>: ...` | `workshop preview`: not a readable PNG, JPEG or GIF |
 | `not a VPK directory file` | pass the `_dir.vpk`, not a `_000.vpk` chunk |
 | `unsupported VPK version N` | only v1 and v2 |
 | `bad entry terminator at offset O` | damaged VPK directory |

@@ -10,7 +10,7 @@ use rmcp::{tool, tool_router};
 #[tool_router(router = workshop_router, vis = "pub(crate)")]
 impl Prybar {
     #[tool(
-        description = "Check Steam for one Workshop game before publishing: client running, user signed in (name, id), game owned. `state` names the one thing to fix. Needs a `workshop` build.",
+        description = "Check Steam for one Workshop game before publishing: client running, user signed in (`user` name when `ready`), game owned. `state` names the one thing to fix. Needs a `workshop` build.",
         annotations(read_only_hint = true, open_world_hint = true)
     )]
     async fn workshop_status(&self, Parameters(a): Parameters<GameArgs>) -> CallToolResult {

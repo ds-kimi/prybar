@@ -69,3 +69,58 @@ prybar decompile "models/*.mdl" other_dir -o out -r --json
 ```
 
 Check `failures` in the report. Exit 0 means all done, 7 some failed, otherwise the shared failure code (see `errors.md`).
+
+## Update my addon's description with a changelog
+
+```sh
+prybar --json workshop items garrysmod --search "crate"        # find the item id
+prybar --json workshop item garrysmod 123456789                 # current description + history
+# write the new description in desc.txt (Steam BBCode)
+prybar --json workshop bbcode desc.txt                          # too_long must be false
+```
+
+Put the text in a spec `{"app_id": 4000, "item_id": 123456789, "description": "...", "change_note": "v1.2: fixed collisions"}` (fields left out keep their Steam value), then `prybar publish spec.json --dry-run` and `prybar publish spec.json`.
+
+MCP: `workshop_items {"game": "garrysmod", "search": "crate"}`, `workshop_item {"game": "garrysmod", "item_id": 123456789}`, `check_bbcode {"text": "[h1]v1.2[/h1][list][*]fixed collisions[/list]"}`, then `publish_workshop {"spec": "/abs/spec.json", "dry_run": true}` and, after the user agrees, `{"spec": "/abs/spec.json", "confirm": true}`.
+
+## Publish a new GMod addon from a folder
+
+```sh
+prybar --json publish --status garrysmod                        # state must be "ready"
+prybar --json workshop preview /abs/preview.png                 # ok must be true
+prybar publish spec.json --dry-run
+prybar publish spec.json
+```
+
+`spec.json`: `{"app_id": 4000, "title": "Crate pack", "description": "[b]Crates[/b] for builds", "visibility": "private", "content": "/abs/crate_addon", "preview": "/abs/preview.png", "change_note": "first upload"}`. No `item_id` creates the item; the report gives its id. Update content later with the same spec plus `item_id`.
+
+MCP: `workshop_status {"game": "garrysmod"}`, `check_preview {"image": "/abs/preview.png"}`, `publish_workshop {"spec": "/abs/spec.json", "dry_run": true}`, then with `"confirm": true`.
+
+## Most subscribed items, or only private ones
+
+```sh
+prybar --json workshop items garrysmod --sort subscribed
+prybar --json workshop items garrysmod --visibility private --tag weapon
+```
+
+MCP: `workshop_items {"game": "garrysmod", "sort": "subscribed"}`. Sorts: `subscribed`, `rated`, `favorited`, `updated`, `newest`, `title`; `reverse` flips the order.
+
+## See a model's texture
+
+```sh
+prybar --json inspect crate.mdl                                 # material names
+prybar --json texture crate.mdl --material models/props/crate01 -o crate01.png
+prybar --json texture materials/models/props/wood.vtf -o wood.png --level 1
+```
+
+MCP: `decode_texture {"input": "/abs/crate.mdl", "material": "models/props/crate01", "out": "/abs/crate01.png"}`.
+
+## Turn off the app's analytics, or see what was sent
+
+```sh
+prybar --json privacy                 # on, blocked_by, log of every payload
+prybar --json privacy --off           # also drops anything queued
+prybar privacy --clear-log
+```
+
+MCP: `privacy {}` to read; `privacy {"set": false, "confirm": true}` after the user asks. `DO_NOT_TRACK=1` or `PRYBAR_TELEMETRY=0` block sending whatever the choice says.

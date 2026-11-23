@@ -42,7 +42,9 @@ impl Prybar {
             Err(e) => return failure(&e),
         };
         blocking(move || match a.material {
-            Some(m) => texture::export_material(&a.input, &m, a.level, &out),
+            Some(m) => {
+                texture::export_material(&guard::model_arg("input", &a.input)?, &m, a.level, &out)
+            }
             None => texture::export_file(&guard::absolute("input", &a.input)?, a.level, &out),
         })
         .await
