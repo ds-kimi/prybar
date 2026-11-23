@@ -3,7 +3,8 @@
 
 use std::path::PathBuf;
 
-use prybar_workshop::changelog::{parse, Change};
+use prybar_workshop::changelog::{parse, Log};
+use prybar_workshop::http::Failure;
 use prybar_workshop::spec::Visibility;
 use prybar_workshop::ListedItem;
 
@@ -24,13 +25,28 @@ pub(crate) fn item() -> ListedItem {
     }
 }
 
-/// One change note for the listed item; any other id is "offline".
-pub(crate) fn history(id: u64) -> Result<Vec<Change>, String> {
+thread_local! {
+    /// Changelog requests made on this test thread.
+    pub(crate) static ASKED: std::cell::Cell<usize> = const { std::cell::Cell::new(0) };
+}
+
+/// One change note for item 7, Steam busy for item 8 (30 s), any
+/// other id is "offline".
+pub(crate) fn history(id: u64) -> Result<Log, Failure> {
+    ASKED.with(|c| c.set(c.get() + 1));
+    let fail = |status, retry_after, message: &str| Failure {
+        status,
+        retry_after,
+        message: message.into(),
+    };
     match id {
-        7 => Ok(parse(
-            "changelog headline\">Update: 1 Jan</div><p id=\"1700000000\">First</p>",
-        )),
-        _ => Err("offline".into()),
+        7 => Ok(Log {
+            changes: parse("changelog headline\">Update: 1 Jan</div><p id=\"1700000000\">First</p>"),
+            age: 0,
+            stale: false,
+        }),
+        8 => Err(fail(Some(429), Some(30), "Steam answered 429")),
+        _ => Err(fail(None, None, "offline")),
     }
 }
 

@@ -3,21 +3,31 @@
 //! folder linked to it.
 
 mod content;
+mod history;
 mod load;
 
 use std::collections::HashMap;
 use std::path::{Path, PathBuf};
+use std::time::Duration;
 
 use gpui::Context;
-use prybar_workshop::changelog::Change;
+use prybar_workshop::changelog::Log;
 use prybar_workshop::item::{Links, Point};
 
 use crate::state::AppState;
 
+/// Quick clicks across items ask Steam only for the one that stays.
+const SETTLE: Duration = Duration::from_millis(500);
+
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum History {
-    Loading,
-    Ready(Vec<Change>),
+    /// Selected a moment ago; asked once the selection settles.
+    Waiting(u32),
+    /// A request is out; the number is how many busy answers came before.
+    Loading(u32),
+    Ready(Log),
+    /// Steam rate-limited us: asked again after `wait` seconds.
+    Busy { wait: u64, attempt: u32 },
     Failed(String),
 }
 
@@ -28,6 +38,8 @@ pub struct ItemView {
     pub series: Vec<Point>,
     pub history: HashMap<u64, History>,
     pub links: Links,
+    /// A changelog request is out; Steam gets one at a time.
+    fetching: bool,
     links_read: bool,
 }
 
@@ -47,7 +59,7 @@ impl AppState {
         v.selected = Some(id);
         let dir = (self.tools.backend.data_dir)();
         v.series = prybar_workshop::item::series(&load::stats_file(&dir), id);
-        self.fetch_history(id, cx);
+        self.plan_history(id, SETTLE, cx);
         cx.notify();
     }
 

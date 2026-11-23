@@ -17,6 +17,8 @@ pub struct SteamView {
     pub items: Vec<ListedItem>,
     /// Why the list could not be read, when Steam was ready.
     pub items_error: Option<String>,
+    /// When `items` came from Steam, for the "read 5 min ago" tips.
+    pub items_read: Option<std::time::SystemTime>,
     /// The folder the check is about, and what it found.
     pub addon: Option<(PathBuf, Result<AddonCheck, String>)>,
     /// The account picture, read once and kept: it rarely changes and
@@ -71,6 +73,7 @@ impl AppState {
                 st.tools.steam.status = Some(s);
                 let steam = &mut st.tools.steam;
                 steam.avatar = steam.avatar.take().or(face);
+                steam.items_read = Some(std::time::SystemTime::now());
                 (steam.items, steam.items_error) = match list {
                     Ok(items) => (items, None),
                     Err(why) => (Vec::new(), Some(why)),

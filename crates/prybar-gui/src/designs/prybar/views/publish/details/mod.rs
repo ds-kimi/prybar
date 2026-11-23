@@ -38,10 +38,10 @@ pub fn view(s: &AppState, it: &ListedItem, t: Tokens, cx: &Context<Root>) -> Any
                 .child(it.title.clone()),
         )
         .child(actions(it, t, cx))
-        .child(stats::view(it, t))
+        .child(stats::view(it, s.tools.steam.items_read, t))
         .child(chart::view(&s.tools.item.series, t))
         .child(folder(s, it, t, cx))
-        .child(history::view(s.tools.item.history.get(&it.item_id), t))
+        .child(history::view(s.tools.item.history.get(&it.item_id), it.item_id, t, cx))
         .into_any_element()
 }
 

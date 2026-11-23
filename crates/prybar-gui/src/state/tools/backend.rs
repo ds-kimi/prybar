@@ -8,7 +8,8 @@ use prybar_service::tools::{self, Game};
 use prybar_service::ServiceError;
 use prybar_tools::compile::CompileReport;
 use prybar_workshop::addon::AddonCheck;
-use prybar_workshop::changelog::Change;
+use prybar_workshop::changelog::Log;
+use prybar_workshop::http::Failure;
 use prybar_workshop::spec::ItemSpec;
 use prybar_workshop::{Avatar, ListedItem, Progress, PublishReport, SteamStatus};
 
@@ -25,7 +26,7 @@ pub type AddonFn = fn(&Path) -> Result<AddonCheck, String>;
 pub type AvatarFn = fn(u32) -> Option<Avatar>;
 /// A preview URL to a cached image file.
 pub type ThumbFn = fn(&str) -> Result<std::path::PathBuf, String>;
-pub type HistoryFn = fn(u64) -> Result<Vec<Change>, String>;
+pub type HistoryFn = fn(u64) -> Result<Log, Failure>;
 /// Where stats snapshots and folder links are kept.
 pub type DataFn = fn() -> std::path::PathBuf;
 

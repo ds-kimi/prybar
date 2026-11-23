@@ -27,6 +27,14 @@ pub fn date(day: u32) -> String {
     format!("{y:04}-{m:02}-{d:02}")
 }
 
+/// A chart of fewer points, or of one day, draws a shape that means
+/// nothing; it waits for at least three readings on two days or more.
+pub fn chartable(series: &[prybar_workshop::item::Point]) -> bool {
+    let days = |p: &prybar_workshop::item::Point| p.day;
+    let spread = series.iter().map(days).max() > series.iter().map(days).min();
+    series.len() >= 3 && spread
+}
+
 /// Muted small text, the panel's secondary voice.
 pub fn small(s: String, t: Tokens) -> gpui::Div {
     div().text_xs().text_color(t.muted).child(s)

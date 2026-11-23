@@ -5,7 +5,7 @@ use gpui::{div, prelude::*, px, relative};
 use prybar_workshop::item::Point;
 
 use super::super::super::super::widgets::Tipped as _;
-use super::when::{date, small};
+use super::when::{chartable, date, small};
 use crate::theme::prybar::Tokens;
 
 /// About two months of daily points fit the panel's width.
@@ -14,9 +14,11 @@ const HEIGHT: f32 = 72.;
 
 pub fn view(series: &[Point], t: Tokens) -> impl IntoElement {
     let pts = &series[series.len().saturating_sub(SHOWN)..];
-    let (Some(first), Some(last)) = (pts.first(), pts.last()) else {
-        let none = "No history yet: prybar saves the numbers each time it lists your items.";
-        return div().child(small(none.into(), t));
+    let (Some(first), Some(last), true) = (pts.first(), pts.last(), chartable(pts)) else {
+        let none = "A chart appears after a few days of use.";
+        return div()
+            .debug_selector(|| "pb-chart-none".into())
+            .child(small(none.into(), t));
     };
     let top = pts
         .iter()
