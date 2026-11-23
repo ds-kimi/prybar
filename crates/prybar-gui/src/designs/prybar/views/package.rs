@@ -51,10 +51,10 @@ fn header(r: &ListReport, t: Tokens, cx: &Context<Root>) -> impl IntoElement {
             this.state.update(cx, |s, cx| s.extract_selected(out, cx))
         }));
     let facts = format!(
-        "{} package, {} files, {} bytes",
+        "{} package, {} files, {}",
         format!("{:?}", r.format).to_uppercase(),
         r.total,
-        r.total_bytes
+        super::bytes::human(r.total_bytes)
     );
     div()
         .flex()
@@ -112,7 +112,7 @@ fn tree(hits: &[(&str, u64)], t: Tokens) -> AnyElement {
         let size = div()
             .text_xs()
             .text_color(t.muted)
-            .child(format!("{size} B"));
+            .child(super::bytes::human(*size));
         let row = widgets::row(("pb-entry", ix), false, t)
             .pl_5()
             .child(div().flex_1().truncate().child(name.to_owned()))

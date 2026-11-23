@@ -17,7 +17,8 @@ const NEVER: &str = "Never sent: your files or their names, paths, any ID for yo
 this computer. The collector does not store IP addresses.";
 
 pub fn notice(s: &AppState, t: Tokens, cx: &Context<Root>) -> Option<AnyElement> {
-    if s.privacy.notice_seen {
+    // Nothing can be sent without a collector, so there is nothing to ask.
+    if s.privacy.notice_seen || s.privacy.endpoint.is_empty() {
         return None;
     }
     let el = div()

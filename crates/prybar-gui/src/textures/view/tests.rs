@@ -7,7 +7,11 @@ use super::*;
 fn zoom_keeps_the_point_under_the_cursor() {
     let (area, image) = (Vec2::new(400.0, 300.0), Vec2::new(100.0, 100.0));
     let mut pan = Pan::default();
-    assert_eq!(pan.scale(area, image), 1.0, "fitting never enlarges");
+    assert_eq!(
+        pan.scale(area, image),
+        3.0,
+        "fitting enlarges by whole steps"
+    );
     let at = Vec2::new(30.0, -20.0);
     let texel = (at - pan.offset) / pan.scale(area, image);
     pan.zoom_at(at, 2.0, area, image);

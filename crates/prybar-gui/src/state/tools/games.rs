@@ -16,9 +16,9 @@ impl AppState {
             "Read games".into(),
             move || games(false),
             |s, list| {
-                let n = list.len();
+                // Read on screen entry, not asked for: the list itself is the feedback.
                 s.set_games(list);
-                format!("{n} {} configured", if n == 1 { "game" } else { "games" })
+                String::new()
             },
             cx,
         );

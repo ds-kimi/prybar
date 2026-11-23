@@ -25,7 +25,7 @@ pub fn default_dir() -> PathBuf {
 pub fn write(dir: &Path) -> io::Result<Sample> {
     let models = dir.join("src").join("models");
     std::fs::create_dir_all(&models)?;
-    std::fs::write(models.join("sample.vvd"), mdl::geometry::vvd())?;
+    std::fs::write(models.join("sample.vvd"), spread(mdl::geometry::vvd()))?;
     std::fs::write(models.join("sample.dx90.vtx"), mdl::geometry::vtx())?;
     let model = models.join("sample.mdl");
     std::fs::write(&model, mdl::build())?;
@@ -63,4 +63,18 @@ fn texture() -> Vec<u8> {
         }
     }
     vtf::vtf(2, 3, (64, 64), 7, &data)
+}
+
+/// The parser fixture lays every vertex on the x axis (its tests pin
+/// that); here y and z move off it so the 3D view has a surface to show.
+fn spread(mut vvd: Vec<u8>) -> Vec<u8> {
+    for i in 0..8usize {
+        let at = 64 + i * 48 + 20;
+        let (y, z) = ((i % 2) as f32 * 4.0, (i / 2) as f32);
+        if let Some(b) = vvd.get_mut(at..at + 8) {
+            b[..4].copy_from_slice(&y.to_le_bytes());
+            b[4..].copy_from_slice(&z.to_le_bytes());
+        }
+    }
+    vvd
 }

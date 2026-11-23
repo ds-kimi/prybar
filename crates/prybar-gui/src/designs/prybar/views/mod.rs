@@ -1,6 +1,7 @@
 //! The area under the bar: one view per screen, on one calm frame of a
 //! title, a line saying what the screen is for, then its content.
 
+mod bytes;
 mod compile;
 mod decompile;
 mod home;

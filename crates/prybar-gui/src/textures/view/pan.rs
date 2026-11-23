@@ -30,9 +30,16 @@ impl Default for Pan {
 }
 
 impl Pan {
-    /// The scale in use: fitted (never enlarged past 1:1 by fitting) or chosen.
+    /// The scale in use: fitted or chosen. Fitting shrinks freely but only
+    /// enlarges by whole steps (up to 8x), so small textures fill the view
+    /// and texels stay square and sharp.
     pub fn scale(&self, area: Vec2, image: Vec2) -> f32 {
-        let fit = (area / image.max(Vec2::ONE)).min_element().min(1.0);
+        let room = (area / image.max(Vec2::ONE)).min_element();
+        let fit = if room > 1.0 {
+            room.floor().min(8.0)
+        } else {
+            room
+        };
         self.scale.unwrap_or(fit).clamp(MIN_SCALE, MAX_SCALE)
     }
 

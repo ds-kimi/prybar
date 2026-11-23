@@ -14,7 +14,7 @@ impl AppState {
 
     /// Starts `work` on the background executor and tracks it as a job.
     /// `done` applies the result on the UI thread; its return value is
-    /// the success message. Errors become a failed job and an error toast.
+    /// the success message (empty = no toast). Errors become a failed job and an error toast.
     pub fn run_job<R: Send + 'static>(
         &mut self,
         label: String,
@@ -54,6 +54,11 @@ impl AppState {
         if let Some(job) = self.jobs.iter_mut().find(|j| j.id == id) {
             job.status = status;
         }
-        self.toast(kind, text, cx);
+        // An empty message marks a quiet background read: no toast.
+        if text.is_empty() {
+            cx.notify();
+        } else {
+            self.toast(kind, text, cx);
+        }
     }
 }
