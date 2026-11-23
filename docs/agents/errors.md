@@ -28,6 +28,9 @@ When nothing was decompiled the run exits with the failures' shared code (4 if t
 | `inputs: expected 1 to 64 items` | send at most 64 inputs per `decompile_model` call |
 | ``built without the `workshop` feature; rebuild with --features workshop`` | `publish` needs a build with the Steam SDK |
 | `invalid <field>: <reason>` | Workshop spec field is wrong; fix the spec JSON (`content` must be an existing `.gma` or addon folder with a valid `addon.json` and only whitelisted files for GMod app 4000, else an existing folder) |
+| `not a supported Workshop game; use 4000 (garrysmod) or 440 (tf2)` | the spec's `app_id` is not a game prybar can publish to; see `publish --games` |
+| `<game> uses the legacy ... Workshop` / `has no Steam Workshop` | that game cannot take uploads from prybar; use the tool named in the message |
+| `content: must be a folder with at least one compiled map (.bsp)...` | Team Fortress 2 items are map folders: put the `.bsp` in the folder or its `maps/` |
 | `a real publish needs `confirm: true`` (MCP) | `publish_workshop` without `dry_run` needs `confirm: true`; dry run first and ask the user |
 | `no user config directory on this system` | set `PRYBAR_CONFIG` to a file path |
 | read-only format | `pack` only writes `.vpk` and `.gma`; APK and HFS are read-only |

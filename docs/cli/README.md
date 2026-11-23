@@ -13,7 +13,7 @@ prybar [--json] [--quiet] <command> [args]
 | `pack <dir> -o <out.vpk\|out.gma> [--vpk-version 1\|2] [--chunk-size <bytes>]` | Build a VPK or GMA |
 | `compile <qc> -g <game>` | studiomdl of the configured game |
 | `view <mdl> -g <game>` | hlmv of the configured game, detached |
-| `publish <spec.json> [--dry-run]` / `publish --list <app_id>` | Steam Workshop create/update (needs `--features workshop`) |
+| `publish <spec.json> [--dry-run] [--game <game>]` / `publish --list <game>` / `publish --status <game>` / `publish --games` | Steam Workshop create/update (needs `--features workshop`). `<game>` is `garrysmod`, `tf2` or the app id; `--games` lists supported games, the installed ones and why others are unsupported ([workshop-games](../workshop-games.md)) |
 | `games [--detect] [--save]` | Configured games; detect Steam installs |
 | `version [--check]` | Version; `--check` gives `{current, latest, update_available}` (`latest` is `null` offline) |
 | `self-update` | Download, verify (SHA256SUMS + minisign) and install the latest release; `{current, latest, action, detail}` with `action` `up_to_date`, `installed` or `manual` (command or link in `detail`) |

@@ -21,7 +21,7 @@ Source engine modding toolkit: CLI `prybar` and MCP server `prybar-mcp`. Prefer 
 3. Edit the QC or SMD files.
 4. `games --detect --save` once, then `compile -g <game>`.
 5. `pack` the addon folder to `.gma` (needs `addon.json`) or `.vpk`.
-6. `publish --dry-run`, then `publish`.
+6. `publish --dry-run`, then `publish`. Supported Workshop games: `garrysmod` (4000, addon folder or .gma) and `tf2` (440, map folder with a .bsp); pick with `--game`, list with `publish --games`. Descriptions are Steam BBCode.
 
 Recipes with exact calls: `docs/agents/usecases.md`.
 
