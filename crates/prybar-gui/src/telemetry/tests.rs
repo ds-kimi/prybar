@@ -3,6 +3,7 @@
 //! log shows every payload. No network.
 
 use std::sync::atomic::{AtomicUsize, Ordering};
+use std::sync::Mutex;
 
 use gpui::{Entity, Modifiers, TestAppContext, VisualTestContext};
 use prybar_telemetry::{Event, Store};
@@ -10,6 +11,9 @@ use prybar_telemetry::{Event, Store};
 use crate::state::{AppState, Screen};
 
 static SENT: AtomicUsize = AtomicUsize::new(0);
+/// Tests run in parallel and share `SENT`; one send from another test
+/// between a read and an assert made the counts flaky.
+static SERIAL: Mutex<()> = Mutex::new(());
 
 /// A first launch: notice not answered, one crash report left from before.
 fn first_launch(
@@ -40,9 +44,12 @@ fn first_launch(
 /// sent, hides the notice and remembers the answer.
 #[gpui::test]
 fn keep_on_sends_only_after_the_answer(cx: &mut TestAppContext) {
+    let _serial = SERIAL.lock().unwrap_or_else(|e| e.into_inner());
+    let before = SENT.load(Ordering::SeqCst);
     let (dir, state, mut cx) = first_launch(cx);
     assert!(cx.debug_bounds("pb-privacy-notice").is_some());
-    assert_eq!(SENT.load(Ordering::SeqCst), 0, "nothing before the answer");
+    let none = SENT.load(Ordering::SeqCst) == before;
+    assert!(none, "nothing before the answer");
     let at = cx.debug_bounds("pb-privacy-keep").expect("keep button");
     cx.simulate_click(at.center(), Modifiers::none());
     cx.run_until_parked();
@@ -58,6 +65,7 @@ fn keep_on_sends_only_after_the_answer(cx: &mut TestAppContext) {
 /// "Turn off" deletes the waiting crash report and never sends.
 #[gpui::test]
 fn turn_off_deletes_the_queue(cx: &mut TestAppContext) {
+    let _serial = SERIAL.lock().unwrap_or_else(|e| e.into_inner());
     let (dir, state, mut cx) = first_launch(cx);
     let before = SENT.load(Ordering::SeqCst);
     let at = cx.debug_bounds("pb-privacy-off").expect("off button");
@@ -77,6 +85,7 @@ fn turn_off_deletes_the_queue(cx: &mut TestAppContext) {
 /// "Clear log" empties the table; a kill switch says why it is off.
 #[gpui::test]
 fn settings_show_log_and_switch(cx: &mut TestAppContext) {
+    let _serial = SERIAL.lock().unwrap_or_else(|e| e.into_inner());
     let (_dir, state, mut cx) = first_launch(cx);
     state.update(&mut cx, |s, cx| s.navigate(Screen::Settings, cx));
     cx.run_until_parked();
