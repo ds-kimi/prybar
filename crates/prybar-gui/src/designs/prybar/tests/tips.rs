@@ -58,7 +58,9 @@ fn walk(src: &Path, dir: &Path, missing: &mut Vec<String>) {
             .strip_prefix(src)
             .unwrap_or(&path)
             .display()
-            .to_string();
+            .to_string()
+            // Windows paths use `\`; the SILENT list uses `/`.
+            .replace(std::path::MAIN_SEPARATOR, "/");
         if path.is_dir() && !name.ends_with("tests") {
             walk(src, &path, missing);
             continue;
