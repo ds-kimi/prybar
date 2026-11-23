@@ -1,4 +1,4 @@
-use prybar_tools::compile::parse_log;
+use prybar_tools::compile::{parse_log, written_files};
 
 #[test]
 fn splits_errors_and_warnings_by_line_start() {
@@ -34,4 +34,12 @@ fn relative_paths_become_absolute_for_the_child() {
     assert!(std::path::Path::new(args[1]).is_absolute());
     let last = args.last().unwrap();
     assert!(std::path::Path::new(last).is_absolute());
+}
+
+#[test]
+fn compiled_vertex_data_is_listed_as_output() {
+    // Some studiomdl builds write a compressed `.cvvd`
+    // next to the `.vvd`; dropping it hides a real output from the user.
+    let log = "writing m/x.mdl:\nwriting m/x.cvvd:\nwriting m/x.txt:\n";
+    assert_eq!(written_files(log), ["m/x.mdl", "m/x.cvvd"]);
 }
