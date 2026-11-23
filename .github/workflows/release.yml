@@ -41,6 +41,13 @@ jobs:
       - uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2
         with:
           key: ${{ matrix.target }}
+      # GPUI links against these on Linux (same list as ci.yml).
+      - name: gui system libraries
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libfontconfig-dev libfreetype-dev libwayland-dev \
+            libx11-xcb-dev libxkbcommon-x11-dev libvulkan1
       # Workshop upload is built in; the Steam API library ships next to
       # the binaries (Linux needs the $ORIGIN rpath to find it there).
       - name: build
@@ -51,6 +58,16 @@ jobs:
           if [[ "$TARGET" == *linux* ]]; then export RUSTFLAGS='-C link-arg=-Wl,-rpath,$ORIGIN'; fi
           cargo build --release --locked --target "$TARGET" -p prybar-cli -p prybar-mcp \
             --features prybar-cli/workshop,prybar-mcp/workshop
+      # The macOS GUI is built later, inside Prybar.app.
+      - name: build gui
+        if: runner.os != 'macOS'
+        shell: bash
+        env:
+          TARGET: ${{ matrix.target }}
+          PRYBAR_TELEMETRY_URL: ${{ vars.PRYBAR_TELEMETRY_URL }}
+        run: |
+          if [[ "$TARGET" == *linux* ]]; then export RUSTFLAGS='-C link-arg=-Wl,-rpath,$ORIGIN'; fi
+          cargo build --release --locked --target "$TARGET" -p prybar-gui --features workshop
       - name: stage
         shell: bash
         env:
@@ -62,6 +79,7 @@ jobs:
           ext=""
           if [[ "$TARGET" == *windows* ]]; then ext=".exe"; fi
           cp "target/$TARGET/release/prybar$ext" "target/$TARGET/release/prybar-mcp$ext" README.md "$name"/
+          if [[ "$RUNNER_OS" != "macOS" ]]; then cp "target/$TARGET/release/prybar-gui$ext" "$name"/; fi
           sh scripts/release/steam-lib.sh "$TARGET" "$name" "target/$TARGET/release"
           # Desktop entry and hicolor icons for the Linux archive, so a
           # package maintainer or the user can install them as they are.

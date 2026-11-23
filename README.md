@@ -26,14 +26,22 @@ Prybar is a from-scratch Rust toolkit for Source engine modding, with no UI. It 
 
 ## Install
 
-Download a binary from the [releases](https://github.com/ds-kimi/prybar/releases) page, or build it:
+Download the archive for your system from the [releases](https://github.com/ds-kimi/prybar/releases) page. Each one has the desktop app, the CLI `prybar` and the MCP server `prybar-mcp`:
+
+- macOS: `Prybar.app`, plus `prybar` and `prybar-mcp` next to it.
+- Windows: `prybar-gui.exe`, `prybar.exe`, `prybar-mcp.exe`.
+- Linux: `prybar-gui`, `prybar`, `prybar-mcp`, with a desktop entry and icons under `share/`. The app needs Vulkan and X11 or Wayland.
+
+Keep the Steam library that ships next to the binaries (`libsteam_api` / `steam_api64.dll`): Workshop publishing uses it.
+
+Or build it:
 
 ```sh
-cargo build --release -p prybar-cli -p prybar-mcp
-# Workshop publishing needs the Steam SDK: add --features workshop
+cargo build --release -p prybar-cli -p prybar-mcp -p prybar-gui
+# Workshop publishing: add --features prybar-cli/workshop,prybar-mcp/workshop,prybar-gui/workshop
 ```
 
-Binaries land in `target/release/` (`prybar`, `prybar-mcp`). Setup details are in [CONTRIBUTING.md](CONTRIBUTING.md).
+Binaries land in `target/release/` (`prybar`, `prybar-mcp`, `prybar-gui`). Setup details are in [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## Quickstart
 
