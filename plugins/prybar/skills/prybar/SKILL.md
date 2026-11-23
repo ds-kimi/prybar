@@ -9,7 +9,7 @@ Source engine modding toolkit: CLI `prybar` and MCP server `prybar-mcp`. Prefer 
 
 ## When to use
 
-- Turn a `.mdl` (+ `.vvd`, `.vtx`, `.phy`, `.ani`) into editable QC, SMD, VTA, VRD.
+- Turn a `.mdl` (+ `.vvd`, `.vtx`, `.phy`, `.ani`) into editable QC, SMD, VTA, VRD. Vampire: Bloodlines (MDL 2531) needs only the `.dx80.vtx` next to it.
 - List, extract or build `.vpk` / `.gma` packages; read `.apk` and `.hfs`.
 - Compile a QC with the game's studiomdl; open a model in hlmv.
 - Publish or update a Steam Workshop item; list, search and sort your items, read an item's stats and version history.
