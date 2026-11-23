@@ -35,7 +35,10 @@ pub fn screen(s: &AppState, f: &Forms, t: Tokens, cx: &Context<Root>) -> AnyElem
         .flex()
         .flex_col()
         .gap_4()
-        .overflow_y_scroll()
+        // The Workshop page scrolls its grid and panel, never itself:
+        // two nested scrollers would fight under the wheel.
+        .when(s.screen != Screen::Publish, |el| el.overflow_y_scroll())
+        .when(s.screen == Screen::Publish, |el| el.overflow_hidden())
         .child(content(s, f, t, cx));
     motion::enter(div().flex_1().min_h_0().child(body), ("pb-view-in", ix))
 }

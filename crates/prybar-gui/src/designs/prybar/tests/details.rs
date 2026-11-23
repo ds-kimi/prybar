@@ -25,11 +25,14 @@ fn item_click_shows_details_and_edit_fills(cx: &mut TestAppContext) {
     state.update(&mut cx, |s, cx| s.navigate(Screen::Publish, cx));
     cx.run_until_parked();
     click(&mut cx, "pb-item-0");
+    cx.executor()
+        .advance_clock(std::time::Duration::from_millis(600));
+    cx.run_until_parked();
     assert!(cx.debug_bounds("pb-details").is_some(), "details drawn");
     assert!(cx.debug_bounds("pb-history").is_some(), "history drawn");
     state.read_with(&cx, |s, _| {
         let h = s.tools.item.history.get(&7);
-        assert!(matches!(h, Some(crate::state::tools::History::Ready(v)) if v.len() == 1));
+        assert!(matches!(h, Some(crate::state::tools::History::Ready(v)) if v.changes.len() == 1));
     });
     click(&mut cx, "pb-det-edit");
     assert!(cx.debug_bounds("pb-pub-popup").is_some(), "popup open");

@@ -4,6 +4,7 @@
 mod card;
 mod cards;
 mod chips;
+mod layout;
 mod text;
 mod toolbar;
 
@@ -22,19 +23,27 @@ pub fn view(s: &AppState, f: &Forms, t: Tokens, cx: &Context<Root>) -> AnyElemen
     let steam = &s.tools.steam;
     let order = apply(&steam.items, &steam.catalog.query);
     let head = head(order.len(), steam.items.len(), t, cx);
-    let main = div().flex_1().min_w_0().child(body(s, order, t, cx));
+    let width = f.items_width.clone();
+    let main = div().relative().flex_1().min_w_0().h_full();
+    let main = main.child(body(s, order, width.get(), t, cx));
+    let main = main.child(layout::measure(width));
     div()
+        .flex_1()
+        .min_h_0()
         .flex()
         .flex_col()
         .gap_2()
         .child(head)
         .child(toolbar::view(s, f, t, cx))
         .child(
+            // The grid and the details panel each scroll on their own;
+            // this row only shares the height left on the page.
             div()
                 .w_full()
+                .flex_1()
+                .min_h_0()
                 .flex()
-                .items_start()
-                .gap_3()
+                .gap_4()
                 .child(main)
                 .children(super::details::selected(s).map(|it| super::details::view(s, it, t, cx))),
         )
@@ -63,7 +72,7 @@ fn head(shown: usize, all: usize, t: Tokens, cx: &Context<Root>) -> impl IntoEle
 
 /// The list, or the one sentence that says why there is none and what
 /// to do about it.
-fn body(s: &AppState, order: Vec<usize>, t: Tokens, cx: &Context<Root>) -> AnyElement {
+fn body(s: &AppState, order: Vec<usize>, width: f32, t: Tokens, cx: &Context<Root>) -> AnyElement {
     let steam = &s.tools.steam;
     let say = |text: String| {
         div()
@@ -77,7 +86,7 @@ fn body(s: &AppState, order: Vec<usize>, t: Tokens, cx: &Context<Root>) -> AnyEl
     if let Some(text) = why {
         return say(text);
     }
-    cards::view(s, order, t, cx)
+    cards::view(s, order, width, t, cx)
 }
 
 /// Why nothing is listed, or `None` when there is something to list.

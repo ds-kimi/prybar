@@ -11,6 +11,8 @@ use prybar_workshop::http::Failure;
 use super::History;
 use crate::state::AppState;
 
+type Got = Result<prybar_workshop::changelog::Log, Failure>;
+
 impl AppState {
     /// Asks for `id`'s history after `delay`, if it is still selected
     /// and still wants it then. A loaded or failed history stays as is.
@@ -36,7 +38,10 @@ impl AppState {
             Some(History::Failed(_)) => 0,
             _ => return,
         };
-        self.tools.item.history.insert(id, History::Waiting(attempt));
+        self.tools
+            .item
+            .history
+            .insert(id, History::Waiting(attempt));
         self.fetch_history(id, cx);
         cx.notify();
     }
@@ -64,20 +69,17 @@ impl AppState {
         cx.notify();
     }
 
-    fn got_history(
-        &mut self,
-        id: u64,
-        attempt: u32,
-        got: Result<prybar_workshop::changelog::Log, Failure>,
-        cx: &mut Context<Self>,
-    ) {
+    fn got_history(&mut self, id: u64, attempt: u32, got: Got, cx: &mut Context<Self>) {
         let mut wait = None;
         let next = match got {
             Ok(log) => History::Ready(log),
             Err(e) if e.busy() => {
                 let w = backoff(attempt, e.retry_after);
                 wait = Some(w);
-                History::Busy { wait: w.as_secs(), attempt: attempt + 1 }
+                History::Busy {
+                    wait: w.as_secs(),
+                    attempt: attempt + 1,
+                }
             }
             Err(e) => History::Failed(e.message),
         };

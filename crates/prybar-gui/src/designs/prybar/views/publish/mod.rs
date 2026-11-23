@@ -21,6 +21,8 @@ use crate::theme::prybar::Tokens;
 pub fn view(s: &AppState, f: &Forms, t: Tokens, cx: &Context<Root>) -> AnyElement {
     div()
         .max_w(px(1040.))
+        .size_full()
+        .min_h_0()
         .flex()
         .flex_col()
         .gap_3()

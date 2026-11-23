@@ -41,7 +41,9 @@ pub(crate) fn history(id: u64) -> Result<Log, Failure> {
     };
     match id {
         7 => Ok(Log {
-            changes: parse("changelog headline\">Update: 1 Jan</div><p id=\"1700000000\">First</p>"),
+            changes: parse(
+                "changelog headline\">Update: 1 Jan</div><p id=\"1700000000\">First</p>",
+            ),
             age: 0,
             stale: false,
         }),

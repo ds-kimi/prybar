@@ -7,6 +7,7 @@ mod shell;
 mod tips;
 mod tools;
 mod views;
+mod workshop;
 
 use gpui::{AppContext as _, Entity, Modifiers, TestAppContext, VisualTestContext};
 

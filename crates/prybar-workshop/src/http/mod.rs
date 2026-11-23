@@ -35,7 +35,7 @@ impl std::fmt::Display for Failure {
 /// of `gate` first so a screen full of items never floods Steam.
 pub fn get(url: &str, max: u64, gate: &Gate) -> Result<Vec<u8>, Failure> {
     let _pass = gate.enter();
-    let fail = |status, retry_after, message: String| Failure {
+    let fail = |status, retry_after, message| Failure {
         status,
         retry_after,
         message,
@@ -60,19 +60,20 @@ pub fn get(url: &str, max: u64, gate: &Gate) -> Result<Vec<u8>, Failure> {
         let after = after.and_then(|v| v.to_str().ok()?.trim().parse().ok());
         return Err(fail(Some(code), after, format!("Steam answered {code}")));
     }
+    body(resp, max).map_err(|message| fail(None, None, message))
+}
+
+/// At most `max` bytes, so a hostile server cannot fill memory.
+fn body(resp: ureq::http::Response<ureq::Body>, max: u64) -> Result<Vec<u8>, String> {
     let mut bytes = Vec::new();
     let read = resp
         .into_body()
         .into_reader()
         .take(max + 1)
         .read_to_end(&mut bytes);
-    read.map_err(|e| fail(None, None, e.to_string()))?;
+    read.map_err(|e| e.to_string())?;
     if bytes.len() as u64 > max {
-        return Err(fail(
-            None,
-            None,
-            format!("the answer is larger than {} KB", max >> 10),
-        ));
+        return Err(format!("the answer is larger than {} KB", max >> 10));
     }
     Ok(bytes)
 }

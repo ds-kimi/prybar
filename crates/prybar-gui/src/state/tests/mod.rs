@@ -4,7 +4,7 @@ use gpui::{AppContext as _, Entity, TestAppContext};
 
 mod catalog;
 pub(crate) mod fake;
-mod fake_item;
+pub(crate) mod fake_item;
 mod ops;
 mod publish;
 mod tools;

@@ -9,75 +9,73 @@ use gpui::{div, prelude::*, px, uniform_list, AnyElement, App, Context, Entity};
 use prybar_workshop::ListedItem;
 
 use super::card::card;
+use super::layout::{self, Layout, GAP};
 use crate::app::Root;
 use crate::state::tools::Thumb;
 use crate::state::AppState;
 use crate::theme::prybar::Tokens;
-
-const COLUMNS: usize = 4;
 
 /// What every row needs, shared by the list's draw callback.
 struct Rows {
     shown: Vec<ListedItem>,
     thumbs: HashMap<u64, Thumb>,
     selected: Option<u64>,
-    cols: usize,
-    height: f32,
+    at: Layout,
     root: Entity<Root>,
     t: Tokens,
 }
 
-pub fn view(s: &AppState, order: Vec<usize>, t: Tokens, cx: &Context<Root>) -> AnyElement {
+/// `width` is what the grid measured last frame (0 before the first).
+pub fn view(
+    s: &AppState,
+    order: Vec<usize>,
+    width: f32,
+    t: Tokens,
+    cx: &Context<Root>,
+) -> AnyElement {
     let c = &s.tools.steam.catalog;
-    // The details panel takes a column's room when an item is picked.
-    let wide = COLUMNS - usize::from(s.tools.item.selected.is_some());
-    let (cols, height) = if c.grid { (wide, 212.) } else { (1, 52.) };
+    let at = [layout::list, layout::grid][usize::from(c.grid)](width);
+    let shown = order.iter().map(|&i| s.tools.steam.items[i].clone());
     let rows = Rc::new(Rows {
-        shown: order
-            .iter()
-            .map(|&i| s.tools.steam.items[i].clone())
-            .collect(),
+        shown: shown.collect(),
         thumbs: c.thumbs.clone(),
         selected: s.tools.item.selected,
-        cols,
-        height,
+        at,
         root: cx.entity(),
         t,
     });
-    let count = rows.shown.len().div_ceil(cols);
+    let count = rows.shown.len().div_ceil(at.cols);
+    // Only this list scrolls: it fills the room left under the toolbar.
     uniform_list("pb-items", count, move |range, _, cx| {
         draw(&rows, range, cx)
     })
-    // As tall as its rows, up to about two grid rows or eight list rows.
-    .h(px((count as f32 * height).min(if c.grid {
-        440.
-    } else {
-        416.
-    })))
+    .debug_selector(|| "pb-items-scroll".into())
+    .size_full()
     .into_any_element()
 }
 
 fn draw(rows: &Rows, range: Range<usize>, cx: &mut App) -> Vec<AnyElement> {
     let mut want = Vec::new();
     let out = range.map(|r| {
-        let end = ((r + 1) * rows.cols).min(rows.shown.len());
-        let cells = (r * rows.cols..end).map(|i| {
+        let at = rows.at;
+        let end = ((r + 1) * at.cols).min(rows.shown.len());
+        let cells = (r * at.cols..end).map(|i| {
             let item = &rows.shown[i];
             let thumb = rows.thumbs.get(&item.item_id);
             if thumb.is_none() {
                 want.push((item.item_id, item.preview_url.clone()));
             }
             let on = rows.selected == Some(item.item_id);
-            card(i, item, thumb, (rows.cols > 1, on), &rows.root, rows.t)
+            card(i, item, thumb, (at, on), &rows.root, rows.t)
         });
         let row = div()
-            .h(px(rows.height))
+            .h(px(at.row))
             .flex()
-            .gap_2()
-            .pb_2()
+            .justify_center()
+            .gap(px(GAP))
             .children(cells)
             // Empty slots keep a short last row on the same columns.
-            .children((end..(r + 1) * rows.cols).map(|_| div().flex_1().w_0()));
+            .children((end..(r + 1) * at.cols).map(|_| div().flex_none().w(px(at.card.0))));
         row.into_any_element()
     });
     let out = out.collect();

@@ -1,3 +1,5 @@
+mod busy;
+
 use prybar_workshop::changelog::parse;
 
 const PAGE: &str = r#"<div class="detailBox workshopAnnouncement noFooter changeLogCtn">

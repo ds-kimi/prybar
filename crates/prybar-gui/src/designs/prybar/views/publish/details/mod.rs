@@ -3,6 +3,7 @@
 
 mod chart;
 mod history;
+mod notes;
 mod stats;
 mod when;
 
@@ -20,14 +21,18 @@ use crate::theme::prybar::Tokens;
 const ITEM_URL: &str = "https://steamcommunity.com/sharedfiles/filedetails/?id=";
 
 pub fn view(s: &AppState, it: &ListedItem, t: Tokens, cx: &Context<Root>) -> AnyElement {
+    let notes = history::view(s.tools.item.history.get(&it.item_id), it.item_id, t, cx);
     div()
+        .id("pb-details")
         .debug_selector(|| "pb-details".into())
         .w(px(320.))
         .flex_none()
+        .max_h_full()
+        .overflow_y_scroll()
         .flex()
         .flex_col()
-        .gap_3()
-        .p_3()
+        .gap_4()
+        .p_4()
         .rounded_lg()
         .border_1()
         .border_color(t.border)
@@ -41,7 +46,7 @@ pub fn view(s: &AppState, it: &ListedItem, t: Tokens, cx: &Context<Root>) -> Any
         .child(stats::view(it, s.tools.steam.items_read, t))
         .child(chart::view(&s.tools.item.series, t))
         .child(folder(s, it, t, cx))
-        .child(history::view(s.tools.item.history.get(&it.item_id), it.item_id, t, cx))
+        .child(notes)
         .into_any_element()
 }
 

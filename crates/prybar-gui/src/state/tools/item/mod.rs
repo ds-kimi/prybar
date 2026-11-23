@@ -27,7 +27,10 @@ pub enum History {
     Loading(u32),
     Ready(Log),
     /// Steam rate-limited us: asked again after `wait` seconds.
-    Busy { wait: u64, attempt: u32 },
+    Busy {
+        wait: u64,
+        attempt: u32,
+    },
     Failed(String),
 }
 

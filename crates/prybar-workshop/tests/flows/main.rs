@@ -1,5 +1,4 @@
 mod addon;
-mod busy;
 mod catalog;
 mod changelog;
 mod fixture;

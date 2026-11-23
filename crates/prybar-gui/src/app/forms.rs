@@ -22,6 +22,8 @@ pub struct Forms {
     pub studiomdl: Entity<TextInput>,
     /// The compile log, so the view can keep its tail in sight.
     pub compile_log: ScrollHandle,
+    /// The Workshop grid's width last frame, so its columns fit it.
+    pub items_width: std::rc::Rc<std::cell::Cell<f32>>,
     /// The 3D preview, kept so its GPU thread and camera survive tabs.
     pub viewport: Entity<Viewport>,
     /// The texture screen, kept so its decoded image and pan survive tabs.
@@ -51,6 +53,7 @@ impl Forms {
                 checks::existing,
             ),
             compile_log: ScrollHandle::new(),
+            items_width: std::rc::Rc::default(),
             viewport: cx.new(|_| Viewport::default()),
             textures: cx.new(|_| TextureView::default()),
         }
