@@ -13,6 +13,9 @@ fn missing_asset_is_reported() {
     assert!(matches!(got, Err(UpdateError::MissingAsset(_))));
 }
 
+// The archive only holds `Prybar.app` on macOS; Windows and Linux ship a
+// plain `prybar-gui` binary, covered by the binary swap tests.
+#[cfg(target_os = "macos")]
 #[test]
 fn swaps_an_app_bundle_whole() {
     let dir = tempfile::tempdir().expect("tmp");
@@ -25,6 +28,22 @@ fn swaps_an_app_bundle_whole() {
         tarball("Prybar.app/Contents/MacOS/prybar-gui", b"new"),
         Faults::default(),
     );
+    let v =
+        download_verified(&cfg, &release, &release.assets[0].clone(), &mut |_, _| {}).expect("v");
+    apply(&v, Kind::Gui, &plan).expect("apply");
+    assert_eq!(std::fs::read(&exe).expect("read"), b"new");
+}
+
+// Windows and Linux ship `prybar-gui` as a plain binary next to the CLI.
+#[cfg(not(target_os = "macos"))]
+#[test]
+fn swaps_a_plain_gui_binary() {
+    let dir = tempfile::tempdir().expect("tmp");
+    let exe = dir.path().join(Kind::Gui.file_name());
+    std::fs::write(&exe, b"old").expect("write");
+    let plan = install_plan(&exe, "p");
+    assert_eq!(plan, Plan::Binary(exe.clone()));
+    let (cfg, release) = signed_release(tarball(Kind::Gui.file_name(), b"new"), Faults::default());
     let v =
         download_verified(&cfg, &release, &release.assets[0].clone(), &mut |_, _| {}).expect("v");
     apply(&v, Kind::Gui, &plan).expect("apply");

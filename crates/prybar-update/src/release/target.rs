@@ -5,21 +5,24 @@ use super::{Asset, Release};
 pub enum Kind {
     Cli,
     Mcp,
-    /// The GUI; on macOS this is the whole `Prybar.app` bundle.
+    /// The GUI; on macOS this is the whole `Prybar.app` bundle, elsewhere a
+    /// plain `prybar-gui` binary.
     Gui,
 }
 
 impl Kind {
     /// File name of the program inside a release archive.
     pub fn file_name(self) -> &'static str {
-        let windows = cfg!(windows);
-        match (self, windows) {
-            (Kind::Cli, false) => "prybar",
-            (Kind::Cli, true) => "prybar.exe",
-            (Kind::Mcp, false) => "prybar-mcp",
-            (Kind::Mcp, true) => "prybar-mcp.exe",
-            (Kind::Gui, false) => "Prybar.app",
-            (Kind::Gui, true) => "prybar-gui.exe",
+        let os = std::env::consts::OS;
+        match (self, os) {
+            (Kind::Cli, "windows") => "prybar.exe",
+            (Kind::Cli, _) => "prybar",
+            (Kind::Mcp, "windows") => "prybar-mcp.exe",
+            (Kind::Mcp, _) => "prybar-mcp",
+            (Kind::Gui, "macos") => "Prybar.app",
+            (Kind::Gui, "windows") => "prybar-gui.exe",
+            // Linux ships a plain binary next to the CLI.
+            (Kind::Gui, _) => "prybar-gui",
         }
     }
 }
