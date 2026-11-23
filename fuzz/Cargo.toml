@@ -21,6 +21,7 @@ prybar-mdl = { path = "../crates/prybar-mdl" }
 prybar-tools = { path = "../crates/prybar-tools" }
 prybar-export = { path = "../crates/prybar-export" }
 prybar-vtf = { path = "../crates/prybar-vtf" }
+prybar-workshop = { path = "../crates/prybar-workshop", default-features = false }
 
 [profile.release]
 debug = 1
@@ -116,6 +117,13 @@ bench = false
 [[bin]]
 name = "vtf"
 path = "fuzz_targets/vtf.rs"
+test = false
+doc = false
+bench = false
+
+[[bin]]
+name = "bbcode"
+path = "fuzz_targets/bbcode.rs"
 test = false
 doc = false
 bench = false

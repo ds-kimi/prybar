@@ -7,6 +7,7 @@
 pub mod addon;
 mod avatar;
 mod backend;
+pub mod bbcode;
 pub mod catalog;
 pub mod changelog;
 mod error;
