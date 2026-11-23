@@ -3,9 +3,11 @@
 //! input: parsing never panics, caps every size, and keeps plain text.
 
 mod fetch;
+mod retry;
 mod text;
 
-pub use fetch::cached;
+pub use fetch::{cached, cached_at, Log};
+pub use retry::backoff;
 
 /// Entries past this are dropped: years of daily updates at most.
 const MAX_ENTRIES: usize = 500;

@@ -10,6 +10,7 @@ mod backend;
 pub mod catalog;
 pub mod changelog;
 mod error;
+pub mod http;
 pub mod item;
 pub mod preview;
 mod publish;
