@@ -124,3 +124,7 @@ prybar privacy --clear-log
 ```
 
 MCP: `privacy {}` to read; `privacy {"set": false, "confirm": true}` after the user asks. `DO_NOT_TRACK=1` or `PRYBAR_TELEMETRY=0` block sending whatever the choice says.
+
+## File a bug found while working
+
+See `reporting-bugs.md`: ask, check `gh auth status`, search duplicates, draft redacted, ask again, `gh issue create`.

@@ -58,3 +58,7 @@ Read the returned log. Frequent causes:
 ## Texture not found (`texture --material`)
 
 The material is looked up like the engine: the model's own tree (folder above `models/`), its package, then every configured game folder and its VPKs. Run `games --detect --save` so the game's VPKs are searched, or pass the `.vtf` file directly.
+
+## prybar itself looks broken
+
+Exit 1, a crash or wrong output with valid input is a bug: follow `reporting-bugs.md` (ask the user twice before filing).

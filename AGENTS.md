@@ -40,3 +40,7 @@ sh scripts/check-limits/check-limits.sh
 ```
 
 Rules: at most 4 functions per `.rs` file, at most 30 lines per function, at most 10 `.rs` files per folder (nested module folders by domain). English only, no trailing spaces, comments say why. Untrusted input: bounds-check everything, never panic. Conventional commits.
+
+## Reporting bugs
+
+If prybar itself looks broken (wrong output, crash, exit 1, MCP error not caused by the input), ask the user "Want me to open an issue on ds-kimi/prybar?" and follow `docs/agents/reporting-bugs.md`: two explicit yeses (before drafting, then on the exact text), `gh auth status`, duplicate search, redacted paths, no game files, one issue per bug.

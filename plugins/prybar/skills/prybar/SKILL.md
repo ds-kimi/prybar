@@ -42,6 +42,10 @@ Recipes with exact calls: `docs/agents/usecases.md`. GUI/CLI/MCP feature table: 
 - Writes need `confirm: true` in MCP (`publish_workshop` without `dry_run`, `privacy` changes): ask the user first.
 - Never commit or redistribute game assets you decompile.
 
+## Reporting a prybar bug
+
+Wrong output, a crash, exit 1 or an MCP error not caused by the input: stop and ask "Want me to open an issue on ds-kimi/prybar?". Continue only on an explicit yes. Check `gh auth status` (else give the prefilled text and the new-issue URL), search duplicates with `gh issue list --search`, draft the bug form fields with redacted paths and no game files, show the exact title, body and labels, ask again, and run `gh issue create` only after the second explicit yes. One issue per bug. Details: `docs/agents/reporting-bugs.md`.
+
 ## JSON and exit codes
 
 `--json` prints exactly one JSON document on stdout; progress is on stderr. Exit codes: 0 ok, 1 internal, 2 usage, 3 not found, 4 invalid input, 5 I/O, 6 external tool, 7 partial batch. MCP errors: `{error, kind, code}` with the same codes.
@@ -51,4 +55,5 @@ Recipes with exact calls: `docs/agents/usecases.md`. GUI/CLI/MCP feature table: 
 - `docs/agents/errors.md`: every error, cause, fix
 - `docs/agents/usecases.md`: task recipes
 - `docs/agents/troubleshooting.md`: studiomdl, config, limits
+- `docs/agents/reporting-bugs.md`: how to file a bug (two confirmations)
 - `docs/cli/README.md`, `docs/mcp/README.md`: full command and tool reference

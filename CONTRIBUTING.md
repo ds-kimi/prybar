@@ -199,6 +199,19 @@ Not in CI: it needs game files.
 
 Conventional commits (`feat(vpk): ...`, `fix(mdl): ...`).
 
+## Issues and labels
+
+Issues use the forms in `.github/ISSUE_TEMPLATE/` (bug, model, feature,
+game, docs); blank issues are off, questions go to Discussions and
+vulnerabilities to `SECURITY.md`. Forms add a type label and
+`needs triage`. Labels are code in `.github/labels.yml`; after editing it
+run `sh scripts/github/sync-labels.sh` (needs `gh` with write access).
+
+Triage: read new `needs triage` issues, add one `area: ...`, then
+`confirmed`, `needs repro` or `needs sample`, and a priority `P1`..`P3`
+for confirmed bugs. Close duplicates with `duplicate` and a link.
+Pull requests follow `.github/pull_request_template.md`.
+
 ## CI
 
 `.github/workflows/`: `ci.yml` (fmt, clippy, test, check-limits on
