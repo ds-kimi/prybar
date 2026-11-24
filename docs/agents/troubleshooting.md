@@ -25,7 +25,7 @@ Read the returned log. Frequent causes:
 
 ## Decompile output looks wrong
 
-`notes` in the report lists companions that were missing or broken (`.vvd`, `.vtx`, `.phy`, `.ani`). Put all companions next to the `.mdl`, or reference the package folder (`pak_dir.vpk:models/props`). Big-endian `.phy` files from console ports (Postal III, Xbox 360, PS3) are detected and read automatically; big-endian `.mdl` (`TSDI` magic) is not supported. Vampire: Bloodlines (MDL 2531) has no `.vvd`: keep the `.dx80.vtx` next to the `.mdl` to get reference meshes, flexes (VTA) and eyeballs; pose parameters and procedural bones (VRD) are decoded too; 2531 animations are still listed in `notes` as not decoded. Known small differences: `docs/roundtrip-report.md`.
+`notes` in the report lists companions that were missing or broken (`.vvd`, `.vtx`, `.phy`, `.ani`). Put all companions next to the `.mdl`, or reference the package folder (`pak_dir.vpk:models/props`). Big-endian `.phy` files from console ports (Postal III, Xbox 360, PS3) are detected and read automatically; big-endian `.mdl` (`TSDI` magic) is not supported. Vampire: Bloodlines (MDL 2531) has no `.vvd`: keep the `.dx80.vtx` next to the `.mdl` to get reference meshes, flexes (VTA) and eyeballs; pose parameters, procedural bones (VRD) and physics chains (commented `$physicschain`) are decoded too, and `.phy` solids with their own `origin`/`angles` pose are placed with it; 2531 animations are still listed in `notes` as not decoded. Known small differences: `docs/roundtrip-report.md`.
 
 ## Limits
 

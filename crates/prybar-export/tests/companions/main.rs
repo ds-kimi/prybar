@@ -54,3 +54,37 @@ fn physics_smd_moves_ragdoll_solids_to_their_bone() {
     ));
     assert!(prybar_export::smd::physics_smd(&fixture::ir()).is_none());
 }
+
+/// VTMB solids carry their own `origin`/`angles` pose, which wins over the
+/// MDL bind; a pose missing one key is ignored.
+#[test]
+fn physics_smd_uses_solid_reference_pose() {
+    let mut ir = fixture::ir();
+    ir.version = 2531;
+    let tri = [[1.0, 0.0, 0.0], [0.0; 3], [0.0, 0.0, 1.0]];
+    let pieces = vec![ConvexPiece {
+        bone: -1,
+        triangles: vec![tri],
+    }];
+    let solid = PhysSolid { pieces };
+    let block = |i: &str, extra: &[(&str, &str)]| KvBlock {
+        name: "solid".into(),
+        pairs: [("index", i), ("name", "valvebiped.arm")]
+            .iter()
+            .chain(extra)
+            .map(|(k, v)| ((*k).into(), (*v).into()))
+            .collect(),
+    };
+    ir.physics = Some(Physics {
+        solids: vec![solid.clone(), solid],
+        blocks: vec![
+            block("0", &[("origin", "0 0 10"), ("angles", "0 90 0")]),
+            block("1", &[("origin", "0 0 10")]),
+        ],
+        ..Physics::default()
+    });
+    let smd = prybar_export::smd::physics_smd(&ir).unwrap();
+    assert!(smd.contains("  1 0.000000 1.000000 10.000000 "), "{smd}");
+    // The partial pose falls back to the bind: one unit along X.
+    assert!(smd.contains("  1 2.000000 0.000000 0.000000 "), "{smd}");
+}
