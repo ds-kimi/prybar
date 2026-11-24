@@ -64,6 +64,10 @@ fn run_batch(
         );
         jobs = next_jobs(at, found, to, &mut run.placed, &mut run.done);
     }
+    for j in jobs {
+        let w = format!("{}.mdl: include chain too deep, skipped", j.stem);
+        run.placed.warnings.push(w);
+    }
 }
 
 fn failure(input: &str, e: &crate::ServiceError) -> Failure {

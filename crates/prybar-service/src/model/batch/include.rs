@@ -76,7 +76,7 @@ pub fn next_jobs(
             placed.warnings.push(w);
             continue;
         };
-        if done.insert(key(&hit)) {
+        if done.insert(key(origin, &hit)) {
             let dir = place(out, flat, (root, &hit, &game), placed);
             let from = Some(format!("{stem}.mdl"));
             jobs.push(Job {

@@ -64,10 +64,13 @@ fn decompile_options(a: &DecompileArgs) -> prybar_service::Result<DecompileOptio
 }
 
 fn summary(r: DecompileReport) -> Value {
+    let counts = [r.models.len(), r.failures.len(), r.warnings.len()];
+    let truncated = counts.iter().any(|&n| n > SHOWN);
     json!({
         "decompiled": r.models.len(),
         "failed": r.failures.len(),
-        "truncated": r.models.len() > SHOWN || r.failures.len() > SHOWN,
+        "warned": r.warnings.len(),
+        "truncated": truncated,
         "models": &r.models[..r.models.len().min(SHOWN)],
         "failures": &r.failures[..r.failures.len().min(SHOWN)],
         "warnings": &r.warnings[..r.warnings.len().min(SHOWN)],

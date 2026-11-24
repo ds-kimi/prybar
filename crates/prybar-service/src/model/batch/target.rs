@@ -1,3 +1,4 @@
+use crate::source::Origin;
 use std::collections::HashSet;
 use std::path::{Path, PathBuf};
 
@@ -65,9 +66,14 @@ fn unique(taken: &mut HashSet<String>, base: PathBuf) -> PathBuf {
 }
 
 /// Identity of a model across a run, so an `$includemodel` reached by
-/// two routes (`./a` and `a`, `A` and `a`) is decompiled once.
-pub fn key(stem: &str) -> String {
-    let real = std::fs::canonicalize(format!("{stem}.mdl")).ok();
+/// two routes (`./a` and `a`, `A` and `a`) is decompiled once. Package
+/// stems are prefixed with their package: the same inner path in two
+/// packages, or on disk, is a different model.
+pub fn key(origin: Origin, stem: &str) -> String {
+    let real = match origin {
+        Origin::Disk => std::fs::canonicalize(format!("{stem}.mdl")).ok(),
+        Origin::Package(p) => Some(p.path().join(stem)),
+    };
     let real = real.as_ref().and_then(|p| p.to_str()).unwrap_or(stem);
     real.replace('\\', "/").to_lowercase()
 }
