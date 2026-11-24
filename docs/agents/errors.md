@@ -26,6 +26,8 @@ When nothing was decompiled the run exits with the failures' shared code (4 if t
 | `<field>: `V` is not an absolute local path` | MCP paths must be absolute; UNC and device paths are refused |
 | `<field>: expected a path of 1 to N bytes` | empty or oversized path |
 | `inputs: expected 1 to 64 items` | send at most 64 inputs per `decompile_model` call |
+| warning `<model>.mdl: $includemodel <name> not found` | the shared model is not in the package or under the game folder; decompile it separately or add its folder as an input. The including model is still complete |
+| warning `<model>.mdl: <dir> is already used, wrote to <dir>_2` | two inputs map to the same output folder (same name with `--flat`, or two inputs with the same tree); nothing was overwritten |
 | ``built without the `workshop` feature; rebuild with --features workshop`` | `publish` needs a build with the Steam SDK |
 | `invalid <field>: <reason>` | Workshop spec field is wrong; fix the spec JSON (`content` must be an existing `.gma` or addon folder with a valid `addon.json` and only whitelisted files for GMod app 4000, else an existing folder) |
 | `not a supported Workshop game; use 4000 (garrysmod) or 440 (tf2)` | the spec's `app_id` is not a game prybar can publish to; see `publish --games` |

@@ -5,7 +5,7 @@ Everything the desktop app does can be done from the CLI (`prybar --json ...`) a
 | Feature | GUI | CLI | MCP |
 |---|---|---|---|
 | Model summary (version, bones, meshes, sequences, materials, companions) | Model screen | `inspect <model>` | `inspect_model` |
-| Decompile to QC/SMD/VTA/VRD | Decompile screen | `decompile <inputs> -o <dir>` | `decompile_model` |
+| Decompile to QC/SMD/VTA/VRD (tree, includes) | Decompile screen | `decompile <inputs> -o <dir> [--flat] [--no-includes]` | `decompile_model` (`flat`, `with_includes`) |
 | Browse a package (search) | Package screen | `list <pkg> --filter <wildcard>` | `list_package` |
 | Extract a package | Package screen › Extract | `unpack <pkg> -o <dir>` | `unpack_package` |
 | Build a VPK or GMA | Package screen | `pack <dir> -o <out>` | `pack_package` |
