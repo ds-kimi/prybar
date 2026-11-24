@@ -48,7 +48,17 @@ fn word(w: &str) -> String {
     if w.contains(['/', '\\']) || w.contains(":\\") {
         return "<path>".into();
     }
+    // Emails, IP addresses and long numbers (SteamID64, workshop ids,
+    // phone numbers) can point at a person; short numbers stay for context.
+    if w.contains('@') {
+        return "<email>".into();
+    }
     let bare = w.trim_end_matches([',', '.', ';', ':', ')', ']']);
+    let digits = bare.bytes().filter(u8::is_ascii_digit).count();
+    let dots = bare.bytes().filter(|&b| b == b'.').count();
+    if digits >= 7 || (dots == 3 && bare.bytes().all(|b| b.is_ascii_digit() || b == b'.')) {
+        return "<number>".into();
+    }
     let is_file = bare.rsplit_once('.').is_some_and(|(stem, ext)| {
         !stem.is_empty()
             && (1..=5).contains(&ext.len())
