@@ -7,7 +7,6 @@ mod inspect;
 mod load;
 mod open;
 mod report;
-mod target;
 mod write;
 
 pub use batch::decompile;

@@ -53,6 +53,8 @@ impl AppState {
             out,
             recursive: true,
             split_qc: self.split_qc,
+            flat: false,
+            with_includes: true,
         };
         let work = move || {
             prybar_service::model::decompile(&[arg], &opts, &|_| {}).map_err(|e| e.to_string())

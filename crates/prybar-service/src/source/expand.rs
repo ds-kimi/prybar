@@ -1,4 +1,4 @@
-use super::packed::{mdl_stem, packed};
+use super::packed::{mdl_stem, packed, packed_root};
 use super::wildcard::has_wildcard;
 use super::{matches, ModelRef};
 use crate::package::Package;
@@ -12,28 +12,34 @@ use walkdir::WalkDir;
 pub struct Batch {
     pub package: Option<Package>,
     pub stems: Vec<String>,
+    /// Folder the stems are relative to in the mirrored output tree:
+    /// the input folder, the wildcard base, or the package prefix.
+    pub root: String,
 }
 
 pub fn expand(arg: &str, recursive: bool) -> Result<Batch> {
-    let stems = match ModelRef::parse(arg) {
-        ModelRef::Path(p) => disk(&p, recursive)?,
+    let (package, stems, root) = match ModelRef::parse(arg) {
+        ModelRef::Path(p) => {
+            let (stems, root) = disk(&p, recursive)?;
+            (None, stems, root)
+        }
         ModelRef::Packed { package, inner } => {
             let package = Package::open(&package)?;
             let stems = packed(&package, &inner, recursive);
-            return non_empty(arg, Some(package), stems);
+            (Some(package), stems, packed_root(&inner))
         }
     };
-    non_empty(arg, None, stems)
-}
-
-fn non_empty(arg: &str, package: Option<Package>, stems: Vec<String>) -> Result<Batch> {
     if stems.is_empty() {
         return Err(ServiceError::NotFound(format!("no .mdl matches {arg}")));
     }
-    Ok(Batch { package, stems })
+    Ok(Batch {
+        package,
+        stems,
+        root,
+    })
 }
 
-fn disk(path: &Path, recursive: bool) -> Result<Vec<String>> {
+fn disk(path: &Path, recursive: bool) -> Result<(Vec<String>, String)> {
     let name = path.file_name().and_then(|n| n.to_str()).unwrap_or("");
     let (root, pattern) = if has_wildcard(name) {
         let parent = path.parent().filter(|p| !p.as_os_str().is_empty());
@@ -44,7 +50,8 @@ fn disk(path: &Path, recursive: bool) -> Result<Vec<String>> {
     } else if path.is_dir() {
         (path.to_path_buf(), "*.mdl".to_owned())
     } else if path.is_file() {
-        return Ok(stem(path).into_iter().collect());
+        let parent = path.parent().and_then(Path::to_str).unwrap_or("");
+        return Ok((stem(path).into_iter().collect(), parent.to_owned()));
     } else {
         return Err(ServiceError::NotFound(path.display().to_string()));
     };
@@ -58,7 +65,7 @@ fn disk(path: &Path, recursive: bool) -> Result<Vec<String>> {
         .filter_map(|e| stem(e.path()))
         .collect();
     out.sort();
-    Ok(out)
+    Ok((out, root.to_str().unwrap_or("").to_owned()))
 }
 
 fn stem(path: &Path) -> Option<String> {

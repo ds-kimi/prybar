@@ -28,7 +28,7 @@ impl Prybar {
     }
 
     #[tool(
-        description = "Decompile models to QC + SMD (+ VTA flexes, VRD procedural bones) source files; existing files of the same name in `out` are overwritten. Models are processed in parallel; one bad model does not stop the others. Companions (.vvd, .vtx, .phy, .ani) must sit next to each .mdl; Vampire: Bloodlines MDL 2531 has no .vvd and needs only its .dx80.vtx. Returns counts, the first 50 results and the first 50 failures.",
+        description = "Decompile models to QC + SMD (+ VTA flexes, VRD procedural bones) source files; existing files of the same name in `out` are overwritten. Models are processed in parallel; one bad model does not stop the others. Companions (.vvd, .vtx, .phy, .ani) must sit next to each .mdl; Vampire: Bloodlines MDL 2531 has no .vvd and needs only its .dx80.vtx. The output mirrors the input tree (`flat` for one folder per model name) and models named by `$includemodel` are decompiled too (`with_includes`, default true; unresolved ones become warnings). Returns counts, the first 50 results (included ones carry `included_from`), failures and warnings.",
         annotations(
             destructive_hint = false,
             idempotent_hint = true,
@@ -58,6 +58,8 @@ fn decompile_options(a: &DecompileArgs) -> prybar_service::Result<DecompileOptio
         out: guard::absolute("out", &a.out)?,
         recursive: a.recursive,
         split_qc: a.split_qc,
+        flat: a.flat,
+        with_includes: a.with_includes,
     })
 }
 
@@ -68,5 +70,6 @@ fn summary(r: DecompileReport) -> Value {
         "truncated": r.models.len() > SHOWN || r.failures.len() > SHOWN,
         "models": &r.models[..r.models.len().min(SHOWN)],
         "failures": &r.failures[..r.failures.len().min(SHOWN)],
+        "warnings": &r.warnings[..r.warnings.len().min(SHOWN)],
     })
 }

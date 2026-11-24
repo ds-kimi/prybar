@@ -10,4 +10,5 @@ mod wildcard;
 pub use expand::{expand, Batch};
 pub use model_ref::ModelRef;
 pub use origin::Origin;
+pub use packed::mdl_stem;
 pub use wildcard::matches;
