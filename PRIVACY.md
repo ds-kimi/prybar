@@ -34,18 +34,18 @@ The collector refuses any other field, any value that is not short plain text, a
 
 - No install ID, user ID, device ID or hardware ID. Events cannot be linked to each other or to a person.
 - No file names, folder paths, model names, package contents or game names.
-- No IP address is stored. The collector keeps no headers and no timestamps finer than a day. The rate limiter holds addresses in memory only and wipes them every minute.
+- No IP address is stored. The collector keeps no headers and no timestamps finer than a day. The hosted collector (Cloudflare Workers) has no request logging and never reads the address; the self-hosted one rate-limits in memory only and wipes it every minute.
 - No usage tracking of screens, buttons or features.
 
 "Active users" is the number of `app_start` events per day, version and OS. It is an estimate of launches, not of people.
 
 ### Where it goes
 
-To the collector the maintainers run, set at build time (`PRYBAR_TELEMETRY_URL`). A build without it is "not configured" and sends nothing. The collector source is in [services/telemetry-collector](services/telemetry-collector) and its deployment notes are in [docs/privacy/collector.md](docs/privacy/collector.md).
+To the collector the maintainers run, set at build time (`PRYBAR_TELEMETRY_URL`). A build without it is "not configured" and sends nothing. Official releases send to `https://prybar-telemetry.progamerkimi.workers.dev/v1/event`, run from [services/telemetry-worker](services/telemetry-worker) on Cloudflare Workers. A self-hostable version is in [services/telemetry-collector](services/telemetry-collector) ([deployment notes](docs/privacy/collector.md)).
 
 ### Retention
 
-The collector stores one counter per day, event, version, OS and CPU type, and the sanitized crash reports. It does not delete them automatically today; they are kept until the operator removes them. Only the last 60 days of counts appear on its stats page.
+The collector stores one counter per day, event, version, OS and CPU type, and the sanitized crash reports. It does not delete them automatically today; they are kept until the operator removes them. The counts are public: anyone can see them at [ds-kimi.github.io/prybar](https://ds-kimi.github.io/prybar/) (last 60 days). Crash messages are not public; only the maintainer can read them.
 
 ### Turn it off
 

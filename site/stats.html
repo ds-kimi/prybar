@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Prybar stats</title>
+<link rel="icon" href="logo.png">
+<style>
+:root{--bg:#fff;--fg:#1b1b1b;--mut:#6b6b6b;--line:#e6e6e6;--acc:#b7410e;--bar:#b7410e33}
+@media (prefers-color-scheme:dark){:root{--bg:#141414;--fg:#ececec;--mut:#9a9a9a;--line:#262626;--acc:#e0743f;--bar:#e0743f44}}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font:15px/1.5 system-ui,-apple-system,sans-serif;max-width:880px;margin:48px auto;padding:0 16px}
+header{display:flex;align-items:center;gap:12px;margin-bottom:6px}
+header img{width:36px;height:36px}
+h1{font-size:22px;margin:0}
+h2{font-size:15px;margin:36px 0 10px}
+p{color:var(--mut);margin:0 0 20px;max-width:640px}
+a{color:var(--acc)}
+.big{display:flex;flex-wrap:wrap;gap:40px;margin:20px 0 8px}
+.big b{display:block;font-size:30px;font-variant-numeric:tabular-nums}
+.big span{color:var(--mut);font-size:13px}
+.chart{display:flex;align-items:flex-end;gap:2px;height:120px;border-bottom:1px solid var(--line)}
+.chart div{flex:1;background:var(--acc);min-height:1px;border-radius:2px 2px 0 0;opacity:.85}
+.axis{display:flex;justify-content:space-between;color:var(--mut);font-size:12px;margin-top:4px}
+table{border-collapse:collapse;width:100%;font-variant-numeric:tabular-nums}
+th,td{text-align:left;padding:7px 8px;border-bottom:1px solid var(--line)}
+th{color:var(--mut);font-weight:500}
+td.n{width:40%}
+.cell{display:flex;align-items:center;gap:10px}
+.cell i{display:block;height:8px;background:var(--bar);border-radius:2px}
+.wrap{overflow-x:auto}
+#err{color:var(--acc)}
+</style>
+<header><img src="logo.png" alt=""><h1>Prybar stats</h1></header>
+<p>Anonymous counts from the Prybar desktop app: launches and crashes per day, version and platform. No IDs, no IP addresses, nothing finer than a day. A launch is not a person, and anyone who turned analytics off is not counted. <a href="https://github.com/ds-kimi/prybar/blob/main/PRIVACY.md">What is sent</a> · <a href="https://github.com/ds-kimi/prybar">GitHub</a></p>
+<div id="err"></div>
+<div class="big">
+  <div><b id="today">–</b><span>launches today (UTC)</span></div>
+  <div><b id="month">–</b><span>launches, last 30 days</span></div>
+  <div><b id="dl">–</b><span>release downloads (GitHub)</span></div>
+</div>
+<h2>Launches per day, last 60 days</h2>
+<div class="chart" id="chart"></div>
+<div class="axis"><span id="a0"></span><span id="a1"></span></div>
+<h2>Versions, last 30 days</h2>
+<div class="wrap"><table id="ver"></table></div>
+<h2>Platforms, last 30 days</h2>
+<div class="wrap"><table id="plat"></table></div>
+<script>
+const API = "https://prybar-telemetry.progamerkimi.workers.dev/stats.json";
+const n = (v) => v ?? 0;
+const fmt = (v) => n(v).toLocaleString("en");
+const esc = (s) => String(s).replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);
+function table(el, head, rows, barCol) {
+  const max = Math.max(1, ...rows.map((r) => r[barCol]));
+  el.innerHTML = `<tr>${head.map((h) => `<th>${h}</th>`).join("")}</tr>` + (rows.length ? rows.map((r) =>
+    `<tr>${r.map((c, i) => i === barCol
+      ? `<td class="n"><div class="cell"><i style="width:${(c / max) * 70}%"></i>${fmt(c)}</div></td>`
+      : `<td>${esc(c)}</td>`).join("")}</tr>`).join("") : `<tr><td colspan="${head.length}">No data yet</td></tr>`);
+}
+function chart(days) {
+  const map = Object.fromEntries(days.map((d) => [d.day, n(d.launches)]));
+  const list = [];
+  for (let i = 59; i >= 0; i--) { const d = new Date(Date.now() - i * 864e5).toISOString().slice(0, 10); list.push([d, map[d] || 0]); }
+  const max = Math.max(1, ...list.map((x) => x[1]));
+  document.getElementById("chart").innerHTML = list.map(([d, v]) => `<div title="${d}: ${v}" style="height:${(v / max) * 100}%"></div>`).join("");
+  document.getElementById("a0").textContent = list[0][0];
+  document.getElementById("a1").textContent = list[59][0];
+}
+fetch(API).then((r) => r.json()).then((s) => {
+  document.getElementById("today").textContent = fmt(s.totals.d);
+  document.getElementById("month").textContent = fmt(s.totals.m);
+  chart(s.days);
+  table(document.getElementById("ver"), ["Version", "Launches", "Crashes"], s.versions.map((v) => [v.version, n(v.launches), n(v.crashes)]), 1);
+  table(document.getElementById("plat"), ["OS", "CPU", "Launches"], s.platforms.map((p) => [p.os, p.arch, n(p.launches)]), 2);
+}).catch(() => { document.getElementById("err").textContent = "Stats are unavailable right now."; });
+fetch("https://api.github.com/repos/ds-kimi/prybar/releases?per_page=100").then((r) => r.json()).then((rs) => {
+  const t = rs.flatMap((r) => r.assets).filter((a) => !/sha256|SHA256SUMS/.test(a.name)).reduce((s, a) => s + a.download_count, 0);
+  document.getElementById("dl").textContent = fmt(t);
+}).catch(() => {});
+</script>
+</html>

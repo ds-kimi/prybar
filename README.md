@@ -112,7 +112,7 @@ code --add-mcp '{"name":"prybar","command":"prybar-mcp"}'
 
 ## Privacy
 
-Only the desktop app sends anonymous analytics (launch and crash events, no IDs, no paths), on by default with a first-launch opt-out, and every payload sent is listed in Settings > Privacy. `PRYBAR_TELEMETRY=0` or `DO_NOT_TRACK=1` turns it off. The CLI and MCP server send none. Details: [PRIVACY.md](PRIVACY.md).
+Only the desktop app sends anonymous analytics (launch and crash events, no IDs, no paths), on by default with a first-launch opt-out, and every payload sent is listed in Settings > Privacy. `PRYBAR_TELEMETRY=0` or `DO_NOT_TRACK=1` turns it off. The CLI and MCP server send none. The counts are public: [live stats](https://ds-kimi.github.io/prybar/). Details: [PRIVACY.md](PRIVACY.md).
 
 ## Documentation
 
