@@ -1,3 +1,10 @@
+mod batch;
+mod expand;
+mod report;
+
+pub use batch::compile_batch;
+pub use report::{CompileBatchReport, CompileItem, CompileOptions, ItemStatus};
+
 use super::{games::game, tool_error};
 use crate::{Result, ServiceError};
 use prybar_tools::compile::CompileReport;
@@ -33,6 +40,10 @@ fn studiomdl_for(game_name: &str, qc: &Path) -> Result<(Game, PathBuf)> {
     if !qc.is_file() {
         return Err(ServiceError::NotFound(qc.display().to_string()));
     }
+    studiomdl(game_name)
+}
+
+fn studiomdl(game_name: &str) -> Result<(Game, PathBuf)> {
     let g = game(game_name)?;
     let studiomdl = g.studiomdl.clone().ok_or_else(|| {
         tool_error(ToolError::MissingTool {

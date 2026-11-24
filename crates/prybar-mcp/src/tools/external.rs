@@ -1,3 +1,4 @@
+use super::compile;
 use crate::guard;
 use crate::params::{CompileArgs, PublishArgs, ViewArgs};
 use crate::reply::{blocking, failure};
@@ -10,7 +11,7 @@ use rmcp::{tool, tool_router};
 #[tool_router(router = external_router, vis = "pub(crate)")]
 impl Prybar {
     #[tool(
-        description = "Compile a QC file with the configured game's studiomdl. A compile that runs but fails still returns a result with `success: false`, the error lines and the full log, so the QC can be fixed and compiled again. `outputs` lists the files studiomdl wrote (.mdl, .vvd, .vtx, .phy, .ani, .cvvd).",
+        description = "Compile QC files with the configured game's studiomdl. With `qc` (one absolute .qc path): a compile that runs but fails still returns `success: false`, the error lines and the full log, so the QC can be fixed and compiled again; `outputs` lists the files studiomdl wrote (.mdl, .vvd, .vtx, .phy, .ani, .cvvd). With `inputs` (absolute .qc files, folders or `*.qc` wildcards, plus `recursive` and `jobs`): every QC is compiled, a few at a time, and the reply has `compiled`/`failed` counts and one item per QC with `status` (ok, failed), `errors`, `warnings` and `outputs`; a missing input is a failed item, not an error.",
         annotations(
             destructive_hint = true,
             idempotent_hint = true,
@@ -18,8 +19,11 @@ impl Prybar {
         )
     )]
     async fn compile_model(&self, Parameters(a): Parameters<CompileArgs>) -> CallToolResult {
-        match guard::absolute("qc", &a.qc) {
-            Ok(qc) => blocking(move || tools::compile(&a.game, &qc)).await,
+        match compile::plan(a) {
+            Ok(compile::Plan::One(game, qc)) => blocking(move || tools::compile(&game, &qc)).await,
+            Ok(compile::Plan::Many(game, inputs, opts)) => {
+                blocking(move || compile::batch(&game, &inputs, &opts)).await
+            }
             Err(e) => failure(&e),
         }
     }

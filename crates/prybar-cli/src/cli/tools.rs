@@ -3,7 +3,17 @@ use std::path::PathBuf;
 
 #[derive(Debug, Args)]
 pub struct CompileArgs {
-    pub qc: PathBuf,
+    /// .qc files, folders (every .qc inside) or wildcards (`out/*.qc`).
+    /// One .qc prints the full studiomdl log; anything more gives a
+    /// per-QC report.
+    #[arg(required = true)]
+    pub inputs: Vec<String>,
+    /// Descend into subfolders of folder and wildcard inputs.
+    #[arg(long, short)]
+    pub recursive: bool,
+    /// studiomdl runs at once (default: half the CPU cores).
+    #[arg(long, short)]
+    pub jobs: Option<usize>,
     /// Configured game name (see `prybar games`).
     #[arg(long, short)]
     pub game: String,

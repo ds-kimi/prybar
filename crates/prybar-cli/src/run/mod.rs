@@ -1,5 +1,6 @@
 //! One handler per command; each returns the exit code.
 
+mod compile;
 mod model;
 mod package;
 mod publish;
@@ -17,7 +18,7 @@ pub fn run(cmd: Command, out: &Output) -> u8 {
         Command::List(a) => package::list(&a, out),
         Command::Unpack(a) => package::unpack(&a, out),
         Command::Pack(a) => package::pack(&a, out),
-        Command::Compile(a) => tools::compile(&a, out),
+        Command::Compile(a) => compile::compile(&a, out),
         Command::View(a) => tools::view(&a, out),
         Command::Publish(a) => publish::publish(&a, out),
         Command::Workshop(a) => workshop::workshop(&a, out),
