@@ -4609,7 +4609,7 @@ dependencies = [
 
 [[package]]
 name = "prybar-apk"
-version = "0.2.1"
+version = "0.3.0"
 dependencies = [
  "prybar-io",
  "tempfile",
@@ -4618,7 +4618,7 @@ dependencies = [
 
 [[package]]
 name = "prybar-cli"
-version = "0.2.1"
+version = "0.3.0"
 dependencies = [
  "assert_cmd",
  "clap",
@@ -4635,7 +4635,7 @@ dependencies = [
 
 [[package]]
 name = "prybar-export"
-version = "0.2.1"
+version = "0.3.0"
 dependencies = [
  "criterion 0.5.1",
  "insta",
@@ -4647,7 +4647,7 @@ dependencies = [
 
 [[package]]
 name = "prybar-gma"
-version = "0.2.1"
+version = "0.3.0"
 dependencies = [
  "crc32fast",
  "criterion 0.5.1",
@@ -4662,7 +4662,7 @@ dependencies = [
 
 [[package]]
 name = "prybar-gui"
-version = "0.2.1"
+version = "0.3.0"
 dependencies = [
  "async-channel",
  "glam",
@@ -4685,7 +4685,7 @@ dependencies = [
 
 [[package]]
 name = "prybar-hfs"
-version = "0.2.1"
+version = "0.3.0"
 dependencies = [
  "proptest",
  "prybar-io",
@@ -4695,7 +4695,7 @@ dependencies = [
 
 [[package]]
 name = "prybar-io"
-version = "0.2.1"
+version = "0.3.0"
 dependencies = [
  "proptest",
  "thiserror 2.0.21",
@@ -4703,7 +4703,7 @@ dependencies = [
 
 [[package]]
 name = "prybar-mcp"
-version = "0.2.1"
+version = "0.3.0"
 dependencies = [
  "prybar-gma",
  "prybar-service",
@@ -4720,7 +4720,7 @@ dependencies = [
 
 [[package]]
 name = "prybar-mdl"
-version = "0.2.1"
+version = "0.3.0"
 dependencies = [
  "criterion 0.5.1",
  "proptest",
@@ -4734,7 +4734,7 @@ dependencies = [
 
 [[package]]
 name = "prybar-roundtrip"
-version = "0.2.1"
+version = "0.3.0"
 dependencies = [
  "prybar-mdl",
  "prybar-service",
@@ -4747,7 +4747,7 @@ dependencies = [
 
 [[package]]
 name = "prybar-service"
-version = "0.2.1"
+version = "0.3.0"
 dependencies = [
  "image",
  "prybar-apk",
@@ -4771,7 +4771,7 @@ dependencies = [
 
 [[package]]
 name = "prybar-telemetry"
-version = "0.2.1"
+version = "0.3.0"
 dependencies = [
  "serde",
  "serde_json",
@@ -4781,14 +4781,14 @@ dependencies = [
 
 [[package]]
 name = "prybar-testkit"
-version = "0.2.1"
+version = "0.3.0"
 dependencies = [
  "prybar-tools",
 ]
 
 [[package]]
 name = "prybar-tools"
-version = "0.2.1"
+version = "0.3.0"
 dependencies = [
  "proptest",
  "serde",
@@ -4800,7 +4800,7 @@ dependencies = [
 
 [[package]]
 name = "prybar-update"
-version = "0.2.1"
+version = "0.3.0"
 dependencies = [
  "dirs",
  "flate2",
@@ -4822,7 +4822,7 @@ dependencies = [
 
 [[package]]
 name = "prybar-vpk"
-version = "0.2.1"
+version = "0.3.0"
 dependencies = [
  "crc32fast",
  "criterion 0.5.1",
@@ -4836,7 +4836,7 @@ dependencies = [
 
 [[package]]
 name = "prybar-vtf"
-version = "0.2.1"
+version = "0.3.0"
 dependencies = [
  "criterion 0.5.1",
  "proptest",
@@ -4845,7 +4845,7 @@ dependencies = [
 
 [[package]]
 name = "prybar-workshop"
-version = "0.2.1"
+version = "0.3.0"
 dependencies = [
  "image",
  "proptest",
@@ -6100,7 +6100,7 @@ dependencies = [
 
 [[package]]
 name = "telemetry-collector"
-version = "0.2.1"
+version = "0.3.0"
 dependencies = [
  "axum",
  "prybar-telemetry",

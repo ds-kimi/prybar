@@ -13,8 +13,8 @@ path = "src/main.rs"
 workspace = true
 
 [dependencies]
-prybar-service = { version = "0.2.1", path = "../prybar-service" }
-prybar-workshop = { version = "0.2.1", path = "../prybar-workshop" }
+prybar-service = { version = "0.3.0", path = "../prybar-service" }
+prybar-workshop = { version = "0.3.0", path = "../prybar-workshop" }
 prybar-update = { path = "../prybar-update" }
 rmcp = { version = "3.11.0", features = ["server", "transport-io", "macros"] }
 schemars = "1.2.3"

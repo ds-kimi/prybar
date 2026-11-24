@@ -1,6 +1,6 @@
 {
   "name": "prybar",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "description": "Decompile, inspect, compile and package Source engine models and addons with prybar (CLI + MCP server).",
   "author": { "name": "Kimi", "url": "https://github.com/ds-kimi" },
   "homepage": "https://github.com/ds-kimi/prybar",

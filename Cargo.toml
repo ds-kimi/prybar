@@ -5,7 +5,7 @@ members = ["crates/*", "services/*", "tests/roundtrip"]
 exclude = ["services/telemetry-worker"]
 
 [workspace.package]
-version = "0.2.1"
+version = "0.3.0"
 edition = "2021"
 license-file = "LICENSE"
 publish = false
