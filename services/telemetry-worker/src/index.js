@@ -54,7 +54,7 @@ th,td{text-align:left;padding:6px 8px;border-bottom:1px solid var(--line)}th{col
 .big{display:flex;gap:32px;margin:16px 0}.big b{display:block;font-size:28px}.big span{color:var(--mut);font-size:13px}
 .wrap{overflow-x:auto}</style>${body}`;
 
-async function stats(env) {
+async function data(env) {
   const q = (sql) => env.DB.prepare(sql).all().then((r) => r.results);
   const [days, versions, platforms, totals] = await Promise.all([
     q(`SELECT day, SUM(CASE WHEN event='app_start' THEN count END) AS launches,
@@ -68,8 +68,18 @@ async function stats(env) {
     q(`SELECT SUM(CASE WHEN event='app_start' AND day >= date('now','-30 days') THEN count END) AS m,
        SUM(CASE WHEN event='app_start' AND day = date('now') THEN count END) AS d FROM daily`),
   ]);
+  return { days, versions, platforms, totals: totals[0] || {} };
+}
+
+async function json(env) {
+  return new Response(JSON.stringify(await data(env)), { headers: {
+    "content-type": "application/json", "cache-control": "public, max-age=300",
+    "access-control-allow-origin": "*" } });
+}
+
+async function stats(env) {
+  const { days, versions, platforms, totals: t } = await data(env);
   const n = (v) => v ?? 0;
-  const t = totals[0] || {};
   return new Response(page("Prybar stats", `<h1>Prybar stats</h1>
 <p>Public, anonymous counts from the desktop app: launches and crashes per day, version and platform. No IDs, no IP addresses, nothing finer than a day. A launch is not a person. <a href="https://github.com/ds-kimi/prybar/blob/main/PRIVACY.md">Privacy</a> · <a href="https://github.com/ds-kimi/prybar">GitHub</a></p>
 <div class="big"><div><b>${n(t.d)}</b><span>launches today (UTC)</span></div><div><b>${n(t.m)}</b><span>launches, last 30 days</span></div></div>
@@ -103,6 +113,7 @@ export default {
     const { pathname } = new URL(req.url);
     if (req.method === "POST" && pathname === "/v1/event") return ingest(req, env);
     if (req.method === "GET" && (pathname === "/" || pathname === "/stats")) return stats(env);
+    if (req.method === "GET" && pathname === "/stats.json") return json(env);
     if (req.method === "GET" && pathname === "/crashes") return crashes(req, env);
     return new Response("not found", { status: 404 });
   },

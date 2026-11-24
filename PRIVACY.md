@@ -45,7 +45,7 @@ To the collector the maintainers run, set at build time (`PRYBAR_TELEMETRY_URL`)
 
 ### Retention
 
-The collector stores one counter per day, event, version, OS and CPU type, and the sanitized crash reports. It does not delete them automatically today; they are kept until the operator removes them. The counts are public: anyone can see them at [prybar-telemetry.progamerkimi.workers.dev/stats](https://prybar-telemetry.progamerkimi.workers.dev/stats) (last 60 days). Crash messages are not public; only the maintainer can read them.
+The collector stores one counter per day, event, version, OS and CPU type, and the sanitized crash reports. It does not delete them automatically today; they are kept until the operator removes them. The counts are public: anyone can see them at [ds-kimi.github.io/prybar](https://ds-kimi.github.io/prybar/) (last 60 days). Crash messages are not public; only the maintainer can read them.
 
 ### Turn it off
 
