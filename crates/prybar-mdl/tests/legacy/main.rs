@@ -1,6 +1,7 @@
 //! MDL 2531 and v27-v37 parsing on synthetic files.
 
 mod builder;
+mod face;
 mod geometry;
 mod hostile;
 mod inline;

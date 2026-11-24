@@ -1,9 +1,10 @@
 //! MDL 2531 keeps each model's vertices in the MDL, in one of three
 //! formats chosen per model; triangles still come from the VTX (v107).
 
-mod normals;
+pub mod normals;
 mod vertex;
 
+use super::face;
 use super::header::LegacyHeader;
 use super::layout::Layout;
 use crate::ir::{Mesh, ModelIr, SubModel, Vertex};
@@ -35,25 +36,37 @@ pub fn attach(r: &Source, hdr: &LegacyHeader, lay: &Layout, ir: &mut ModelIr) ->
 
 /// `fields` is just past the model name; offsets are model-relative.
 fn load(r: &Source, fields: usize, at: usize, model: &mut SubModel) -> Result<()> {
-    let w = Words::read(r, fields, 14)?;
+    let w = Words::read(r, fields, 18)?;
+    let mut kinds = Vec::new();
     model.meshes = table(r, at, w.i(2), w.i(3), MESH_STRIDE)?
         .into_iter()
         .map(|m| {
-            let m = Words::read(r, m, 4)?;
-            Ok(Mesh {
-                material: m.i(0),
-                vertex_count: m.i(2),
-                vertex_offset: m.i(3),
-                ..Mesh::default()
-            })
+            let words = Words::read(r, m, 8)?;
+            kinds.push((words.i(6), words.i(7), words.i(0)));
+            mesh(r, m, &words)
         })
         .collect::<Result<_>>()?;
+    model.eyeballs = face::eyeballs(r, at, (w.i(16), w.i(17)), &kinds)?;
+    model.eyeball_count = model.eyeballs.len() as i32;
     let frame = Frame {
         offset: w.v3(8),
         scale: w.v3(11),
     };
     model.vertices = vertices(r, at, (w.i(4), w.i(5)), w.i(7), &frame)?;
     Ok(())
+}
+
+/// Words 4 and 5 are the flex `(count, index)`, relative to the mesh.
+fn mesh(r: &Source, at: usize, w: &Words) -> Result<Mesh> {
+    let flexes = face::mesh_flexes(r, at, w.i(4), w.i(5))?;
+    Ok(Mesh {
+        material: w.i(0),
+        vertex_count: w.i(2),
+        vertex_offset: w.i(3),
+        flex_count: flexes.len() as i32,
+        flexes,
+        ..Mesh::default()
+    })
 }
 
 /// `kind` 0 is skinned, 1 unskinned, anything else compressed.
