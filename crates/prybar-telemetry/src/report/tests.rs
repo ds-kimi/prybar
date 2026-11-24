@@ -16,6 +16,12 @@ fn message_drops_paths_files_quotes_and_user() {
         message("index 7 out of range 1.5", None),
         "index 7 out of range 1.5"
     );
+    let people =
+        "steam 76561198012345678 item 3141592653 mail kimi@x.fr from 192.168.1.5 at 10.0.0.1:";
+    assert_eq!(
+        message(people, None),
+        "steam <number> item <number> mail <email> from <number> at <number>"
+    );
 }
 
 #[test]
