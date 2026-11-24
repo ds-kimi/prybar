@@ -6,7 +6,6 @@ license-file.workspace = true
 publish.workspace = true
 
 [dependencies]
-prybar-io.workspace = true
 serde.workspace = true
 thiserror.workspace = true
 toml = "0.8"

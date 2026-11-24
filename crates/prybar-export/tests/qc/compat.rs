@@ -40,3 +40,17 @@ fn bloodlines_phoneme_filter_round_trips_to_qc() {
     ir.phoneme_filter = [0.1, 0.3];
     assert!(qc(&ir)[0].text.contains("$phonemefilter 0.1 0.3\n"));
 }
+
+/// VTMB fork compilers read `$vtmbbonerotation`; stock studiomdl would
+/// reject it, so it is kept as a comment and only for 2531.
+#[test]
+fn bloodlines_rotation_flag_is_a_qc_comment() {
+    let mut ir = super::fixture::ir();
+    ir.bones[0].flags |= 0x02;
+    let qc = |ir: &prybar_mdl::ModelIr| qc_files(ir, &Names::new(ir), QcOptions::default());
+    assert!(!qc(&ir)[0].text.contains("vtmbbonerotation"));
+    ir.version = 2531;
+    let name = ir.bones[0].name.clone();
+    let line = format!("// $vtmbbonerotation \"{name}\" \"model\"\n");
+    assert!(qc(&ir)[0].text.contains(&line));
+}

@@ -23,7 +23,11 @@ pub fn sequences(r: &Source, hdr: &Header, bone_count: usize) -> Result<Vec<Sequ
 
 /// `mstudioposeparamdesc_t` (20 bytes).
 pub fn pose_params(r: &Source, hdr: &Header) -> Result<Vec<PoseParam>> {
-    let (count, index) = hdr.span(fields::POSE_PARAMS);
+    pose_param_table(r, hdr.span(fields::POSE_PARAMS))
+}
+
+/// The struct is unchanged since 2531, so legacy models share it.
+pub(crate) fn pose_param_table(r: &Source, (count, index): (i32, i32)) -> Result<Vec<PoseParam>> {
     table(r, 0, count, index, 20)?
         .into_iter()
         .map(|at| {

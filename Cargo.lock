@@ -4791,7 +4791,6 @@ name = "prybar-tools"
 version = "0.2.1"
 dependencies = [
  "proptest",
- "prybar-io",
  "serde",
  "tempfile",
  "thiserror 2.0.21",

@@ -44,6 +44,15 @@ index the fine normal table; lengths are /255 x 8 (position) or x 2
 takes the material of the mesh with type 1 and parameter i. The QC gets
 `$phonemefilter`, `eyeball` lines and the VTA like any v44 model.
 
+2531 rig: pose parameters use the v44 20 B struct (header ints 39-40).
+Bone ints 116-120 hold the procedural rule type and bone-relative index:
+1 axis interp, 2 quaternion interp (same struct and 48 B triggers as v44,
+written to the VRD). The bind rotation is a quat, converted to euler for
+SMD and `$definebone`. Bone flag 0x02 (rotation stored in model space)
+becomes a `// $vtmbbonerotation "bone" "model"` QC comment: only VTMB
+fork compilers accept the command, so uncomment it for those.
+
 Not decoded, listed in `ModelIr::notes`: meshes for v27-v37 (vertex data
-lives in the MDL in old layouts), animations, sequences, flex controllers (except 2531), pose
-parameters, procedural bone rules, and attachments for v27-v31.
+lives in the MDL in old layouts), animations, sequences, flex controllers
+and pose parameters (except 2531), procedural bone rules (except 2531),
+and attachments for v27-v31.

@@ -26,6 +26,11 @@ pub fn write(s: &mut String, ir: &ModelIr) {
         if bone.flags & BONE_USED_BY_BONE_MERGE != 0 {
             let _ = writeln!(s, "$bonemerge {}", quote(&bone.name));
         }
+        // Model-space rotation bit: only VTMB fork compilers accept the
+        // command, so it stays a comment that stock studiomdl ignores.
+        if ir.version == 2531 && bone.flags & 0x02 != 0 {
+            let _ = writeln!(s, "// $vtmbbonerotation {} \"model\"", quote(&bone.name));
+        }
         let prop = &bone.surface_prop;
         if !prop.is_empty() && *prop != ir.surface_prop {
             let _ = writeln!(s, "$jointsurfaceprop {} {}", quote(&bone.name), quote(prop));

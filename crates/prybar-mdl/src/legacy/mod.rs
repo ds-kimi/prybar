@@ -1,7 +1,8 @@
 //! MDL 2531 and v27-v37: the pre-release Source formats. They predate the
 //! VVD/VTX split and many of their structs are only partly known, so the
 //! parser recovers the skeleton, markers, materials and body part names
-//! (plus meshes, vertices, flexes and eyeballs for 2531), and lists everything else in
+//! (plus meshes, vertices, flexes, eyeballs, pose parameters and
+//! procedural bones for 2531), and lists everything else in
 //! [`ModelIr::notes`].
 
 mod body;
@@ -32,6 +33,7 @@ pub fn parse(data: &[u8]) -> Result<ModelIr> {
     ir.notes = notes(&hdr, &lay);
     if lay.inline_vertices {
         face::tables(&r, &hdr, &mut ir)?;
+        ir.pose_params = crate::seq::pose_param_table(&r, hdr.span(lay.pose_params))?;
         geometry::attach(&r, &hdr, &lay, &mut ir)?;
     }
     Ok(ir)
@@ -71,8 +73,8 @@ fn notes(hdr: &LegacyHeader, lay: &Layout) -> Vec<String> {
         (lay.pose_params, "pose parameters"),
     ];
     for (slot, what) in sections {
-        // 2531 decodes its flex tables (see `face`).
-        if lay.inline_vertices && slot == lay.flex_ctrls {
+        // 2531 decodes its flex tables (see `face`) and pose parameters.
+        if lay.inline_vertices && (slot == lay.flex_ctrls || slot == lay.pose_params) {
             continue;
         }
         let n = hdr.int(slot);

@@ -1,6 +1,8 @@
 use super::header::LegacyHeader;
 use super::layout::{BoneShape, Layout};
+use crate::anim::math::quat_to_euler;
 use crate::ir::Bone;
+use crate::procbones;
 use crate::read::{mat3x4, name_at, quat, table, vec3, Source};
 use crate::Result;
 use prybar_io::Cursor;
@@ -63,20 +65,24 @@ fn bone_2531(r: &Source, at: usize) -> Result<Bone> {
         rotation_scale: vec3(&mut c)?,
         ..Bone::default()
     };
+    // SMD and $definebone take euler angles.
+    b.rotation = quat_to_euler(b.quat);
     c.bytes(4)?;
     b.pose_to_bone = mat3x4(&mut c)?;
-    tail(r, at, &mut c, &mut b)?;
+    let rule = tail(r, at, &mut c, &mut b)?;
     b.contents = c.read()?;
+    b.procedural = procbones::parse(r, at, rule, 2531)?;
     b.name = name_at(r, at, name_rel)?;
     Ok(b)
 }
 
-/// Procedural rules are skipped: their legacy structs are not decoded.
-fn tail(r: &Source, at: usize, c: &mut Cursor, b: &mut Bone) -> Result<()> {
+/// Returns the procedural rule `(type, index)`; only 2531 decodes it,
+/// the v27-v37 rule structs are unknown.
+fn tail(r: &Source, at: usize, c: &mut Cursor, b: &mut Bone) -> Result<(i32, i32)> {
     b.flags = c.read()?;
-    c.bytes(8)?;
+    let rule = (c.read()?, c.read()?);
     b.physics_bone = c.read()?;
     let surface_rel: i32 = c.read()?;
     b.surface_prop = name_at(r, at, surface_rel)?;
-    Ok(())
+    Ok(rule)
 }
