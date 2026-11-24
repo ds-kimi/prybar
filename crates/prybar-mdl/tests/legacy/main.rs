@@ -6,6 +6,7 @@ mod geometry;
 mod hostile;
 mod inline;
 mod records;
+mod rig;
 mod vtx107;
 
 use prybar_mdl::{detect, inspect, parse, Family};
