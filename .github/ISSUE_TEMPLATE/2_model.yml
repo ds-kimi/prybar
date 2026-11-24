@@ -1,0 +1,44 @@
+name: Model decompile or compile problem
+description: A model decompiles wrong, fails to recompile, or loses data
+labels: ["bug", "area: mdl", "needs triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Never attach copyrighted game files (models, packages, textures). Describe where the file comes from (game, path inside the package) instead. Redact private paths and usernames.
+
+  - type: input
+    id: mdl-version
+    attributes:
+      label: MDL version
+      description: The `version` field from `prybar --json inspect <model.mdl>`.
+      placeholder: "49"
+    validations:
+      required: true
+  - type: input
+    id: file
+    attributes:
+      label: Which model
+      description: Game and path, e.g. `hl2/pak01_dir.vpk:models/props_c17/oildrum001.mdl`.
+    validations:
+      required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: What is wrong
+      description: Missing bones, broken QC line, studiomdl error, wrong flexes...
+    validations:
+      required: true
+  - type: textarea
+    id: roundtrip
+    attributes:
+      label: Roundtrip result
+      description: Did decompile then `prybar compile` work? Paste the studiomdl error if not.
+      render: shell
+  - type: input
+    id: version
+    attributes:
+      label: prybar version
+      description: Output of `prybar --version`.
+    validations:
+      required: true

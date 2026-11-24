@@ -1,0 +1,58 @@
+name: Bug report
+description: prybar crashed, failed, or produced wrong output
+labels: ["bug", "needs triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Never attach copyrighted game files (models, packages, textures). Describe where the file comes from (game, path inside the package) instead. Redact private paths and usernames.
+
+  - type: textarea
+    id: summary
+    attributes:
+      label: What happened
+      description: Expected result vs actual result.
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: prybar version
+      description: Output of `prybar --version`.
+      placeholder: prybar 0.1.0
+    validations:
+      required: true
+  - type: input
+    id: os
+    attributes:
+      label: OS
+      placeholder: macOS 15 arm64, Windows 11 x64, Ubuntu 24.04
+    validations:
+      required: true
+  - type: dropdown
+    id: surface
+    attributes:
+      label: Surface
+      options: [GUI, CLI, MCP server]
+      multiple: true
+    validations:
+      required: true
+  - type: input
+    id: game
+    attributes:
+      label: Game
+      placeholder: Garry's Mod, TF2, VTMB...
+  - type: textarea
+    id: steps
+    attributes:
+      label: Command or steps
+      description: The exact command, MCP tool call, or GUI clicks.
+      render: shell
+    validations:
+      required: true
+  - type: textarea
+    id: output
+    attributes:
+      label: Output
+      description: The `--json` output, MCP error, or log. Redact private paths.
+      render: json

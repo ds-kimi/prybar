@@ -1,0 +1,27 @@
+name: Game support request
+description: Ask for support of a game, engine branch, or format version
+labels: ["enhancement", "area: game", "needs triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Never attach copyrighted game files (models, packages, textures). Describe where the file comes from (game, path inside the package) instead. Redact private paths and usernames.
+
+  - type: input
+    id: game
+    attributes:
+      label: Game
+    validations:
+      required: true
+  - type: textarea
+    id: formats
+    attributes:
+      label: Formats and versions
+      description: MDL version from `prybar --json inspect`, package type, file signatures. Paste the error prybar gives.
+    validations:
+      required: true
+  - type: textarea
+    id: references
+    attributes:
+      label: References
+      description: Other tools that handle it, format docs, the game's SDK.
