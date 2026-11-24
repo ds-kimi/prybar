@@ -1,4 +1,6 @@
-use super::fixture::{json, model, prybar};
+mod tree;
+
+use crate::fixture::{json, model, prybar};
 use std::path::Path;
 use tempfile::tempdir;
 

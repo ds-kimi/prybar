@@ -16,6 +16,8 @@ pub fn decompile(a: &DecompileArgs, out: &Output) -> Result<u8> {
         out: a.out.clone(),
         recursive: a.recursive,
         split_qc: a.split_qc,
+        flat: a.flat,
+        with_includes: !a.no_includes,
     };
     let report = model::decompile(&a.inputs, &opts, &|m| {
         out.progress(&format!("decompiling {m}"))
@@ -50,12 +52,18 @@ fn text(r: &DecompileReport) -> String {
             m.out_dir.display(),
             m.files
         );
+        if let Some(from) = &m.included_from {
+            let _ = writeln!(s, "     included by {from}");
+        }
         for n in &m.notes {
             let _ = writeln!(s, "     note: {n}");
         }
     }
     for f in &r.failures {
         let _ = writeln!(s, "fail {}: {}", f.input, f.error);
+    }
+    for w in &r.warnings {
+        let _ = writeln!(s, "warn {w}");
     }
     s
 }

@@ -7,7 +7,7 @@ prybar [--json] [--quiet] <command> [args]
 | Command | What it does |
 |---|---|
 | `inspect <model>` | Version, bones, meshes, materials, sequences of one model |
-| `decompile <inputs>... -o <dir> [-r] [--split-qc]` | QC + SMD + VTA + VRD (+ GoldSrc BMP textures), one subfolder per model, models in parallel |
+| `decompile <inputs>... -o <dir> [-r] [--split-qc] [--flat] [--no-includes]` | QC + SMD + VTA + VRD (+ GoldSrc BMP textures), one subfolder per model mirroring the source tree, `$includemodel` models too, models in parallel |
 | `list <package> [--filter <wildcard>] [--limit <n>]` | Entries of a VPK, GMA, APK or HFS |
 | `unpack <package> -o <dir>` | Extract every entry |
 | `pack <dir> -o <out.vpk\|out.gma> [--vpk-version 1\|2] [--chunk-size <bytes>]` | Build a VPK or GMA |
@@ -40,6 +40,22 @@ Vampire: Bloodlines (MDL 2531) keeps its vertices in the `.mdl` and needs
 only the `.dx80.vtx` (or `.dx7_2bone.vtx`) for triangles; there is no `.vvd`. A
 missing or broken companion becomes a `notes` entry; the model is still
 decompiled.
+
+Each model's folder sits at its path relative to the input (the folder,
+the wildcard's folder, or the package prefix), so the source tree is
+mirrored and `a/crate.mdl` and `b/crate.mdl` never meet:
+`decompile models -r -o out` writes `out/props/crate/`. A model found
+through an `$includemodel` outside that tree keeps its game path
+(`out/models/humans/male_shared/`). `--flat` puts every model in
+`<out>/<name>/` instead; a clash there gets `_2`, `_3`... and a
+`warnings` entry, never an overwrite.
+
+Models named by `$includemodel` (shared `*_animations`, `*_gestures`,
+`*_postures` models) are decompiled too, once per run, and carry
+`included_from` in the report. They are looked up in the same package,
+under every folder above the model (the game folder), the input folder,
+and next to the model. One that is not found is a `warnings` entry, not
+a failure. `--no-includes` turns this off.
 
 ## Output
 

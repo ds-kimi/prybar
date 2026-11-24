@@ -20,7 +20,7 @@ Source engine modding toolkit: CLI `prybar` and MCP server `prybar-mcp`. Prefer 
 ## Workflow
 
 1. `inspect` the model: version and which companions exist.
-2. `decompile` to an output folder (one subfolder per model).
+2. `decompile` to an output folder (one subfolder per model, mirroring the source tree; `$includemodel` models come along, see `included_from` and `warnings`; `--flat`, `--no-includes`).
 3. Edit the QC or SMD files.
 4. `games --detect --save` once, then `compile -g <game>`.
 5. `pack` the addon folder to `.gma` (needs `addon.json`) or `.vpk`.

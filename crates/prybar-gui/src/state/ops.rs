@@ -53,6 +53,8 @@ impl AppState {
             out,
             recursive: true,
             split_qc: self.split_qc,
+            flat: false,
+            with_includes: true,
         };
         let work = move || {
             prybar_service::model::decompile(&[arg], &opts, &|_| {}).map_err(|e| e.to_string())
@@ -86,11 +88,16 @@ impl AppState {
 
 /// Keeps the report for the decompile screen and words the toast.
 fn decompiled(state: &mut AppState, report: DecompileReport) -> String {
-    let msg = format!(
+    let mut msg = format!(
         "Decompiled {} model(s), {} failed",
         report.models.len(),
         report.failures.len()
     );
+    // Missing includes and renamed folders are not failures but the
+    // user still needs to know the output is not exactly what they asked.
+    if !report.warnings.is_empty() {
+        msg.push_str(&format!(", {} warning(s)", report.warnings.len()));
+    }
     state.last_decompile = Some(report);
     msg
 }

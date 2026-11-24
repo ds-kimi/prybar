@@ -20,7 +20,8 @@ fn decompile_from_inside_a_vpk() {
     cmd.args(["decompile", &folder, "-o", s(&out)]);
     let r = json(cmd, 0);
     assert!(r["models"][0]["notes"].is_null(), "{r}");
-    assert!(out.join("models/crate").is_dir());
+    // Relative to the `models` prefix the ref named, like a disk folder.
+    assert!(out.join("crate").is_dir());
 }
 
 #[test]

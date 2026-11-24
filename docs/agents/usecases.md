@@ -29,7 +29,7 @@ MCP: `decompile_model {"inputs": ["/abs/crate.mdl"], "out": "/abs/work"}`, then 
 
 ## Find and decompile models inside a package
 
-Output keeps the inner path: `out/models/props/crate/crate.qc` (loose files give `out/<name>/<name>.qc`).
+Output mirrors the tree under the ref's prefix: `pak01_dir.vpk:models/props` gives `out/crate/`, `out/wood/box/`... (a whole package, `pak01_dir.vpk:`, gives `out/models/props/crate/`). `--flat` (MCP `flat: true`) gives `out/<name>/` per model.
 
 ```sh
 prybar list pak01_dir.vpk --filter "models/props/*.mdl" --limit 20
@@ -68,7 +68,17 @@ Folders, wildcards and many inputs run in parallel. A bad model never stops the 
 prybar decompile "models/*.mdl" other_dir -o out -r --json
 ```
 
-Check `failures` in the report. Exit 0 means all done, 7 some failed, otherwise the shared failure code (see `errors.md`).
+Check `failures` in the report. Exit 0 means all done, 7 some failed, otherwise the shared failure code (see `errors.md`). The output mirrors each input's folder tree.
+
+## Decompile a model with its shared animations
+
+Characters often pull their sequences from other models through `$includemodel` (`models/humans/male_shared.mdl`, `*_gestures.mdl`). They are decompiled with the model by default, once per run:
+
+```sh
+prybar decompile "hl2_misc_dir.vpk:models/humans/group01/male_01.mdl" -o out --json
+```
+
+Included models carry `included_from`; ones that cannot be found are listed in `warnings`. MCP: `decompile_model` does the same (`with_includes: false` to skip).
 
 ## Update my addon's description with a changelog
 

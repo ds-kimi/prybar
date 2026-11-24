@@ -14,7 +14,7 @@ shared `prybar-service` crate.
 | Tool | Does |
 |---|---|
 | `inspect_model` | header summary of one model, no files written |
-| `decompile_model` | 1-64 inputs (files, folders, packages, `pkg:inner`, wildcards) to QC/SMD/VTA/VRD; counts + first 50 results/failures |
+| `decompile_model` | 1-64 inputs (files, folders, packages, `pkg:inner`, wildcards) to QC/SMD/VTA/VRD in a tree mirroring the source (`flat: true` for one folder per name), with `$includemodel` models (`with_includes`, default true); counts + first 50 results/failures/warnings |
 | `list_package` | sorted entries; `filter`, `limit` (default 200, max 5000); `total` counts all |
 | `unpack_package` | extract a whole package; returns the file count |
 | `pack_package` | folder to `.vpk` (v1/v2, chunks) or `.gma` (needs `addon.json`) |

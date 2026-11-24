@@ -6,7 +6,7 @@ Prybar decompiles and packages Source engine content (MDL 04-53, VPK, GMA, APK, 
 
 ```sh
 prybar --json inspect <model.mdl>
-prybar --json decompile <inputs...> -o <dir> [-r] [--split-qc]
+prybar --json decompile <inputs...> -o <dir> [-r] [--split-qc] [--flat] [--no-includes]
 prybar --json list <package> [--filter "models/*.mdl"] [--limit N]
 prybar --json unpack <package> -o <dir>
 prybar --json pack <dir> -o <out.vpk|out.gma>

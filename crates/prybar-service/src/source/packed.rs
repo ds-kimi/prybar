@@ -45,3 +45,17 @@ pub fn mdl_stem(path: &str) -> Option<&str> {
         .eq_ignore_ascii_case(".mdl")
         .then_some(stem)
 }
+
+/// The folder part of a package ref: what the mirrored tree is relative
+/// to. A wildcard or a single `.mdl` count from their parent folder.
+pub fn packed_root(inner: &str) -> String {
+    let inner = inner.trim_matches('/');
+    let is_folder = !has_wildcard(inner) && !inner.to_ascii_lowercase().ends_with(".mdl");
+    // Only the literal folders before the first wildcard are a root.
+    let head = inner.get(..inner.find(['*', '?']).unwrap_or(inner.len()));
+    match (is_folder, head.unwrap_or("").rfind('/')) {
+        (true, _) => inner.to_owned(),
+        (false, Some(i)) => inner.get(..i).unwrap_or("").to_owned(),
+        (false, None) => String::new(),
+    }
+}

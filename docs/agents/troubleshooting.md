@@ -21,7 +21,7 @@ Read the returned log. Frequent causes:
 
 - A missing SMD: the QC is not next to its SMD files. Compile from the decompile output folder.
 - Bone or vertex limits: studiomdl caps them; reduce in the SMD.
-- A `$sequence` naming an animation that was not decompiled: the animation lives in an `.ani` or an include model. Decompile with all companions in the same folder.
+- A `$sequence` naming an animation that was not decompiled: the animation lives in an `.ani` or an include model. Decompile with all companions in the same folder, and keep includes on (the default) so the `$includemodel` models are decompiled too; check `warnings` for ones that were not found.
 
 ## Decompile output looks wrong
 
@@ -29,7 +29,7 @@ Read the returned log. Frequent causes:
 
 ## Limits
 
-- 64 inputs per `decompile_model`; the reply shows the first 50 results and failures, the rest is on disk.
+- 64 inputs per `decompile_model`; the reply shows the first 50 results, failures and warnings, the rest is on disk.
 - `list_package` returns 200 entries by default and at most 5000; `total` counts every match.
 - Spec and config files over 1 MiB are refused.
 - HFS `.comp` entries are listed, not extracted.
