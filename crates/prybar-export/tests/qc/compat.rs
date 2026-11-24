@@ -31,3 +31,12 @@ fn ragdoll_with_concave_bone_gets_per_joint_flag() {
     };
     assert!(text.contains("$concaveperjoint"));
 }
+
+#[test]
+fn bloodlines_phoneme_filter_round_trips_to_qc() {
+    let mut ir = super::fixture::ir();
+    let qc = |ir: &prybar_mdl::ModelIr| qc_files(ir, &Names::new(ir), QcOptions::default());
+    assert!(!qc(&ir)[0].text.contains("$phonemefilter"));
+    ir.phoneme_filter = [0.1, 0.3];
+    assert!(qc(&ir)[0].text.contains("$phonemefilter 0.1 0.3\n"));
+}

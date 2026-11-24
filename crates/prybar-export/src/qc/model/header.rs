@@ -1,4 +1,4 @@
-use crate::qc::fmt::{quote, vec3};
+use crate::qc::fmt::{num, quote, vec3};
 use crate::qc::sanitize::{balanced, game_path};
 use prybar_mdl::ModelIr;
 use std::fmt::Write;
@@ -33,6 +33,11 @@ pub fn write(s: &mut String, ir: &ModelIr) {
     let _ = writeln!(s, "$illumposition {}", vec3(ir.illum_position));
     let _ = writeln!(s, "$eyeposition {}", vec3(ir.eye_position));
     boxes(s, ir);
+    // Only MDL 2531 stores the speech crossfade window.
+    if ir.phoneme_filter != [0.0; 2] {
+        let [min, max] = ir.phoneme_filter;
+        let _ = writeln!(s, "$phonemefilter {} {}", num(min), num(max));
+    }
     for m in &ir.include_models {
         let _ = writeln!(s, "$includemodel {}", game_path(&m.path));
     }
