@@ -52,3 +52,8 @@ Without it the build is "not configured": the notice and Settings › Privacy st
 - Nothing is queued before the first-launch notice is answered. "Turn off" (notice or Settings) deletes the outbox at once.
 - `DO_NOT_TRACK=1`, `PRYBAR_TELEMETRY=0` or `CI` set: nothing is sent, whatever the setting.
 - The CLI and MCP server send no analytics.
+
+## Maintainer view
+
+- Browser: `https://prybar-telemetry.progamerkimi.workers.dev/crashes` with the token as a Bearer header (crash reports).
+- Scripts and AI agents: `sh scripts/telemetry/stats.sh [summary|daily|crashes|all]` prints one JSON document (`summary` = the public numbers, `daily` = raw counters for 90 days, `crashes` = last 200 sanitized crash reports with frames). The token comes from `PRYBAR_TELEMETRY_TOKEN` or the Keychain item `prybar-telemetry-token`; without it the endpoint answers 404.

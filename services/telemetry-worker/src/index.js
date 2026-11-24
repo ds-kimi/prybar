@@ -96,10 +96,26 @@ function same(a, b) {
   return d === 0;
 }
 
-async function crashes(req, env) {
+function authed(req, env) {
   const tok = env.COLLECTOR_TOKEN;
   const got = (req.headers.get("authorization") || "").replace(/^Bearer /, "");
-  if (!tok || tok.length < 16 || !same(got, tok)) return new Response("not found", { status: 404 });
+  return Boolean(tok && tok.length >= 16 && same(got, tok));
+}
+
+// Everything the maintainer may read, as one JSON document (for scripts and agents).
+async function full(req, env) {
+  if (!authed(req, env)) return new Response("not found", { status: 404 });
+  const q = (sql) => env.DB.prepare(sql).all().then((r) => r.results);
+  const [summary, daily, crashes] = await Promise.all([data(env),
+    q("SELECT day, event, version, os, arch, count FROM daily WHERE day >= date('now','-90 days') ORDER BY day DESC, event, version"),
+    q("SELECT day, version, os, arch, message, frames FROM crashes ORDER BY id DESC LIMIT 200")]);
+  for (const c of crashes) c.frames = JSON.parse(c.frames);
+  return new Response(JSON.stringify({ summary, daily, crashes }), {
+    headers: { "content-type": "application/json", "cache-control": "no-store" } });
+}
+
+async function crashes(req, env) {
+  if (!authed(req, env)) return new Response("not found", { status: 404 });
   const rows = (await env.DB.prepare(
     "SELECT day, version, os, arch, message, frames FROM crashes ORDER BY id DESC LIMIT 100").all()).results;
   return new Response(page("Prybar crashes", `<h1>Crashes (private)</h1><div class="wrap">${table(
@@ -114,6 +130,7 @@ export default {
     if (req.method === "POST" && pathname === "/v1/event") return ingest(req, env);
     if (req.method === "GET" && (pathname === "/" || pathname === "/stats")) return stats(env);
     if (req.method === "GET" && pathname === "/stats.json") return json(env);
+    if (req.method === "GET" && pathname === "/private.json") return full(req, env);
     if (req.method === "GET" && pathname === "/crashes") return crashes(req, env);
     return new Response("not found", { status: 404 });
   },
