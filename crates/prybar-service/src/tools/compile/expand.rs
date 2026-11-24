@@ -41,7 +41,12 @@ fn one(path: &Path, recursive: bool) -> Result<Vec<PathBuf>, ServiceError> {
         .into_iter()
         .filter_map(|e| e.ok())
         .filter(|e| e.file_type().is_file())
-        .filter(|e| e.file_name().to_str().is_some_and(|n| matches(pattern, n)))
+        .filter(|e| e.file_name().to_str().is_some_and(|n| is_qc(pattern, n)))
         .map(|e| e.into_path())
         .collect())
+}
+
+/// `out/*` must not send the SMDs and VTAs next to the QC to studiomdl.
+fn is_qc(pattern: &str, name: &str) -> bool {
+    matches(pattern, name) && name.to_lowercase().ends_with(".qc")
 }

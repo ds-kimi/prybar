@@ -72,6 +72,10 @@ fn wildcard_and_missing_inputs() {
     cmd.args(["compile", s(&src.join("?.qc")), "-g", "test"]);
     assert_eq!(json(cmd, 0)["compiled"].as_u64(), Some(2));
     let mut cmd = prybar(tmp.path());
+    cmd.env("PRYBAR_WINE", "/bin/sh");
+    cmd.args(["compile", s(&src.join("*")), "-g", "test"]);
+    assert_eq!(json(cmd, 7)["items"].as_array().unwrap().len(), 3);
+    let mut cmd = prybar(tmp.path());
     let gone = src.join("gone");
     cmd.args(["compile", s(&gone), s(&src.join("*.nope")), "-g", "test"]);
     assert_eq!(json(cmd, 3)["failed"].as_u64(), Some(2));
