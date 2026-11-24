@@ -7,6 +7,7 @@ mod gmod;
 mod hostile;
 mod ik;
 mod parts;
+mod vtmb;
 
 use prybar_export::qc::{decompile_files, qc_files, Names, QcOptions};
 

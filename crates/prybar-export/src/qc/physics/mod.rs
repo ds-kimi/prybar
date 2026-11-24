@@ -1,6 +1,7 @@
 //! `$collisionmodel` (one solid) or `$collisionjoints` (ragdoll) from the
-//! `.phy` text section.
+//! `.phy` text section, plus MDL 2531 physics chains.
 
+mod chains;
 mod joints;
 
 use super::fmt::{quote, text_num};
@@ -10,7 +11,7 @@ use prybar_mdl::ModelIr;
 use std::fmt::Write;
 
 pub fn write(ir: &ModelIr, names: &Names) -> String {
-    let mut s = String::new();
+    let mut s = chains::write(ir);
     let (Some(phy), Some(file)) = (&ir.physics, &names.physics) else {
         return s;
     };
