@@ -57,6 +57,16 @@ impl AppState {
         self.decompile_batch(arg, out, cx);
     }
 
+    /// A command-line folder is the decompile screen's batch input, as
+    /// when it is dropped on the window; anything else opens.
+    pub fn open_arg(&mut self, path: PathBuf, cx: &mut Context<Self>) {
+        if path.is_dir() {
+            self.batch.folder = Some(path);
+        } else {
+            self.open(path, cx);
+        }
+    }
+
     /// Extracts every file of the selected package into `out`.
     pub fn extract_selected(&mut self, out: PathBuf, cx: &mut Context<Self>) {
         let Some(Document::Package { path, .. }) =
