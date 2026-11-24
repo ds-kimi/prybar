@@ -41,3 +41,13 @@ impl KvBlock {
             .map(|(_, v)| v.as_str())
     }
 }
+
+/// MDL 2531 (Vampire: Bloodlines) procedural physics chain: a bone driven
+/// by its parent with five tuning values (update rate, gravity, damping,
+/// spring, cone angle, as the VTMB tools name them).
+#[derive(Debug, Clone, Default, PartialEq, Serialize)]
+pub struct PhysicsChain {
+    pub bone: i32,
+    pub parent: i32,
+    pub params: [f32; 5],
+}

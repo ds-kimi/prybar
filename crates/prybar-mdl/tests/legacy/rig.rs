@@ -58,3 +58,19 @@ fn v2531_bad_rule_offset_errors_without_panic() {
     put(&mut buf, BONE + 120, 0x7fff_0000);
     assert!(parse(&buf).is_err());
 }
+
+/// One physics chain from the 2531 header slot after the surface prop.
+#[test]
+fn v2531_physics_chain_decodes() {
+    let mut buf = rigged();
+    let ints = build(2531).1;
+    const CHAIN: usize = 2000;
+    put(&mut buf, ints + 42 * 4, 1);
+    put(&mut buf, ints + 43 * 4, CHAIN as i32);
+    put(&mut buf, CHAIN + 4, -1);
+    put(&mut buf, CHAIN + 8, 30f32.to_bits() as i32);
+    put(&mut buf, CHAIN + 24, 45f32.to_bits() as i32);
+    let chain = &parse(&buf).unwrap().physics_chains[0];
+    assert_eq!((chain.bone, chain.parent), (0, -1));
+    assert_eq!(chain.params, [30.0, 0.0, 0.0, 0.0, 45.0]);
+}

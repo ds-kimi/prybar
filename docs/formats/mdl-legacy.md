@@ -52,6 +52,18 @@ SMD and `$definebone`. Bone flag 0x02 (rotation stored in model space)
 becomes a `// $vtmbbonerotation "bone" "model"` QC comment: only VTMB
 fork compilers accept the command, so uncomment it for those.
 
+2531 physics chains: header ints 42-43 (count, offset) point at 28 B
+records (bone, parent bone, five floats: update rate, gravity, damping,
+spring, cone angle). Each becomes a `// $physicschain "bone" "parent" ...`
+QC comment, for the same reason as `$vtmbbonerotation`.
+
+2531 collision: a `.phy` solid block with both `origin` and `angles`
+keys gives the pose the collision was authored in; the physics SMD
+places that solid with it (angles in degrees, pitch yaw roll) instead of
+the MDL bind. A solid with only one of the keys uses the bind; other
+versions ignore the keys. VTMB cloth
+(`.vcloth`, cloth capsules) needs a VTMB fork compiler and is not written.
+
 Not decoded, listed in `ModelIr::notes`: meshes for v27-v37 (vertex data
 lives in the MDL in old layouts), animations, sequences, flex controllers
 and pose parameters (except 2531), procedural bone rules (except 2531),

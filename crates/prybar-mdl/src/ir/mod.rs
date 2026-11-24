@@ -15,7 +15,7 @@ pub use body::{BodyPart, Mesh, SubModel};
 pub use flex::{Eyeball, Flex, FlexController, FlexOp, FlexRule, VertexDelta};
 pub use geometry::{Lod, LodMesh, Vertex};
 pub use material::{IncludeModel, Material, Texture};
-pub use physics::{ConvexPiece, KvBlock, PhysSolid, Physics};
+pub use physics::{ConvexPiece, KvBlock, PhysSolid, Physics, PhysicsChain};
 pub use procbone::{AimAt, Jiggle, ProcBone, QuatTrigger};
 pub use sequence::{AutoLayer, Event, IkLock, PoseParam, Sequence};
 pub use skeleton::{Attachment, Bone, Hitbox, HitboxSet, IkChain};
@@ -65,6 +65,9 @@ pub struct ModelIr {
     /// its QC sets with `$phonemefilter`; zero elsewhere.
     #[serde(skip_serializing_if = "is_zero_pair")]
     pub phoneme_filter: [f32; 2],
+    /// MDL 2531 `$physicschain` records; empty elsewhere.
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    pub physics_chains: Vec<PhysicsChain>,
     /// GoldSrc embedded textures, from the model or its `T.mdl`.
     #[serde(skip_serializing_if = "Vec::is_empty")]
     pub textures: Vec<Texture>,

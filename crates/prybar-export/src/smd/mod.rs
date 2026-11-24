@@ -5,6 +5,7 @@ pub(crate) mod names;
 mod phys;
 pub(crate) mod phys_math;
 mod phys_piece;
+mod phys_space;
 pub(crate) mod skeleton;
 pub(crate) mod triangles;
 

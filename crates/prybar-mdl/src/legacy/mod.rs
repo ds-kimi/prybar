@@ -1,12 +1,13 @@
 //! MDL 2531 and v27-v37: the pre-release Source formats. They predate the
 //! VVD/VTX split and many of their structs are only partly known, so the
 //! parser recovers the skeleton, markers, materials and body part names
-//! (plus meshes, vertices, flexes, eyeballs, pose parameters and
-//! procedural bones for 2531), and lists everything else in
+//! (plus meshes, vertices, flexes, eyeballs, pose parameters,
+//! procedural bones and physics chains for 2531), and lists everything else in
 //! [`ModelIr::notes`].
 
 mod body;
 mod bones;
+mod chains;
 mod face;
 mod geometry;
 mod header;
@@ -34,6 +35,7 @@ pub fn parse(data: &[u8]) -> Result<ModelIr> {
     if lay.inline_vertices {
         face::tables(&r, &hdr, &mut ir)?;
         ir.pose_params = crate::seq::pose_param_table(&r, hdr.span(lay.pose_params))?;
+        ir.physics_chains = chains::physics_chains(&r, &hdr, &lay)?;
         geometry::attach(&r, &hdr, &lay, &mut ir)?;
     }
     Ok(ir)
