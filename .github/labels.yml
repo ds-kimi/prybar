@@ -1,0 +1,31 @@
+# Labels as code. Apply with scripts/github/sync-labels.sh.
+# One color per group so the kind of label reads at a glance.
+- {name: bug, color: d73a4a, description: Something is broken}
+- {name: regression, color: b60205, description: Worked in an earlier release}
+- {name: enhancement, color: a2eeef, description: New feature or improvement}
+- {name: docs, color: 0075ca, description: Documentation}
+- {name: question, color: d876e3, description: Usage question}
+- {name: "area: mdl", color: c5def5, description: MDL decompile}
+- {name: "area: vpk", color: c5def5, description: VPK packages}
+- {name: "area: gma", color: c5def5, description: GMA packages}
+- {name: "area: compile", color: c5def5, description: studiomdl compile}
+- {name: "area: workshop", color: c5def5, description: Steam Workshop publish}
+- {name: "area: gui", color: c5def5, description: Desktop app}
+- {name: "area: cli", color: c5def5, description: Command line}
+- {name: "area: mcp", color: c5def5, description: MCP server}
+- {name: "area: update", color: c5def5, description: Self update}
+- {name: "area: game", color: c5def5, description: Game or engine branch support}
+- {name: "area: texture", color: c5def5, description: VTF textures}
+- {name: needs triage, color: fbca04, description: Not reviewed yet}
+- {name: needs repro, color: fbca04, description: Steps do not reproduce yet}
+- {name: needs sample, color: fbca04, description: Needs a file or a way to build one}
+- {name: confirmed, color: 0e8a16, description: Reproduced}
+- {name: blocked, color: 5319e7, description: Waits on something else}
+- {name: P1, color: e11d21, description: Fix first}
+- {name: P2, color: eb6420, description: Fix soon}
+- {name: P3, color: fef2c0, description: Fix when possible}
+- {name: good first issue, color: 7057ff, description: Small and well scoped}
+- {name: help wanted, color: 008672, description: Contributions welcome}
+- {name: duplicate, color: cfd3d7, description: Already reported}
+- {name: wontfix, color: ffffff, description: Will not be done}
+- {name: accessibility, color: c5def5, description: Accessibility}
