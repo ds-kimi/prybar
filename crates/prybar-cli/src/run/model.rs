@@ -18,6 +18,7 @@ pub fn decompile(a: &DecompileArgs, out: &Output) -> Result<u8> {
         split_qc: a.split_qc,
         flat: a.flat,
         with_includes: !a.no_includes,
+        cancel: None,
     };
     let report = model::decompile(&a.inputs, &opts, &|m| {
         out.progress(&format!("decompiling {m}"))

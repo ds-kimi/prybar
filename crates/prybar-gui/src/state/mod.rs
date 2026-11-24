@@ -1,6 +1,7 @@
 //! App state: what is open, where the user is,
 //! and what runs in the background.
 
+pub mod batch;
 pub mod checks;
 pub(crate) mod companions;
 mod document;
@@ -42,6 +43,8 @@ pub struct AppState {
     pub light: bool,
     /// Decompile option: one `.qci` per QC section.
     pub split_qc: bool,
+    /// Folder decompile and compile: options, items, progress.
+    pub batch: batch::Batches,
     /// Games config, compile and publish runs.
     pub tools: Tools,
     /// Release check, download and restart.

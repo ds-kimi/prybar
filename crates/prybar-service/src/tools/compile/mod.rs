@@ -3,6 +3,7 @@ mod expand;
 mod report;
 
 pub use batch::compile_batch;
+pub use expand::qc_files;
 pub use report::{CompileBatchReport, CompileItem, CompileOptions, ItemStatus};
 
 use super::{games::game, tool_error};

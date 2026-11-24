@@ -1,5 +1,7 @@
-//! Compile screen: QC, game, compile or cancel, then the streamed log.
+//! Compile screen: a QC or a folder of QCs, game, compile or cancel,
+//! then the streamed log (one QC) or the item list (a folder).
 
+mod input;
 mod log;
 
 use gpui::{div, prelude::*, px, AnyElement, Context};
@@ -17,36 +19,26 @@ pub fn view(s: &AppState, f: &Forms, t: Tokens, cx: &Context<Root>) -> AnyElemen
         .flex_col()
         .gap_4()
         .child(form(s, f, t, cx))
-        .child(log::view(s, f, t, cx))
+        .child(super::batch::view("pb-cmp", &s.batch.compile, t, cx))
+        .when(s.batch.compile.items.is_empty(), |el| {
+            el.child(log::view(s, f, t, cx))
+        })
         .into_any_element()
 }
 
-const INTRO: &str = "Build a QC with the game's studiomdl.";
+const INTRO: &str =
+    "Build a QC, or every QC in a folder, with the game's studiomdl. Drop a .qc or a folder here.";
 const NO_GAME: &str = "No game is set up yet. Detect games in Settings.";
 
 fn form(s: &AppState, f: &Forms, t: Tokens, cx: &Context<Root>) -> impl IntoElement {
-    let choose = widgets::button("pb-qc-pick", "Choose…", Kind::Secondary, true, t)
-        .tip("Pick the .qc file to compile", t)
-        .on_click(cx.listener(|this, _, _, cx| this.pick_into(this.forms.qc.clone(), false, cx)));
     div()
-        .max_w(px(520.))
+        .max_w(px(560.))
         .flex()
         .flex_col()
         .gap_3()
         .child(widgets::heading("Compile"))
         .child(div().text_color(t.muted).child(INTRO))
-        .child(
-            div()
-                .flex()
-                .items_end()
-                .gap_2()
-                .child(
-                    widgets::field("QC file", &f.qc, t)
-                        .flex_1()
-                        .debug_selector(|| "pb-qc".into()),
-                )
-                .child(choose),
-        )
+        .child(input::view(s, f, t, cx))
         .child(widgets::section("Game", t))
         .child(games(s, t, cx))
         .child(div().flex().child(actions(s, f, t, cx)))
@@ -86,25 +78,31 @@ fn games(s: &AppState, t: Tokens, cx: &Context<Root>) -> AnyElement {
 
 /// Compile needs a real QC and a game; while it runs, Cancel takes over.
 fn actions(s: &AppState, f: &Forms, t: Tokens, cx: &Context<Root>) -> AnyElement {
-    let run = &s.tools.compile;
-    if run.running {
+    if s.tools.compile.running || s.batch.compile.running {
         return widgets::button("pb-cancel", "Cancel", Kind::Secondary, true, t)
             .debug_selector(|| "pb-cancel".into())
-            .tip("Stop studiomdl", t)
-            .on_click(
-                cx.listener(|this, _, _, cx| this.state.update(cx, |s, _| s.cancel_compile())),
+            .tip(
+                "Stop studiomdl; in a folder, the QCs not started yet are skipped",
+                t,
             )
+            .on_click(cx.listener(|this, _, _, cx| {
+                this.state
+                    .update(cx, |s, _| (s.cancel_compile(), s.cancel_batch()).1)
+            }))
             .into_any_element();
     }
     let qc = f.qc.read(cx);
     let ready = !qc.text().trim().is_empty() && qc.error().is_none() && !s.tools.games.is_empty();
     widgets::button("pb-compile", "Compile", Kind::Primary, ready, t)
         .debug_selector(|| "pb-compile".into())
-        .tip("Run studiomdl on this QC for the chosen game", t)
+        .tip(
+            "Run studiomdl on this QC, or on every QC in this folder, for the chosen game",
+            t,
+        )
         .when(ready, |el| {
             el.on_click(cx.listener(|this, _, _, cx| {
                 let qc = this.forms.qc.read(cx).text().trim().into();
-                this.state.update(cx, |s, cx| s.compile(qc, cx))
+                this.state.update(cx, |s, cx| s.compile_input(qc, cx))
             }))
         })
         .into_any_element()

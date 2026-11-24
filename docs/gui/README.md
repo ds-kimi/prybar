@@ -76,8 +76,16 @@ corner of the preview. Measure on your own model with
 Open and drop files, recent files, model inspector (version, bones,
 meshes, sequences, materials, flex, body parts, companions found or missing),
 package listing with filter and extract, decompile to a folder with split QC,
+folder batches (see below),
 game list in settings and compile, live 3D preview with sequences, skins,
 body groups and LODs, texture preview with mips and alpha.
+
+Folder batches: drop a folder on the window (or use "Folder…") and the
+Decompile screen takes every model in it, keeping the folder tree and pulling
+in `$includemodel` animation models; on the Compile screen a dropped folder or
+"Folder…" compiles every `.qc` in it a few at a time. Both show the item list
+with each item's state (the reason of a failure on hover), progress, Cancel and
+"Open output". A folder given on the command line is the decompile input.
 
 Compile runs the picked game's studiomdl (through Wine or `PRYBAR_WINE` off
 Windows) with the log streamed line by line, cancel and copy. Settings

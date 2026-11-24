@@ -83,8 +83,14 @@ fn initial_state(launch: Launch, cx: &mut gpui::Context<AppState>) -> AppState {
             Err(e) => state.toast(crate::state::ToastKind::Error, format!("Sample: {e}"), cx),
         }
     }
+    // A folder argument is the decompile screen's batch input, as when
+    // it is dropped on the window.
     for path in files {
-        state.open(path, cx);
+        if path.is_dir() {
+            state.batch.folder = Some(path);
+        } else {
+            state.open(path, cx);
+        }
     }
     state
 }

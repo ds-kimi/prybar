@@ -50,3 +50,28 @@ impl Root {
         .detach();
     }
 }
+
+impl Root {
+    /// Decompile screen "Folder…": every model in it replaces the open
+    /// file as the input; a cancel changes nothing.
+    pub fn pick_batch_folder(&mut self, cx: &mut Context<Self>) {
+        let answer = cx.prompt_for_paths(PathPromptOptions {
+            files: false,
+            directories: true,
+            multiple: false,
+            prompt: Some("Choose".into()),
+        });
+        cx.spawn(async move |this, cx| {
+            let Ok(Ok(Some(paths))) = answer.await else {
+                return;
+            };
+            let _ = this.update(cx, |r, cx| {
+                r.state.update(cx, |s, cx| {
+                    s.batch.folder = paths.into_iter().next();
+                    cx.notify();
+                })
+            });
+        })
+        .detach();
+    }
+}

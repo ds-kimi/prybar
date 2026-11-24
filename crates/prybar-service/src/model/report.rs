@@ -1,5 +1,7 @@
 use serde::Serialize;
 use std::path::PathBuf;
+use std::sync::atomic::AtomicBool;
+use std::sync::Arc;
 
 #[derive(Debug, Clone, Default)]
 pub struct DecompileOptions {
@@ -13,6 +15,9 @@ pub struct DecompileOptions {
     /// Also decompile the models named by `$includemodel` (animations,
     /// gestures, postures), once each.
     pub with_includes: bool,
+    /// Set by a GUI cancel: models not started yet fail as "cancelled"
+    /// instead of running, the ones already writing finish.
+    pub cancel: Option<Arc<AtomicBool>>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
