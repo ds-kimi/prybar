@@ -8,14 +8,30 @@ use gpui::{
 
 use super::root::Root;
 use crate::actions::{Back, Open, Search};
+use crate::state::Screen;
 
 impl Root {
+    /// Files open; a folder becomes the batch input of the compile
+    /// screen when it is showing, else of the decompile screen. A `.qc`
+    /// dropped on the compile screen fills its field.
     pub fn open_paths(&mut self, paths: Vec<PathBuf>, cx: &mut Context<Self>) {
-        self.state.update(cx, |state, cx| {
-            for path in paths {
-                state.open(path, cx);
+        let compiling = self.state.read(cx).screen == Screen::Compile;
+        for path in paths {
+            let qc = path
+                .extension()
+                .is_some_and(|e| e.eq_ignore_ascii_case("qc"));
+            if compiling && (qc || path.is_dir()) {
+                let text = path.display().to_string();
+                self.forms.qc.update(cx, |i, cx| i.set_text(&text, cx));
+            } else if path.is_dir() {
+                self.state.update(cx, |s, cx| {
+                    s.batch.folder = Some(path);
+                    s.navigate(Screen::Decompile, cx);
+                });
+            } else {
+                self.state.update(cx, |s, cx| s.open(path, cx));
             }
-        });
+        }
     }
 
     /// The platform dialog answers later; a cancel or a dialog error

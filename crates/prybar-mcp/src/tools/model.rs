@@ -60,6 +60,7 @@ fn decompile_options(a: &DecompileArgs) -> prybar_service::Result<DecompileOptio
         split_qc: a.split_qc,
         flat: a.flat,
         with_includes: a.with_includes,
+        cancel: None,
     })
 }
 

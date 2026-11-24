@@ -78,7 +78,8 @@ fn main_click_paths(cx: &mut TestAppContext) {
     click(&mut cx, "pb-split");
     click(&mut cx, "pb-decompile");
     assert!(state.read_with(&cx, |s, _| s.split_qc && s.last_decompile.is_some()));
-    assert!(cx.debug_bounds("pb-result").is_some());
+    assert!(cx.debug_bounds("pb-dec-items").is_some());
+    assert!(cx.debug_bounds("pb-dec-row-0").is_some());
     state.update(&mut cx, |s, cx| s.navigate(Screen::Compile, cx));
     cx.run_until_parked();
     click(&mut cx, "pb-game-1");

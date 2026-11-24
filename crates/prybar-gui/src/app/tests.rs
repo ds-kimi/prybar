@@ -67,4 +67,16 @@ fn dropped_file_opens(cx: &mut TestAppContext) {
         assert_eq!(s.documents.len(), 1);
         assert_eq!(s.screen, Screen::Inspector);
     });
+    // A folder becomes the decompile screen's batch input.
+    let paths = ExternalPaths(vec![tmp.path().to_path_buf()].into());
+    cx.simulate_event(FileDropEvent::Entered {
+        position: at,
+        paths,
+    });
+    cx.simulate_event(FileDropEvent::Submit { position: at });
+    cx.run_until_parked();
+    state.read_with(&cx, |s, _| {
+        assert_eq!(s.screen, Screen::Decompile);
+        assert_eq!(s.batch.folder.as_deref(), Some(tmp.path()));
+    });
 }

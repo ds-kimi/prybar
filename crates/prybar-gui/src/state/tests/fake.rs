@@ -16,6 +16,7 @@ pub(crate) use super::fake_item::item;
 pub(crate) fn backend() -> Backend {
     Backend {
         compile,
+        compile_batch: super::batch::compile_batch,
         publish,
         games: |detect| Ok(games(if detect { 3 } else { 2 })),
         save: |g| Ok(vec![g]),

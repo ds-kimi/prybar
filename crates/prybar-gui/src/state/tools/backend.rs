@@ -15,6 +15,14 @@ use prybar_workshop::{Avatar, ListedItem, Progress, PublishReport, SteamStatus};
 
 pub type CompileFn =
     fn(&Game, &Path, &mut dyn FnMut(&str), &AtomicBool) -> Result<CompileReport, String>;
+/// Game, inputs, options, the "started" callback and the cancel flag.
+pub type BatchFn = fn(
+    &Game,
+    &[String],
+    &tools::CompileOptions,
+    &(dyn Fn(&str) + Sync),
+    &AtomicBool,
+) -> Result<tools::CompileBatchReport, String>;
 pub type PublishFn =
     fn(&ItemSpec, bool, &mut dyn FnMut(&Progress)) -> Result<PublishReport, String>;
 /// `true` detects installs through Steam and saves the merged list.
@@ -35,6 +43,7 @@ pub type TargetsFn = fn() -> tools::WorkshopGames;
 #[derive(Clone, Copy)]
 pub struct Backend {
     pub compile: CompileFn,
+    pub compile_batch: BatchFn,
     pub publish: PublishFn,
     pub games: GamesFn,
     pub save: SaveFn,
@@ -52,6 +61,7 @@ impl Default for Backend {
     fn default() -> Self {
         Backend {
             compile,
+            compile_batch: crate::state::batch::compile_batch,
             publish: |spec, dry, progress| {
                 tools::publish(spec, dry, progress).map_err(|e| explain(&e))
             },
@@ -74,40 +84,14 @@ impl Default for Backend {
     }
 }
 
-/// Says exactly what is missing before studiomdl is even tried, since
-/// a bare "cannot start" helps nobody on a Mac.
 fn compile(
     game: &Game,
     qc: &Path,
     on_line: &mut dyn FnMut(&str),
     cancel: &AtomicBool,
 ) -> Result<CompileReport, String> {
-    if game.studiomdl.is_none() {
-        return Err(format!(
-            "{} has no studiomdl path. Set it in Settings: it is studiomdl.exe in the game's bin folder.",
-            game.name
-        ));
-    }
-    if !cfg!(windows) && !wine_found() {
-        return Err(
-            "studiomdl is a Windows program and no Wine was found. Install Wine \
-                    (brew install --cask wine-stable) or set PRYBAR_WINE to a Proton-style \
-                    runner, then restart prybar."
-                .into(),
-        );
-    }
+    crate::state::batch::precheck(game)?;
     tools::compile_streamed(&game.name, qc, on_line, cancel).map_err(|e| e.to_string())
-}
-
-/// `PRYBAR_WINE` if set, else `wine` somewhere on PATH, the same lookup
-/// the runner does when it starts the tool.
-fn wine_found() -> bool {
-    if let Some(wine) = std::env::var_os("PRYBAR_WINE") {
-        let path = Path::new(&wine);
-        return path.is_file() || !path.is_absolute();
-    }
-    std::env::var_os("PATH")
-        .is_some_and(|paths| std::env::split_paths(&paths).any(|dir| dir.join("wine").is_file()))
 }
 
 /// Steam problems in words that say what to do next.

@@ -8,6 +8,11 @@ use crate::Result;
 use include::{next_jobs, Job};
 use rayon::prelude::*;
 use run::{first_jobs, record, Run};
+use std::sync::atomic::Ordering;
+
+/// The failure text of a model skipped by a cancel, so callers can tell
+/// it from a broken one.
+pub const CANCELLED: &str = "cancelled";
 
 /// Includes of includes are followed this deep; `done` already stops
 /// cycles, this only bounds hostile chains.
@@ -52,7 +57,7 @@ fn run_batch(
     for _ in 0..MAX_INCLUDE_DEPTH {
         let results: Vec<_> = jobs
             .par_iter()
-            .map(|j| one(origin, j, opts.split_qc, progress))
+            .map(|j| one(origin, j, opts, progress))
             .collect();
         let found = record(run, &jobs, results);
         if !opts.with_includes || found.is_empty() {
@@ -82,14 +87,23 @@ fn failure(input: &str, e: &crate::ServiceError) -> Failure {
 fn one(
     origin: Origin,
     job: &Job,
-    split_qc: bool,
+    opts: &DecompileOptions,
     progress: &(dyn Fn(&str) + Sync),
 ) -> std::result::Result<(ModelReport, Vec<String>), Failure> {
     let input = format!("{}.mdl", job.stem);
+    if opts
+        .cancel
+        .as_ref()
+        .is_some_and(|c| c.load(Ordering::Relaxed))
+    {
+        let code = crate::ExitCode::Partial as u8;
+        let error = CANCELLED.to_owned();
+        return Err(Failure { input, error, code });
+    }
     progress(&input);
     let fail = |e: crate::ServiceError| failure(&input, &e);
     let mut ir = load(origin, &job.stem).map_err(&fail)?;
-    let files = write_model(&mut ir, &job.dir, split_qc).map_err(&fail)?;
+    let files = write_model(&mut ir, &job.dir, opts.split_qc).map_err(&fail)?;
     let includes = ir.include_models.iter().map(|m| m.path.clone()).collect();
     let report = ModelReport {
         input,

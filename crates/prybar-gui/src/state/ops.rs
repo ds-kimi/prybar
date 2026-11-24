@@ -3,7 +3,6 @@
 use std::path::PathBuf;
 
 use gpui::Context;
-use prybar_service::model::{DecompileOptions, DecompileReport};
 
 use super::{AppState, Document, Screen};
 
@@ -39,27 +38,23 @@ impl AppState {
         );
     }
 
-    /// Decompiles the selected document (a model, or every model in a package).
+    /// Decompiles the picked folder, else the selected document (a
+    /// model, or every model in a package).
     pub fn decompile_selected(&mut self, out: PathBuf, cx: &mut Context<Self>) {
-        let Some(doc) = self.selected.and_then(|i| self.documents.get(i)) else {
-            return;
+        let arg = if let Some(dir) = &self.batch.folder {
+            dir.to_string_lossy().into_owned()
+        } else {
+            let Some(doc) = self.selected.and_then(|i| self.documents.get(i)) else {
+                return;
+            };
+            let mut arg = doc.path().to_string_lossy().into_owned();
+            if matches!(doc, Document::Package { .. }) {
+                // An empty inner path names every model in the package.
+                arg.push(':');
+            }
+            arg
         };
-        let mut arg = doc.path().to_string_lossy().into_owned();
-        if matches!(doc, Document::Package { .. }) {
-            // An empty inner path names every model in the package.
-            arg.push(':');
-        }
-        let opts = DecompileOptions {
-            out,
-            recursive: true,
-            split_qc: self.split_qc,
-            flat: false,
-            with_includes: true,
-        };
-        let work = move || {
-            prybar_service::model::decompile(&[arg], &opts, &|_| {}).map_err(|e| e.to_string())
-        };
-        self.run_job("Decompile".into(), work, decompiled, cx);
+        self.decompile_batch(arg, out, cx);
     }
 
     /// Extracts every file of the selected package into `out`.
@@ -84,20 +79,4 @@ impl AppState {
             cx,
         );
     }
-}
-
-/// Keeps the report for the decompile screen and words the toast.
-fn decompiled(state: &mut AppState, report: DecompileReport) -> String {
-    let mut msg = format!(
-        "Decompiled {} model(s), {} failed",
-        report.models.len(),
-        report.failures.len()
-    );
-    // Missing includes and renamed folders are not failures but the
-    // user still needs to know the output is not exactly what they asked.
-    if !report.warnings.is_empty() {
-        msg.push_str(&format!(", {} warning(s)", report.warnings.len()));
-    }
-    state.last_decompile = Some(report);
-    msg
 }

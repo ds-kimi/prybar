@@ -9,7 +9,7 @@ mod open;
 mod report;
 mod write;
 
-pub use batch::decompile;
+pub use batch::{decompile, CANCELLED};
 pub use inspect::inspect;
 pub use load::load;
 pub use open::open;
