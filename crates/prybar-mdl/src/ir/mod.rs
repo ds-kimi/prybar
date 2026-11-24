@@ -61,6 +61,10 @@ pub struct ModelIr {
     pub flex_descs: Vec<String>,
     pub flex_controllers: Vec<FlexController>,
     pub flex_rules: Vec<FlexRule>,
+    /// Speech crossfade durations `(min, max)` that MDL 2531 stores and
+    /// its QC sets with `$phonemefilter`; zero elsewhere.
+    #[serde(skip_serializing_if = "is_zero_pair")]
+    pub phoneme_filter: [f32; 2],
     /// GoldSrc embedded textures, from the model or its `T.mdl`.
     #[serde(skip_serializing_if = "Vec::is_empty")]
     pub textures: Vec<Texture>,
@@ -70,4 +74,8 @@ pub struct ModelIr {
     /// for every fully supported version.
     #[serde(skip_serializing_if = "Vec::is_empty")]
     pub notes: Vec<String>,
+}
+
+fn is_zero_pair(pair: &[f32; 2]) -> bool {
+    *pair == [0.0; 2]
 }

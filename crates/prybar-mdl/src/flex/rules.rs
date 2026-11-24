@@ -1,11 +1,9 @@
-use crate::header::{fields, Header};
 use crate::ir::{FlexOp, FlexRule};
 use crate::read::table;
 use crate::read::Source;
 use crate::Result;
 
-pub fn rules(r: &Source, hdr: &Header) -> Result<Vec<FlexRule>> {
-    let (count, index) = hdr.span(fields::FLEX_RULES);
+pub fn rules(r: &Source, (count, index): (i32, i32)) -> Result<Vec<FlexRule>> {
     table(r, 0, count, index, 12)?
         .into_iter()
         .map(|at| {

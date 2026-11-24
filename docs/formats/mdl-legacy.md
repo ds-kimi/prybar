@@ -32,6 +32,18 @@ Triangles come from VTX v107 (`.dx80.vtx`): i16 counts, 8 B mesh, 20 B
 strip group, 12 B vertex (3 bone ids, mesh vertex id at byte 10), 16 B
 strip; flag 0x10 marks static-prop groups whose vertices are bare u16 ids.
 
+2531 facial data (`legacy/face/`): header ints 1-2 are the `$phonemefilter`
+floats; flex descs, controllers and rules use the v44 records at int slots
+29, 31 and 33. Mesh words 4-5 are the flex count and mesh-relative index,
+words 6-7 the material type and parameter. A flex is 32 B (desc, 4 target
+floats, i16 count, offset, i16 type); type 0 deltas are 20 B (u16 index,
+float position, u16 normal direction + u8 length), type 1 deltas 8 B
+(u16 index, u16 position and normal directions, u8 lengths). Directions
+index the fine normal table; lengths are /255 x 8 (position) or x 2
+(normal). Eyeballs are 140 B at model words 16-17 with no material: eye i
+takes the material of the mesh with type 1 and parameter i. The QC gets
+`$phonemefilter`, `eyeball` lines and the VTA like any v44 model.
+
 Not decoded, listed in `ModelIr::notes`: meshes for v27-v37 (vertex data
-lives in the MDL in old layouts), animations, sequences, flex controllers, pose
+lives in the MDL in old layouts), animations, sequences, flex controllers (except 2531), pose
 parameters, procedural bone rules, and attachments for v27-v31.
