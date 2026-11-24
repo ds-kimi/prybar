@@ -9,7 +9,8 @@ Everything the desktop app does can be done from the CLI (`prybar --json ...`) a
 | Browse a package (search) | Package screen | `list <pkg> --filter <wildcard>` | `list_package` |
 | Extract a package | Package screen › Extract | `unpack <pkg> -o <dir>` | `unpack_package` |
 | Build a VPK or GMA | Package screen | `pack <dir> -o <out>` | `pack_package` |
-| Compile with the log | Compile screen (streamed) | `compile <qc> -g <game>` (log in the report) | `compile_model` (log in the result) |
+| Compile with the log | Compile screen (streamed) | `compile <qc> -g <game>` (log in the report) | `compile_model` `qc` (log in the result) |
+| Batch compile a folder | not yet (lot C) | `compile <dir\|*.qc>... -g <game> [-r] [-j N]` | `compile_model` `inputs`, `recursive`, `jobs` |
 | Open in hlmv | Model screen | `view <mdl> -g <game>` | `view_model` |
 | Texture preview (VTF decode, mip level) | Texture screen | `texture <vtf> -o <png> [--level]`, `texture <model> --material <m> -o <png>` | `decode_texture` |
 | 3D model preview | Model screen viewport | none: GPU-only view; `inspect` gives the data it draws | none, same reason |

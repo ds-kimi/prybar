@@ -93,7 +93,7 @@ Format of the message: `<input>: <detail>`.
 | `update check: <detail>` | `self-update` could not reach GitHub; check the network and retry |
 | `network: ...`, `no release asset for ...`, `cannot install here: ...` | `self-update` download or install failed; use the release page |
 
-A compile that ran but failed is not an MCP error: `compile_model` returns `success: false` with the studiomdl log. The CLI exits 6 for it.
+A compile that ran but failed is not an MCP error: `compile_model` returns `success: false` with the studiomdl log. The CLI exits 6 for it. In a batch, a failed QC, a missing input (`no .qc matches <arg>`) or a studiomdl that will not start is an item with `status: failed` and its `code`; the call still succeeds. `qc or inputs: expected 1 to 64 paths`: send `qc` or 1-64 `inputs`.
 
 ### partial (7) and internal (1)
 

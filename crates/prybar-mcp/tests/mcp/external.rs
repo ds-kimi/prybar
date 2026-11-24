@@ -68,3 +68,17 @@ async fn publish_workshop_lists_games_and_resolves_game_names() {
     let (err, v) = call(&c, "publish_workshop", args).await;
     assert!(!err && v["dry_run"] == true, "{v}");
 }
+
+#[tokio::test]
+async fn compile_model_batch_checks_its_inputs() {
+    let tmp = tempfile::tempdir().unwrap();
+    let c = connect().await;
+    let (err, v) = call(&c, "compile_model", json!({ "game": "g" })).await;
+    assert!(err && v["kind"] == "usage", "{v}");
+    let args = json!({ "game": "g", "inputs": ["rel/*.qc"] });
+    let (err, v) = call(&c, "compile_model", args).await;
+    assert!(err && v["error"].as_str().unwrap().contains("absolute"));
+    let args = json!({ "game": "no-such-game", "inputs": [tmp.path()], "recursive": true });
+    let (err, v) = call(&c, "compile_model", args).await;
+    assert!(err && v["kind"] == "usage", "{v}");
+}

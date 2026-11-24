@@ -1,3 +1,5 @@
+#[cfg(unix)]
+mod compile;
 mod tree;
 
 use crate::fixture::{json, model, prybar};

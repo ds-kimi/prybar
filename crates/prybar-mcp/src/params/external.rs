@@ -5,8 +5,21 @@ use serde::Deserialize;
 pub struct CompileArgs {
     /// Name of a configured game (see games_list), case-insensitive, e.g. `GarrysMod`.
     pub game: String,
-    /// Absolute path of the `.qc` file to compile with the game's studiomdl.
-    pub qc: String,
+    /// Absolute path of one `.qc` file; the reply is then the full
+    /// compile report with the studiomdl log.
+    #[serde(default)]
+    pub qc: Option<String>,
+    /// Batch mode: absolute `.qc` files, folders (every `.qc` inside) or
+    /// wildcards like `/abs/out/*.qc`. The reply is a per-QC report
+    /// (status, errors, warnings, outputs) without the logs.
+    #[serde(default)]
+    pub inputs: Vec<String>,
+    /// Batch mode: also search sub-folders of folder and wildcard inputs.
+    #[serde(default)]
+    pub recursive: bool,
+    /// Batch mode: studiomdl runs at once (default half the CPU cores).
+    #[serde(default)]
+    pub jobs: Option<usize>,
 }
 
 #[derive(Debug, Deserialize, JsonSchema)]

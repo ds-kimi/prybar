@@ -9,7 +9,10 @@ mod targets;
 mod view;
 mod workshop;
 
-pub use compile::{compile, compile_streamed};
+pub use compile::{
+    compile, compile_batch, compile_streamed, CompileBatchReport, CompileItem, CompileOptions,
+    ItemStatus,
+};
 pub use config::{config_get, config_remove, config_set, ConfigReport};
 pub use games::{games, GamesReport};
 pub use prybar_tools::config::{Game, Packer};

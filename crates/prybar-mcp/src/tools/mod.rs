@@ -2,6 +2,7 @@
 //! block would hold every tool in one file.
 
 mod check;
+mod compile;
 mod config;
 mod external;
 mod model;

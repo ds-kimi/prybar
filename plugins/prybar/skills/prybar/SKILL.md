@@ -22,7 +22,7 @@ Source engine modding toolkit: CLI `prybar` and MCP server `prybar-mcp`. Prefer 
 1. `inspect` the model: version and which companions exist.
 2. `decompile` to an output folder (one subfolder per model, mirroring the source tree; `$includemodel` models come along, see `included_from` and `warnings`; `--flat`, `--no-includes`).
 3. Edit the QC or SMD files.
-4. `games --detect --save` once, then `compile -g <game>`.
+4. `games --detect --save` once, then `compile -g <game>` on a .qc, or on the whole output folder with `-r` (per-QC report, exit 7 if some failed).
 5. `pack` the addon folder to `.gma` (needs `addon.json`) or `.vpk`.
 6. `publish --dry-run`, then `publish`. Supported Workshop games: `garrysmod` (4000, addon folder or .gma) and `tf2` (440, map folder with a .bsp); pick with `--game`, list with `publish --games`. Descriptions are Steam BBCode.
 
@@ -36,7 +36,7 @@ Recipes with exact calls: `docs/agents/usecases.md`. GUI/CLI/MCP feature table: 
 - Package inner paths: `pak_dir.vpk:models/props/crate.mdl`; folders and wildcards work too.
 - Multi-archive VPK: use the `_dir.vpk`.
 - A bad model in a batch lands in `failures`; the batch continues.
-- `compile_model` failing is `success: false` with the log, not a tool error. On success `outputs` lists the written files.
+- `compile_model` failing is `success: false` with the log, not a tool error. On success `outputs` lists the written files. Batch: `inputs` (files, folders, `*.qc`) + `recursive`, items with `status` and `errors`, no logs.
 - MCP `config_set` cannot set `studiomdl` or `hlmv` paths on purpose; use `games --detect --save` or edit the config file.
 - Descriptions are Steam BBCode, at most 7999 characters; run `check_bbcode` first. Visibility: `public`, `friendsonly`, `private`, `unlisted`.
 - Writes need `confirm: true` in MCP (`publish_workshop` without `dry_run`, `privacy` changes): ask the user first.

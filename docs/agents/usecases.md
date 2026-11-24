@@ -80,6 +80,15 @@ prybar decompile "hl2_misc_dir.vpk:models/humans/group01/male_01.mdl" -o out --j
 
 Included models carry `included_from`; ones that cannot be found are listed in `warnings`. MCP: `decompile_model` does the same (`with_includes: false` to skip).
 
+## Recompile a whole decompiled folder
+
+```sh
+prybar decompile models -r -o work --json
+prybar compile work -r -g garrysmod --json
+```
+
+Every `.qc` under `work` is compiled (`.qci` includes are not compiled on their own), at most half the cores at a time (`-j N` to change). Each item has `status` (`ok`, `failed`), the `errors` lines and the `outputs`; the logs are left out, so compile one failing QC alone to read its full log. Exit 7 when some failed. MCP: `compile_model {"game": "garrysmod", "inputs": ["/abs/work"], "recursive": true}`.
+
 ## Update my addon's description with a changelog
 
 ```sh

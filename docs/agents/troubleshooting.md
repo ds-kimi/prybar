@@ -30,6 +30,7 @@ Read the returned log. Frequent causes:
 ## Limits
 
 - 64 inputs per `decompile_model`; the reply shows the first 50 results, failures and warnings, the rest is on disk.
+- 64 inputs per batch `compile_model`; the reply lists failures first and at most 200 items, the counts stay exact.
 - `list_package` returns 200 entries by default and at most 5000; `total` counts every match.
 - Spec and config files over 1 MiB are refused.
 - HFS `.comp` entries are listed, not extracted.

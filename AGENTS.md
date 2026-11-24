@@ -11,7 +11,7 @@ prybar --json list <package> [--filter "models/*.mdl"] [--limit N]
 prybar --json unpack <package> -o <dir>
 prybar --json pack <dir> -o <out.vpk|out.gma>
 prybar --json games [--detect --save]
-prybar --json compile <file.qc> -g <game>
+prybar --json compile <qc|folder|*.qc...> -g <game> [-r] [-j N]
 prybar publish <spec.json> --dry-run
 prybar --json workshop items <game> [--search T] [--sort subscribed]
 prybar --json workshop item <game> <id>
