@@ -1,0 +1,7 @@
+CREATE TABLE IF NOT EXISTS daily (
+  day TEXT NOT NULL, event TEXT NOT NULL, version TEXT NOT NULL,
+  os TEXT NOT NULL, arch TEXT NOT NULL, count INTEGER NOT NULL,
+  PRIMARY KEY (day, event, version, os, arch));
+CREATE TABLE IF NOT EXISTS crashes (
+  id INTEGER PRIMARY KEY, day TEXT NOT NULL, version TEXT NOT NULL,
+  os TEXT NOT NULL, arch TEXT NOT NULL, message TEXT NOT NULL, frames TEXT NOT NULL);

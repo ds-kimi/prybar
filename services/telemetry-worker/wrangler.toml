@@ -1,0 +1,11 @@
+name = "prybar-telemetry"
+main = "src/index.js"
+compatibility_date = "2026-10-01"
+# No request logs: the collector keeps no addresses, and neither should its host.
+observability = { enabled = false }
+workers_dev = true
+
+[[d1_databases]]
+binding = "DB"
+database_name = "prybar-telemetry"
+database_id = "f2c74fa9-313d-424c-928e-4ee235da3ed3"

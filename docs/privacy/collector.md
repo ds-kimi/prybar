@@ -1,5 +1,7 @@
 # Analytics collector
 
+Official releases use the Cloudflare Worker in `services/telemetry-worker` (same events, same validation, D1 storage, public `/stats`, token-only `/crashes`). Deploy: `npx wrangler d1 create prybar-telemetry`, put the id in `wrangler.toml`, `npx wrangler d1 execute prybar-telemetry --remote --file schema.sql`, `npx wrangler secret put COLLECTOR_TOKEN`, `npx wrangler deploy`. The rest of this page is the self-hosted Rust version.
+
 `services/telemetry-collector` receives the GUI's two events (`app_start`, `crash`) and keeps only:
 
 - `daily`: one counter per UTC day, event, version, OS and CPU type. "Active users" is the number of `app_start` per day: an estimate of launches, not of people, because no ID exists.
